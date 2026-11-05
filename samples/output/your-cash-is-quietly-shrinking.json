@@ -1,0 +1,77 @@
+{
+  "title": "Your Cash Is Quietly Shrinking",
+  "channel": "money",
+  "duration": 42.11,
+  "voiced": false,
+  "tts": "TTS unavailable (ClientConnectorDNSError: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x7f0456) -> silent render + narration files for CapCut",
+  "style": {
+    "palette": "paper",
+    "layout": "A",
+    "caption": "pop",
+    "pacing": "steady",
+    "transition": "slide",
+    "kinetic": "pop",
+    "motif": "bars",
+    "header": "banner",
+    "chart_orientation": "h",
+    "seed": 3795952053
+  },
+  "lines": [
+    {
+      "start": 0.0,
+      "end": 5.63,
+      "speech_start": 0.3,
+      "text": "Hide ten thousand dollars in a drawer and it quietly loses almost half its value.",
+      "visual": "kinetic: Hide *$10,000* | in a drawer | and it quietly *shrinks*"
+    },
+    {
+      "start": 5.63,
+      "end": 10.73,
+      "speech_start": 6.11,
+      "text": "The thief is inflation. It works like compound interest in reverse.",
+      "visual": "stat: label=Illustrative inflation rate | value=3% | sub=of your buying power, gone every year | trend=down"
+    },
+    {
+      "start": 10.73,
+      "end": 17.43,
+      "speech_start": 11.21,
+      "text": "At three percent a year, that cash slides to about fifty five hundred dollars in twenty years.",
+      "visual": "line: title=Buying power of $10,000 at 3% inflation | x=Today,5 yrs,10 yrs,15 yrs,20 yrs | y=10000,9709,9426,9151,8885,8626,8375,8131,7894,7664,7441,7224,7014,6810,6611,6419,6232,6050,5874,5703,5537 | prefix=$ | color=bad | delta=-45% | note=Illustrative example. Not financial advice."
+    },
+    {
+      "start": 17.43,
+      "end": 23.22,
+      "speech_start": 17.91,
+      "text": "So make it earn more than inflation, like a savings account paying four percent",
+      "visual": "kinetic: Make cash *earn* | more than | *inflation*"
+    },
+    {
+      "start": 23.22,
+      "end": 28.75,
+      "speech_start": 23.7,
+      "text": "In twenty years, it grows to about twenty one thousand nine hundred dollars",
+      "visual": "bar: title=Balance after 20 years | x=Drawer,Savings at 4% | y=10000,21900 | prefix=$ | highlight=1 | note=Illustrative example. Not financial advice."
+    },
+    {
+      "start": 28.75,
+      "end": 34.65,
+      "speech_start": 29.23,
+      "text": "After inflation, it still buys about twelve thousand dollars Double the drawer.",
+      "visual": "bar: title=Buying power in today's dollars | x=Drawer,Savings at 4% | y=5500,12100 | prefix=$ | bad=0 | highlight=1"
+    },
+    {
+      "start": 34.65,
+      "end": 38.42,
+      "speech_start": 35.13,
+      "text": "Real return is your interest rate minus inflation.",
+      "visual": "kinetic: *Real return* | = interest rate | \u2212 inflation"
+    },
+    {
+      "start": 38.42,
+      "end": 42.11,
+      "speech_start": 38.9,
+      "text": "Follow for more simple money explainers.",
+      "visual": "kinetic: Follow for | more *money* | explainers"
+    }
+  ]
+}

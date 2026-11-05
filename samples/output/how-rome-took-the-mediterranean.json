@@ -1,0 +1,77 @@
+{
+  "title": "How Rome Took The Mediterranean",
+  "channel": "history",
+  "duration": 43.16,
+  "voiced": false,
+  "tts": "TTS unavailable (ClientConnectorDNSError: Cannot connect to host speech.platform.bing.com:443 ssl:<ssl.SSLContext object at 0x7f0456) -> silent render + narration files for CapCut",
+  "style": {
+    "palette": "sepia",
+    "layout": "B",
+    "caption": "serif",
+    "pacing": "cinematic",
+    "transition": "push",
+    "kinetic": "stack",
+    "motif": "paper",
+    "header": "chip",
+    "chart_orientation": "v",
+    "seed": 2421479886
+  },
+  "lines": [
+    {
+      "start": 0.0,
+      "end": 6.11,
+      "speech_start": 0.3,
+      "text": "One small city in Italy grew into an empire that ruled the entire Mediterranean.",
+      "visual": "map: year=264 BC | view=italy>empire | cities=Rome | label=Rome rises"
+    },
+    {
+      "start": 6.11,
+      "end": 11.57,
+      "speech_start": 6.76,
+      "text": "Then it fought Carthage, in North Africa, for over a century.",
+      "visual": "map: year=264 BC | view=west_med | route=Rome > Carthage | label=The Punic Wars"
+    },
+    {
+      "start": 11.57,
+      "end": 17.76,
+      "speech_start": 12.22,
+      "text": "In 218 BC, Hannibal marched elephants over the Alps and nearly broke Rome.",
+      "visual": "map: year=218 BC | view=west_med | route=Carthago Nova > Pyrenees > Alps > Po Valley > Cannae | label=Hannibal's march"
+    },
+    {
+      "start": 17.76,
+      "end": 24.18,
+      "speech_start": 18.41,
+      "text": "Rome won anyway. By 133 BC, it held Spain, North Africa, and Greece.",
+      "visual": "map: year=133 BC | view=med"
+    },
+    {
+      "start": 24.18,
+      "end": 28.32,
+      "speech_start": 24.83,
+      "text": "Julius Caesar then added Gaul, today's France.",
+      "visual": "map: year=44 BC | view=europe | cities=Rome"
+    },
+    {
+      "start": 28.32,
+      "end": 34.1,
+      "speech_start": 28.97,
+      "text": "At its peak in 117 AD, the empire stretched from Britain to Egypt.",
+      "visual": "map: year=117 AD | view=wide>empire | label=Greatest extent | note=Shown by modern country. Borders approximate."
+    },
+    {
+      "start": 34.1,
+      "end": 38.55,
+      "speech_start": 34.75,
+      "text": "Tens of millions of people lived under Roman rule.",
+      "visual": "stat: label=People under Roman rule | value=50\u201370M | sub=Common scholarly estimate at its peak"
+    },
+    {
+      "start": 38.55,
+      "end": 43.16,
+      "speech_start": 39.2,
+      "text": "Follow for more maps that make history move.",
+      "visual": "kinetic: Follow for | maps that make | *history* move"
+    }
+  ]
+}
