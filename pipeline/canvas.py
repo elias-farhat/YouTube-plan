@@ -199,6 +199,13 @@ class Canvas:
     def text(self, x, y, s, size, font="bold", fill=(255, 255, 255, 255), anchor="la",
              stroke=0, stroke_fill=None, shadow=None):
         S = self.S
+        # Pillow draws alpha-0 text as fully OPAQUE in RGBA mode, so skip invisible text explicitly
+        if len(fill) == 4 and fill[3] < 2:
+            return
+        if stroke and stroke_fill is not None and len(stroke_fill) == 4 and stroke_fill[3] < 2:
+            stroke = 0
+        if shadow and len(shadow[2]) == 4 and shadow[2][3] < 2:
+            shadow = None
         f = _font(font, round(size * S))
         if shadow:
             dx, dy, col = shadow

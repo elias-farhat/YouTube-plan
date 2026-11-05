@@ -55,6 +55,18 @@ class StyleTests(unittest.TestCase):
             pick_style("space", 5, {"palette": "nope"})
 
 
+class CanvasTests(unittest.TestCase):
+    def test_transparent_text_is_invisible(self):
+        # Pillow draws alpha-0 text opaque in RGBA mode; Canvas.text must guard against it
+        import numpy as np
+        from PIL import Image
+        from pipeline.canvas import Canvas
+        bg = (200, 220, 210)
+        cv = Canvas(Image.new("RGB", (400, 200), bg), 1)
+        cv.text(10, 10, "HELLO", 60, "black", (0, 0, 0, 0), stroke=4, stroke_fill=(255, 255, 255, 0))
+        self.assertEqual(int((np.asarray(cv.img) != np.array(bg)).any(2).sum()), 0)
+
+
 class TTSFallbackTests(unittest.TestCase):
     def test_auto_falls_back_to_silent_when_tts_fails(self):
         orig = tts.synth_edge
