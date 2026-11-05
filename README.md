@@ -1,128 +1,109 @@
-# YouTube Shorts pipeline: money · space · history
+# Faceless Shorts factory: Remotion + Manim
 
-Script file in → **1080×1920 MP4 (30–50 s) with burned-in, word-highlighted captions** out.
-Pure Python (Pillow + numpy) for the animation, ffmpeg for encoding. No manim, no stock footage, nothing to download at render time.
+One YAML script in `scripts/<channel>/` → one **1080×1920, 30–50 s MP4 with burned-in captions** in `output/`.
 
-| Channel | Template | Scene vocabulary |
+| Channel | Engine | Look |
 |---|---|---|
-| `money` | animated charts + kinetic text | `kinetic`, `stat`, `line`, `bar` |
-| `space` | 2D motion graphics (shaded planets, light pulses, orbits) | `kinetic`, `stat`, `lightbeam`, `lightscale`, `orbit`, `sizes` |
-| `history` | animated maps (Natural Earth, Mercator) with territory ripples, routes, year counter | `kinetic`, `stat`, `map` (alias `route`) |
-
-## Quick start
+| `money` | **Remotion** (React) | animated line/bar charts, count-up numbers, bold kinetic text; dark background, green/gold accents |
+| `space` | **Manim CE** (+ Remotion for captions) | 2D motion graphics: shaded planets, orbits, a light pulse with live timer, scale comparisons, counters |
+| `history` | **Remotion** | animated Mercator map: a sweeping frontier that conquers territory (marching-dash borders), animated routes, pins, labels, year counter |
 
 ```bash
-pip install -r requirements.txt          # Pillow, numpy, edge-tts ; ffmpeg must be on PATH
-./run_samples.sh                         # renders the 3 samples into samples/output/
-python -m pipeline render my_script.txt -o output/
+npm install                 # Remotion, React, js-yaml ... (also needs ffmpeg on PATH)
+npm run setup               # creates .venv with Manim, edge-tts, Piper
+npm run render all          # every script in scripts/*/   ->  output/
+npm run render money        # one channel
+npm run render scripts/space/sunlight-delay.yaml   # one script
 ```
 
-Useful commands:
+Handy extras: `npm run check` (parse every script, estimate length, show the chosen look, no render), `npm test`, `npm run studio` (Remotion preview; the CLI injects real props, the studio shows a placeholder), and the dev flag `npm run render money -- --stills 3,12,25` which writes PNG stills to `build/<video>/stills/`.
 
-```bash
-python -m pipeline check  my_script.txt            # parse + estimated length + chosen look (instant)
-python -m pipeline stills my_script.txt -o stills  # one PNG per line, to review the design fast
-python -m pipeline render my_script.txt --scale 1  # 4x faster draft render (no supersampling)
-python -m pipeline render my_script.txt --set palette=ember,layout=B,caption=bar
-python -m pipeline render my_script.txt --tts none # force silent
-python -m pipeline render my_script.txt --no-captions
+## Next week's video
+
+1. Copy a script: `cp scripts/money/coffee-habit.yaml scripts/money/my-topic.yaml`
+2. Edit `title`, `hook`, `lines`.
+3. `npm run check` (fits 30–50 s?) then `npm run render money`.
+
+Outputs: `output/<channel>_<slug>.mp4` plus `.narration.txt`, `.cues.txt`, `.srt`.
+
+## Script format (YAML)
+
+```yaml
+title: The $5 Habit That Costs You $172,000
+hook: "Your daily coffee costs {$172,000|one hundred seventy two thousand dollars}."   # first ~2 s, spoken + shown huge
+seed: 3                                    # optional: pins the look (default: hash of the title)
+style: {palette: lime_gold, layout: B}     # optional: pin any part of the look
+handle: "@MyChannel"                       # optional watermark
+voice: en-US-GuyNeural                     # optional edge-tts voice
+lines:
+  - say: "Five dollars a day sounds like nothing."
+    visual: {type: kinetic, text: ["*$5* a day", "sounds like", "*nothing*"]}
+  - say: "But that is {$1,825|eighteen twenty five dollars} every single year."
+    visual: {type: stat, label: "Five dollars a day", from: 0, to: 1825, prefix: "$", trend: down}
 ```
 
-A render takes about 45–70 s per video on 4 cores (2× supersampled for smooth edges).
+* `hook`: ≤ 8 words. It becomes a ~2 s opening scene: the sentence as giant kinetic text (captions are replaced by that text).
+* `say`: narration for one scene. `{shown|spoken}` shows `$172,000` on screen but speaks "one hundred seventy two thousand dollars"; punctuation right after `}` stays attached.
+* `visual`: omit it and the line gets auto kinetic text. `note:` adds a small footnote under the visual.
+* The script must land in **30–50 s** (the renderer tells you how many words to add/cut; `--any-length` overrides).
 
-## Script format
+### Visual types
 
-```text
-title: Your Cash Is Quietly Shrinking
-channel: money                    # money | space | history
-seed: 3                           # optional - pins the look (default: hash of the title)
-style: palette=ember layout=B     # optional - pin any part of the look
-handle: @YourChannel              # optional watermark text
-voice: en-US-GuyNeural            # optional Edge TTS voice
----
-Hide {$10,000|ten thousand dollars} in a drawer and it quietly loses almost half its value.
-> kinetic: Hide *$10,000* | in a drawer | and it quietly *shrinks*
-
-The thief is inflation.
-> stat: label=Inflation | value=3% | sub=lost every year | trend=down
-```
-
-* **Narration line** = one scene. Its duration is the spoken length of the line (real TTS audio length, or an estimate when silent).
-* `{shown|spoken}` shows `$10,000` in the captions but speaks "ten thousand dollars" (TTS + timing). Punctuation right after `}` stays attached.
-* **Visual note** `> kind: arg | arg | key=value` (optional; lines without one get auto kinetic text). `*word*` highlights in kinetic text. `note=...` adds a small footnote under the visual.
-* Total length must land in **30–50 s** (guard rail; `--any-length` skips it). `python -m pipeline check` tells you the estimate and roughly how many words to cut/add.
-
-### Visual notes
-
-| channel | note | options |
+| channel | type | fields |
 |---|---|---|
-| all | `kinetic: row \| row \| row` | rows split by `\|`, `*highlight*` |
-| all | `stat:` | `label`, `value` **or** `from`+`to` (counts), `prefix`, `suffix`, `decimals`, `sub`, `trend=up\|down` |
-| money | `line:` | `title`, `x=a,b,c` (tick labels), `y=1,2,3…`, `prefix`, `suffix`, `color=accent\|bad\|good`, `delta=-45%` |
-| money | `bar:` | `title`, `x=…`, `y=…`, `prefix`, `suffix`, `highlight=1`, `bad=0`, `orient=v\|h` |
-| space | `lightbeam:` | `from`, `to`, `time=8:19`, `distance=149.6 million km`, `title` |
-| space | `lightscale:` | args `Earth@8.3 min \| Jupiter@43 min …`, `title` |
-| space | `orbit:` | `vanish=1` (Sun winks out, last light keeps travelling), `label` |
-| space | `sizes:` | `count=109` |
-| history | `map:` | `year=117 AD`, `from=`, `view=empire` or `italy>med` (camera move), `cities=Rome,Carthage` (or `Name@lat,lon`), `route=A > B > C`, `label`, `origin` |
+| all | `kinetic` | `text: [rows]`, `*highlight*` |
+| money, history | `stat` | `label`, `value` **or** `from`+`to` (counts), `prefix`, `suffix`, `decimals`, `sub`, `trend: up\|down` |
+| money | `line` | `title`, `x: [tick labels]`, `y: [values]`, `prefix`, `suffix`, `color: green\|gold\|red`, `delta`, `ymin` |
+| money | `bar` | `title`, `x`, `y`, `prefix`, `suffix`, `highlight: [i]`, `bad: [i]`, `orient: v\|h` |
+| space | `counter` | `label`, `from`, `to`, `prefix`, `suffix`, `decimals`, `sub` |
+| space | `orbit` | `vanish: true` (Sun winks out, its last light keeps travelling), `label` |
+| space | `lightbeam` | `from`, `to`, `time: "8:19"`, `distance: "149.6 million km"`, `title` |
+| space | `ladder` | `title`, `items: [{name, label}]` (Earth, Mars, Jupiter, Saturn, Neptune, ...), `note` |
+| space | `scale` | `big: Sun`, `small: Earth`, `count: 109` |
+| history | `map` | `year: "117 AD"`, `from`, `view: empire` or `"italy>med"` (camera move) or `lon,lat,span`, `cities: [Rome]`, `route: [A, B, C]`, `labels: [{text, at: [lon, lat]}]`, `label`, `origin` |
 
-History videos define territory once in the header, by modern country (`world_110m.json` names), and every `map: year=…` note animates it: countries gained in that year ripple in from the centre of the empire, earlier gains stay filled.
+History scripts declare territory once, by modern country (names from `data/world_110m.json`), and each `map` scene animates it:
 
-```text
-territory: 264 BC | Italy
-territory: 133 BC | Spain, Portugal, Tunisia, Greece
+```yaml
+territories:
+  - {year: 264 BC, countries: [Italy]}
+  - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece]}
 ```
 
-View presets: `italy`, `med`, `empire`, `west_med`, `east_med`, `europe`, `wide`, or `lon,lat,span_degrees`.
+A scene with `year: 133 BC` shows earlier territory solid, and the countries gained in 133 BC are conquered by a dashed frontier ring sweeping out from the heart of the empire (the borders of the new land "march" with moving dashes). `route` draws a curved, dashed, animated path with an arrowhead and waypoint chips. Places are built-in names (Rome, Carthage, Athens, Alexandria, Alps, ...) or `"Name@lat,lon"`. Presets for `view`: `italy med empire west_med east_med europe wide`.
 
-## How videos stay different
+## Variation (nothing looks mass-produced)
 
-Each channel is a *template* (fonts, chart/map language, background motif). Per video, a seed (hash of the title, or `seed:`) picks from:
+A seed (hash of the title, or `seed:`) picks, per video: **palette** (6 per channel; money is always dark with green/gold accents), **layout** `A/B/C` (visual on top / captions on top / tall visual), **pacing** (snappy, steady, cinematic: speech speed, transition length, gaps, camera push), **caption style** (3 per channel), **transition** (fade, slide, wipe, zoom, push), **kinetic animation** (pop, slide, drop, stack + pill/colour highlights), **header** (chip, line, banner), **background motif** and chart orientation. Pin any of them with `style:` in the script. `npm run check` prints the look of every script.
 
-* **palette** (6 per channel, incl. a light theme), **layout** `A/B/C` (captions below / above / low + taller visual),
-* **caption style** (3 per channel), **header** (chip / line / banner), **background motif** (3 per channel),
-* **pacing** (snappy / steady / cinematic: speech speed, transition length, gaps, camera push), **transition** (fade, slide, wipe, zoom, push),
-* **kinetic-text animation** (pop, slide, drop, stack, plus pill vs colour highlights) and **chart orientation** (vertical / horizontal bars).
+## Voice: edge-tts → Piper → silent
 
-Every part can be pinned from the script header (`style:`) or with `--set`. The chosen look is printed on render and stored in `<slug>.json`.
+`tools/tts.py` tries, in order:
 
-## Voice: TTS or CapCut
+1. **edge-tts** (free neural voices; needs internet access to Microsoft's endpoint). Gives real word timings, so captions follow the voice.
+2. **Piper** (offline). Needs a voice model: download e.g. `en_US-lessac-medium.onnx` + `.onnx.json` from <https://huggingface.co/rhasspy/piper-voices> into `models/piper/` (the script also tries to fetch it automatically).
+3. **No voice.** The video is rendered silent (with a silent audio track so uploaders accept it), captions stay burned in, and `output/<name>.narration.txt` + `.cues.txt` (start time of each line) are written for you to voice in CapCut: import the MP4 → Text → Text to speech (or record) → place each line at its cue time. Timings assume ~150 words per minute.
 
-`--tts auto` (default) tries Microsoft Edge neural voices via `edge-tts` (free, needs internet). If the network blocks it, the render **falls back to a silent MP4** (with a silent audio track so editors/uploaders accept it) and writes everything you need to add a voice yourself. In this repo's samples that fallback was used, because the build sandbox could not reach the TTS service.
+Force a mode with `npm run render money -- --tts none|edge|piper`.
 
-Next to every `<slug>.mp4` you get:
-
-| file | use |
-|---|---|
-| `<slug>.narration.txt` | the full voice-over text (numbers written the way they should be spoken) |
-| `<slug>.cues.txt` | `[mm:ss.s] line`: when each narration line should start |
-| `<slug>.srt` | the burned-in captions as timed subtitles |
-| `<slug>.json` | durations, chosen style, per-line timings |
-
-**CapCut workflow:** import the MP4 → Text → *Text to speech* (or record your own) for each line in `cues.txt`, starting it at the cue time → nudge speed so each line ends before the next cue. Timings are estimated for a ~150 wpm read, so a normal TTS voice lands within a fraction of a second. If you would rather caption inside CapCut, render with `--no-captions`.
-
-When TTS works, line audio is rendered per line, mixed at the exact speech start of each scene, and the captions use the real word timings from the voice.
-
-## Layout of the repo
+## Layout
 
 ```
-pipeline/            script.py  parse the script          style.py       palettes + seeded variation
-                     tts.py     Edge TTS + fallback       timeline.py    timing (real audio or estimate)
-                     captions.py  burned-in captions      transitions.py scene-to-scene transitions
-                     backgrounds.py  motifs + header      render.py      frame loop -> ffmpeg, sidecar files
-                     scenes/    common · money · space (+ planets) · history
-                     data/world_110m.json   Natural Earth 110m countries (public domain)
-                     assets/fonts/          Inter (OFL) + DejaVu Serif
-samples/scripts/     one script per channel          samples/output/   the rendered samples
-tools/build_map_data.py   regenerate the map data     tests/            python -m unittest discover -s tests
+scripts/<channel>/*.yaml   input         output/   MP4 + narration/cues/srt
+tools/render.mjs           the one command (YAML -> TTS -> plan -> Manim/Remotion -> ffmpeg)
+tools/lib/                 script loader, seeded variation + palettes, timeline
+tools/tts.py               edge-tts / Piper bridge        tools/build_map_data.py   regenerate map data
+src/                       Remotion: Shorts.tsx (all channels), components/ (captions, chrome, background), scenes/ (money + shared), history/ (map)
+manim/space_scene.py       Manim scenes for the space channel
+data/world_110m.json       Natural Earth 110m countries (public domain)
+public/fonts/              Inter (OFL) + DejaVu Serif, bundled so renders look identical everywhere
+.agents/skills, .claude/skills   the official Remotion agent skills (npx skills add remotion-dev/skills)
 ```
 
-### Adding a scene
+## Requirements and notes
 
-Subclass `Scene` (`pipeline/scenes/base.py`), implement `draw(cv, t, dur)` (draw in 1080×1920 logical coordinates inside `self.x0..x1, self.y0..y1`; be a pure function of `t`), and register it in `pipeline/scenes/__init__.py`.
-
-## Notes and limits
-
-* History territories are drawn by **modern country** on a 110 m map, which is a deliberate simplification (the sample says so on screen). For finer borders swap in a higher-resolution dataset via `tools/build_map_data.py`.
-* The sample facts are conservative and illustrative (the money numbers are straight compound-interest arithmetic, not advice).
-* Fonts are bundled so renders are identical everywhere; Inter is SIL OFL licensed.
+* Node 20+, Python 3.10+, ffmpeg. Manim on Linux also needs Pango/Cairo dev packages (`apt install libpango1.0-dev` on Debian/Ubuntu); no LaTeX needed (text only).
+* Remotion renders with its own headless Chrome. If that download is blocked, the renderer falls back to a local Chromium (Playwright's, or set `REMOTION_BROWSER=/path/to/chrome`).
+* Rendering takes roughly 1 min (money), 2 min (history), 3 min (space) on 4 cores.
+* Remotion is free for individuals and small teams but has a company license above that size: check <https://www.remotion.dev/docs/license>.
+* History territory is drawn by modern country on a 110 m map, an intentional simplification (the sample says so on screen).

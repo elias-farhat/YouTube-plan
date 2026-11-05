@@ -1,0 +1,32 @@
+# HISTORY sample (Remotion animated map). Territory is defined by modern country (approximate) and animates by year.
+title: How Rome Took The Mediterranean
+hook: "One city took the whole Mediterranean."
+territories:
+  - {year: 264 BC, countries: [Italy]}
+  - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece, North Macedonia, Albania]}
+  - {year: 44 BC, countries: [France, Belgium, Switzerland, Slovenia, Croatia, Bosnia and Herz., Montenegro, Turkey, Cyprus, N. Cyprus, Syria, Lebanon, Israel, Palestine]}
+  - {year: 117 AD, countries: [Egypt, Libya, Algeria, Morocco, United Kingdom, Luxembourg, Austria, Hungary, Serbia, Kosovo, Romania, Bulgaria, Jordan, Iraq]}
+lines:
+  - say: "In 264 BC, Rome ruled only Italy."
+    visual: {type: map, year: 264 BC, view: "italy>empire", cities: [Rome], label: "Rome rises"}
+
+  - say: "Then it fought Carthage, a rival power across the sea, for over a century."
+    visual: {type: map, year: 264 BC, view: west_med, route: [Rome, Carthage], label: "The Punic Wars"}
+
+  - say: "In 218 BC, Hannibal marched elephants over the Alps and nearly broke Rome."
+    visual: {type: map, year: 218 BC, view: west_med, route: [Carthago Nova, Pyrenees, Alps, Po Valley, Cannae], label: "Hannibal's march"}
+
+  - say: "Rome won anyway. By 133 BC, it held Spain, North Africa, and Greece."
+    visual: {type: map, year: 133 BC, view: med, labels: [{text: Hispania, at: [-3.5, 40.2]}, {text: Africa, at: [9.5, 33.2]}, {text: Greece, at: [22.2, 39.4]}]}
+
+  - say: "Julius Caesar then added Gaul, today's France."
+    visual: {type: map, year: 44 BC, view: europe, labels: [{text: Gaul, at: [2.3, 46.6]}], cities: [Rome]}
+
+  - say: "At its peak in 117 AD, the empire stretched from Britain to Egypt."
+    visual: {type: map, year: 117 AD, view: "wide>empire", label: "Greatest extent", labels: [{text: Britannia, at: [-1.5, 52.8]}, {text: Aegyptus, at: [29.5, 26.5]}], note: "Shown by modern country. Borders approximate."}
+
+  - say: "Tens of millions of people lived under Roman rule."
+    visual: {type: stat, label: "People under Roman rule", value: "50–70M", sub: "Common scholarly estimate at its peak"}
+
+  - say: "Follow for more maps that make history move."
+    visual: {type: kinetic, text: ["Follow for", "maps that make", "*history* move"]}

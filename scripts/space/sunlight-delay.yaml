@@ -1,0 +1,25 @@
+# SPACE sample (Manim motion graphics + Remotion captions overlay). Render:  npm run render space
+title: The Sun You See Is 8 Minutes Old
+hook: "The Sun you see is eight minutes old."
+lines:
+  - say: "Light is the fastest thing there is, about three hundred thousand kilometers every second."
+    visual: {type: counter, label: "Speed of light", from: 0, to: 299792, suffix: " km/s", sub: "Fast enough to circle the Earth seven times in one second"}
+
+  - say: "But the Sun is one hundred fifty million kilometers away, so the trip takes eight minutes and nineteen seconds."
+    visual: {type: lightbeam, title: "Sunlight's trip", from: Sun, to: Earth, time: "8:19", distance: "149.6 million km"}
+
+  - say: "If the Sun vanished right now, we would keep seeing it shine for eight more minutes."
+    visual: {type: orbit, vanish: true}
+
+  - say: "Sunlight takes forty three minutes to reach Jupiter, and over four hours to reach Neptune."
+    visual:
+      type: ladder
+      title: "Sunlight travel time"
+      items: [{name: Earth, label: "8.3 min"}, {name: Mars, label: "12.7 min"}, {name: Jupiter, label: "43 min"}, {name: Neptune, label: "4.2 hours"}]
+      note: "Spacing not to scale"
+
+  - say: "And it has a lot to light up. A hundred and nine Earths fit across the Sun."
+    visual: {type: scale, big: Sun, small: Earth, count: 109}
+
+  - say: "So tonight, look up. You are seeing the past."
+    visual: {type: kinetic, text: ["Look up.", "You are seeing", "the *past*."]}

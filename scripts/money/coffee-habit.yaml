@@ -1,0 +1,48 @@
+# MONEY sample (Remotion). Dark background, green/gold accents. Render:  npm run render money
+title: The $5 Habit That Costs You $172,000
+hook: "Your daily coffee costs {$172,000|one hundred seventy two thousand dollars}."
+# seed: 3                                   # pin the look (default: hash of the title)
+# style: {palette: lime_gold, layout: B}    # or pin parts of it: palette, layout, pacing, caption, transition, kinetic, motif, header, orient
+lines:
+  - say: "Five dollars a day sounds like nothing."
+    visual: {type: kinetic, text: ["*$5* a day", "sounds like", "*nothing*"]}
+
+  - say: "But that is {$1,825|eighteen twenty five dollars} every single year."
+    visual: {type: stat, label: "Five dollars a day", from: 0, to: 1825, prefix: "$", sub: "per year, gone", trend: down}
+
+  - say: "Now invest that same money every year, at an average of {7%|seven percent}."
+    visual: {type: stat, label: "Assumed average return", value: "7%", sub: "per year, not guaranteed", trend: up}
+
+  - say: "In ten years, it is {$25,000|twenty five thousand dollars}. In twenty, {$75,000|seventy five thousand}."
+    visual:
+      type: bar
+      title: "$1,825 invested every year at 7%"
+      x: ["10 years", "20 years", "30 years"]
+      y: [25215, 74817, 172391]
+      prefix: "$"
+      highlight: [2]
+      note: "Illustrative. Assumes a steady 7% return. Not financial advice."
+
+  - say: "After thirty years, it grows to {$172,000|one hundred seventy two thousand dollars}."
+    visual:
+      type: line
+      title: "Your balance over 30 years"
+      x: ["Today", "10 yrs", "20 yrs", "30 yrs"]
+      y: [0, 1825, 3778, 5867, 8103, 10495, 13055, 15794, 18724, 21860, 25215, 28805, 32646, 36757, 41155, 45860, 50896, 56283, 62048, 68217, 74817, 81879, 89435, 97521, 106172, 115429, 125335, 135933, 147273, 159407, 172391]
+      prefix: "$"
+      color: gold
+
+  - say: "You only put in {$55,000|fifty five thousand dollars}. Growth did the rest."
+    visual:
+      type: bar
+      title: "Where the $172,000 comes from"
+      x: ["You put in", "Growth added"]
+      y: [54750, 117641]
+      prefix: "$"
+      highlight: [1]
+
+  - say: "Time does the heavy lifting, so start small and start early."
+    visual: {type: kinetic, text: ["*Time* does", "the heavy lifting"]}
+
+  - say: "Follow for more money math."
+    visual: {type: kinetic, text: ["Follow for", "more *money* math"]}

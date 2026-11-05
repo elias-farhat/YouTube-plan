@@ -3,7 +3,7 @@ history channel renders from.  Offline-friendly: the output is committed, so you
 only need this script if you want to regenerate / swap the dataset.
 
     pip install pyshp
-    python tools/build_map_data.py path/to/naturalearth_lowres.shp pipeline/data/world_110m.json
+    python tools/build_map_data.py path/to/naturalearth_lowres.shp data/world_110m.json
 
 The shapefile ships inside geopandas<=0.14 wheels (geopandas/datasets/naturalearth_lowres).
 """

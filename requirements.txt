@@ -1,6 +1,6 @@
-Pillow>=10
-numpy>=1.24
-# optional: free neural voices (needs internet access to Microsoft's TTS endpoint)
-edge-tts>=6.1
-# only needed to regenerate pipeline/data/world_110m.json
-# pyshp
+# Python side: Manim (space channel) + TTS.  Install with:  npm run setup
+manim>=0.19
+pyyaml
+edge-tts>=6.1       # free neural voices (needs internet)
+piper-tts>=1.2      # offline voices (needs a model in models/piper/, see README)
+pyshp               # only for tools/build_map_data.py
