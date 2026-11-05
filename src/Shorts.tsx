@@ -1,5 +1,5 @@
 import React from 'react';
-import {AbsoluteFill, Audio, OffthreadVideo, Sequence, staticFile} from 'remotion';
+import {AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, staticFile} from 'remotion';
 import {Plan, Seg} from './lib/types';
 import {loadFonts} from './lib/fonts';
 import {Background} from './components/Background';
@@ -43,9 +43,24 @@ const SceneFor: React.FC<{seg: Seg; plan: Plan; dur: number}> = ({seg, plan, dur
   return <Stage plan={plan} v={v}><C v={v} plan={plan} dur={dur} /></Stage>;
 };
 
+/** Text is measured (fitText) while rendering, so wait until the custom fonts are really loaded. */
+const useFontsReady = () => {
+  const [ready, setReady] = React.useState(false);
+  React.useEffect(() => {
+    const h = delayRender('fonts');
+    Promise.all([
+      ...['500', '700', '800', '900'].map((w) => document.fonts.load(`${w} 100px ShortsInter`)),
+      document.fonts.load('700 100px ShortsSerif'),
+    ]).catch(() => undefined).then(() => { setReady(true); continueRender(h); });
+  }, []);
+  return ready;
+};
+
 export const Shorts: React.FC<Plan> = (plan) => {
+  const fontsReady = useFontsReady();
   const n = plan.style.pace.trans;
   const space = plan.channel === 'space';
+  if (!fontsReady) return null;
   return (
     <AbsoluteFill style={{background: plan.style.palette.bgTop}}>
       {space && plan.bgVideo ? <OffthreadVideo src={staticFile(plan.bgVideo)} muted style={{width: 1080, height: 1920}} /> : <Background plan={plan} />}

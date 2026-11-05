@@ -86,6 +86,12 @@ A seed (hash of the title, or `seed:`) picks, per video: **palette** (6 per chan
 
 Force a mode with `npm run render money -- --tts none|edge|piper`.
 
+### Round trip with CapCut (voice recorded elsewhere)
+
+1. `npm run render history` → silent video + `.narration.txt` / `.cues.txt`.
+2. Voice it in CapCut (paste the narration), export, and drop the file in `voices/` named `<channel>_<slug>.m4a` (e.g. `voices/history_rome-never-quit.m4a`; mp3/wav/mp4 also work), or pass `--voice path/to/file`.
+3. `npm run render history` again: `tools/voice_import.py` finds the speech chunks, aligns them to the script lines (using offline speech recognition as a second signal), cuts a clip per line, and the whole video **re-times itself to the voice**: scenes stretch, captions follow the words. Extra audio after the last script line (a dropped outro) is ignored.
+
 ## Layout
 
 ```

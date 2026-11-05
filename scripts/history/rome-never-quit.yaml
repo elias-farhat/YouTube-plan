@@ -1,0 +1,36 @@
+# HISTORY v2 - punchier retelling, built around ONE peak moment (Cannae) and a payoff.
+# Beats: HOOK -> setup -> PEAK ("It didn't.") -> comeback -> payoff line that loops back to the hook.
+# No "follow for more" line: the channel name goes in the end card / pinned comment instead.
+title: Rome Should Have Died in 216 BC
+hook: "Rome should have died in 216 BC."
+handle: "@HistoryForNoobs"        # placeholder channel name, change when you pick one
+style: {pacing: snappy}
+territories:
+  - {year: 264 BC, countries: [Italy]}
+  - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece, North Macedonia, Albania]}
+  - {year: 44 BC, countries: [France, Belgium, Switzerland, Slovenia, Croatia, Bosnia and Herz., Montenegro, Turkey, Cyprus, N. Cyprus, Syria, Lebanon, Israel, Palestine]}
+  - {year: 117 AD, countries: [Egypt, Libya, Algeria, Morocco, United Kingdom, Luxembourg, Austria, Hungary, Serbia, Kosovo, Romania, Bulgaria, Jordan, Iraq]}
+lines:
+  - say: "Hannibal had just marched elephants over the Alps."
+    visual: {type: map, year: 218 BC, view: west_med, route: [Carthago Nova, Pyrenees, Alps, Po Valley], label: "218 BC: Hannibal invades"}
+
+  - say: "Then, in one afternoon at Cannae, he crushed the Roman army. Tens of thousands dead."
+    visual: {type: map, year: 216 BC, view: "west_med>italy", cities: [Cannae, Rome], label: "Cannae: Rome's worst day"}
+
+  - say: "Everyone expected Rome to give up."
+    visual: {type: kinetic, text: ["Everyone expected", "*Rome* to give up"]}
+
+  - say: "It didn't."
+    visual: {type: kinetic, text: ["*It didn't.*"]}
+
+  - say: "So Rome sailed to Africa and hit Carthage itself."
+    visual: {type: map, year: 204 BC, view: west_med, route: [Syracuse, Carthage], label: "Rome strikes back"}
+
+  - say: "Hannibal lost. Carthage was burned to the ground."
+    visual: {type: kinetic, text: ["Hannibal *lost.*", "Carthage *burned.*"]}
+
+  - say: "And the whole Mediterranean became Rome's."
+    visual: {type: map, year: 117 AD, view: "med>wide", label: "The whole sea", note: "Shown by modern country. Borders approximate."}
+
+  - say: "Rome lost the biggest battles. It just never lost the war."
+    visual: {type: kinetic, text: ["Rome lost the *biggest battles.*", "It never lost the *war.*"]}

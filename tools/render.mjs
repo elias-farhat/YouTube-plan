@@ -22,7 +22,7 @@ process.chdir(ROOT);
 
 // ---------------------------------------------------------------- args ---
 const argv = process.argv.slice(2);
-const flags = { tts: 'auto', concurrency: Math.max(1, os.cpus().length - 0), anyLength: false, check: false, stills: null, out: 'output' };
+const flags = { tts: 'auto', concurrency: Math.max(1, os.cpus().length - 0), anyLength: false, check: false, stills: null, out: 'output', voice: null };
 const targets = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
@@ -31,6 +31,7 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--any-length') flags.anyLength = true;
   else if (a === '--check') flags.check = true;
   else if (a === '--out') flags.out = argv[++i];
+  else if (a === '--voice') flags.voice = argv[++i]; // a recorded/CapCut voice-over to align the video to
   else if (a === '--stills') flags.stills = argv[++i].split(',').map(Number); // dev: render PNG stills at these seconds
   else if (a.startsWith('--')) { console.error(`unknown flag ${a}`); process.exit(1); }
   else targets.push(a);
@@ -94,7 +95,21 @@ function runWithProgress(cmd, args, label, env = {}) {
   });
 }
 
+function findVoiceFile(script) {
+  if (flags.voice) return flags.voice;
+  if (flags.tts === 'none' || !fs.existsSync('voices')) return null;
+  const hit = fs.readdirSync('voices').find((f) => f.startsWith(`${script.channel}_${script.slug}.`) && /\.(m4a|mp3|wav|mp4|aac|ogg)$/.test(f));
+  return hit ? path.join('voices', hit) : null;
+}
+
 function getVoice(script, style, workdir) {
+  const vf = findVoiceFile(script);
+  if (vf) {
+    const lines = [script.hook.words, ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
+    const r = spawnSync(py, ['tools/voice_import.py'], { input: JSON.stringify({ lines, voiceFile: vf, outdir: workdir }), encoding: 'utf8' });
+    if (r.status !== 0) throw new Error(`voice import failed: ${(r.stderr || '').trim().split('\n').slice(-3).join(' | ')}`);
+    return JSON.parse(r.stdout.trim().split('\n').pop());
+  }
   if (flags.tts === 'none') return { engine: 'none', status: 'TTS disabled (--tts none)', lines: null };
   const lines = [script.hook.words, ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
   const req = { lines, voice: script.voice ?? ({ money: 'en-US-GuyNeural', space: 'en-US-AndrewNeural', history: 'en-GB-RyanNeural' })[script.channel], rate: style.pace.rate, outdir: workdir, engine: flags.tts };

@@ -27,6 +27,3 @@ lines:
 
   - say: "Tens of millions of people lived under Roman rule."
     visual: {type: stat, label: "People under Roman rule", value: "50–70M", sub: "Common scholarly estimate at its peak"}
-
-  - say: "Follow for more maps that make history move."
-    visual: {type: kinetic, text: ["Follow for", "maps that make", "*history* move"]}

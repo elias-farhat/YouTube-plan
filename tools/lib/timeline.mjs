@@ -8,7 +8,7 @@ export function estimate(words, speed) {
   let t = 0;
   const spans = words.map((w) => {
     const t0 = t;
-    for (const sp of w.spoken) t += (0.13 + 0.047 * letters(sp)) * speed;
+    for (const sp of w.spoken) t += (0.13 + 0.047 * letters(sp)) * 1.22 * speed; // 1.22: calibrated against a real CapCut voice-over
     const span = [t0, t];
     t += pause(w.shown) * speed;
     return span;
@@ -34,8 +34,9 @@ export function buildSegments(script, style, audio) {
   const segs = [];
   let t = 0;
   items.forEach((it, i) => {
-    const lead = i === 0 ? 0.12 : td + 0.1;
     const a = audio?.[i] ?? null;
+    const tight = !!a?.tight; // imported voice already has natural pauses: add only the transition time
+    const lead = i === 0 ? 0.12 : td + (tight ? 0.03 : 0.1);
     let spans = null, speech;
     if (a) { speech = a.duration; spans = mapTts(it.words, a.words); }
     if (!spans) {
@@ -43,9 +44,9 @@ export function buildSegments(script, style, audio) {
       if (a) { const k = a.duration / Math.max(est.total, 1e-6); spans = est.spans.map(([x, y]) => [x * k, y * k]); }
       else { spans = est.spans; speech = est.total; }
     }
-    let tail = style.pace.gap + (i === items.length - 1 ? 0.55 : 0);
+    let tail = (tight ? 0.04 : style.pace.gap) + (i === items.length - 1 ? 0.55 : 0);
     let dur = lead + speech + tail;
-    if (it.isHook) dur = Math.min(2.6, Math.max(2.0, dur)); // first 2 seconds belong to the hook
+    if (it.isHook) dur = a ? Math.max(2.0, dur) : Math.min(2.6, Math.max(2.0, dur)); // the hook owns the first ~2 s
     const start = t, s0 = start + lead;
     segs.push({
       idx: i, isHook: !!it.isHook, say: it.say, shown: it.words.map((w) => w.shown).join(' '), visual: it.visual,
