@@ -29,7 +29,7 @@ function mapTts(words, wt) {
  * The hook segment is held to ~2-2.6 s.
  */
 export function buildSegments(script, style, audio) {
-  const items = [{ ...script.hook, visual: null, isHook: true }, ...script.lines];
+  const items = [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
   const td = style.pace.trans / FPS;
   const segs = [];
   let t = 0;
@@ -49,7 +49,7 @@ export function buildSegments(script, style, audio) {
     if (it.isHook) dur = a ? Math.max(2.0, dur) : Math.min(2.6, Math.max(2.0, dur)); // the hook owns the first ~2 s
     const start = t, s0 = start + lead;
     segs.push({
-      idx: i, isHook: !!it.isHook, say: it.say, shown: it.words.map((w) => w.shown).join(' '), visual: it.visual,
+      idx: i, isHook: !!it.isHook, sfx: it.sfx ?? [], say: it.say, shown: it.words.map((w) => w.shown).join(' '), visual: it.visual,
       startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
       speechStart: s0, speechEnd: s0 + speech,
       words: it.words.map((w, k) => ({ text: w.shown, spoken: w.spoken.join(' '), start: s0 + spans[k][0], end: s0 + spans[k][1] })),

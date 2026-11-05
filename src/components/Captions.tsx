@@ -85,6 +85,6 @@ export const Captions: React.FC<{plan: Plan}> = ({plan}) => {
   const t = frame / plan.fps;
   // the segment currently speaking (captions stay with their own line, hook is shown as big text instead)
   const seg = [...plan.segs].reverse().find((s) => frame >= s.startFrame) ?? plan.segs[0];
-  if (seg.isHook) return null;
+  if (seg.isHook && !seg.visual) return null;
   return <SegCaptions key={seg.idx} seg={{...seg}} plan={plan} />;
 };

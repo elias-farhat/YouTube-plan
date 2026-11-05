@@ -7,7 +7,7 @@ export const CHANNELS = ['money', 'space', 'history'];
 export const VISUALS = {
   money: ['kinetic', 'stat', 'line', 'bar'],
   space: ['kinetic', 'counter', 'orbit', 'lightbeam', 'ladder', 'scale'],
-  history: ['kinetic', 'stat', 'map'],
+  history: ['kinetic', 'stat', 'map', 'battle', 'stamps'],
 };
 
 const MARK = /\{([^|{}]+)\|([^{}]+)\}/g;
@@ -61,7 +61,8 @@ export function loadScript(file) {
       if (typeof v !== 'object' || !v.type) fail(`lines[${i}].visual needs a "type" (${VISUALS[channel].join(', ')})`);
       if (!VISUALS[channel].includes(v.type)) fail(`lines[${i}].visual.type "${v.type}" is not available for ${channel}. Use: ${VISUALS[channel].join(', ')}`);
     }
-    return { say: l.say.trim(), words: parseNarration(l.say), visual: v ?? null };
+    const sfx = l.sfx === undefined ? [] : Array.isArray(l.sfx) ? l.sfx : [l.sfx];
+    return { say: l.say.trim(), words: parseNarration(l.say), visual: v ?? null, sfx };
   });
   let territories = [];
   if (raw.territories) {
@@ -74,7 +75,7 @@ export function loadScript(file) {
   const slug = raw.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'video';
   return {
     file, channel, title: raw.title.trim(), slug, seed, handle: raw.handle, voice: raw.voice,
-    style: raw.style ?? {}, hook: { say: raw.hook.trim(), words: hookWords }, lines, territories,
+    style: raw.style ?? {}, hook: { say: raw.hook.trim(), words: hookWords, sfx: [] }, hookVisual: raw.hook_visual ?? null, lines, territories,
   };
 }
 

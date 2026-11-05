@@ -5,7 +5,7 @@ export const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 export const seg = (t: number, t0: number, t1: number) => clamp01((t - t0) / Math.max(1e-6, t1 - t0));
 export const easeOut = (x: number) => Easing.out(Easing.cubic)(clamp01(x));
 export const easeInOut = (x: number) => Easing.inOut(Easing.cubic)(clamp01(x));
-export const easeOutBack = (x: number) => Easing.out(Easing.back(1.7))(clamp01(x));
+export const easeOutBack = (x: number, k = 1.7) => Easing.out(Easing.back(k))(clamp01(x));
 export const easeOutExpo = (x: number) => Easing.out(Easing.exp)(clamp01(x));
 export const bounceOut = (x: number) => Easing.bounce(clamp01(x));
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;

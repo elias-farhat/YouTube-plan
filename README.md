@@ -51,8 +51,8 @@ lines:
 
 | channel | type | fields |
 |---|---|---|
-| all | `kinetic` | `text: [rows]`, `*highlight*` |
-| money, history | `stat` | `label`, `value` **or** `from`+`to` (counts), `prefix`, `suffix`, `decimals`, `sub`, `trend: up\|down` |
+| all | `kinetic` | `text: [rows]`, `*highlight*`, `dark: true` (black-out slam for the peak line) |
+| money, history | `stat` | `label`, `value` **or** `from`+`to` (counts), `prefix`, `suffix`, `decimals`, `sub`, `trend: up\|down`, `impact: true` (shake + flash when the count lands) |
 | money | `line` | `title`, `x: [tick labels]`, `y: [values]`, `prefix`, `suffix`, `color: green\|gold\|red`, `delta`, `ymin` |
 | money | `bar` | `title`, `x`, `y`, `prefix`, `suffix`, `highlight: [i]`, `bad: [i]`, `orient: v\|h` |
 | space | `counter` | `label`, `from`, `to`, `prefix`, `suffix`, `decimals`, `sub` |
@@ -60,7 +60,9 @@ lines:
 | space | `lightbeam` | `from`, `to`, `time: "8:19"`, `distance: "149.6 million km"`, `title` |
 | space | `ladder` | `title`, `items: [{name, label}]` (Earth, Mars, Jupiter, Saturn, Neptune, ...), `note` |
 | space | `scale` | `big: Sun`, `small: Earth`, `count: 109` |
-| history | `map` | `year: "117 AD"`, `from`, `view: empire` or `"italy>med"` (camera move) or `lon,lat,span`, `cities: [Rome]`, `route: [A, B, C]`, `labels: [{text, at: [lon, lat]}]`, `label`, `origin` |
+| history | `battle` | `title`, `dead: 50000`, `rome`, `enemy` (schematic of Cannae: the pincers close, the legions fall) |
+| history | `stamps` | `title`, `items: [{text, tag}]` (cards slammed onto the screen one by one) |
+| history | `map` | `year: "117 AD"`, `from`, `view: empire` or `"italy>med"` (camera move) or `lon,lat,span`, `cities: [Rome]`, `route: [A, B, C]`, `labels: [{text, at: [lon, lat]}]`, `label`, `origin`, `icon: elephant\|ship\|army` (marching route head), `battles: [Cannae]` (red X), `burn: [Carthage]` (fire), `tint: red` |
 
 History scripts declare territory once, by modern country (names from `data/world_110m.json`), and each `map` scene animates it:
 
@@ -71,6 +73,14 @@ territories:
 ```
 
 A scene with `year: 133 BC` shows earlier territory solid, and the countries gained in 133 BC are conquered by a dashed frontier ring sweeping out from the heart of the empire (the borders of the new land "march" with moving dashes). `route` draws a curved, dashed, animated path with an arrowhead and waypoint chips. Places are built-in names (Rome, Carthage, Athens, Alexandria, Alps, ...) or `"Name@lat,lon"`. Presets for `view`: `italy med empire west_med east_med europe wide`.
+
+### Hook and peak
+
+`hook` is the first ~2 s. By default it becomes giant kinetic text; give it a visual with `hook_visual:` (e.g. a counting number) and the spoken hook is captioned as usual. A line can carry `sfx: [riser]` (a tension build that ends where the line starts), `boom`, `hit`, `stamp` or `sting`. Put the riser on the line *before the peak* and `kinetic: {dark: true}` on the peak itself.
+
+## Sound
+
+Everything you hear is synthesised (`tools/sfx.py`, no samples, no network): whooshes on scene changes, hits on highlighted words, stamps, counter ticks, clashes, fire crackle, a riser and boom, plus a quiet ambient bed per channel (war-drum heartbeat for history, soft pulse for money, airy pad for space) that ducks under the voice. Cues are derived from what is on screen, and every hit also shakes the camera and flashes the frame. `--no-sfx` turns it all off. Audio is muxed after the frames are rendered, so changing the voice or sounds does **not** re-render the video.
 
 ## Variation (nothing looks mass-produced)
 

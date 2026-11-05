@@ -1,12 +1,12 @@
 The $5 Habit That Costs You $172,000
-Total 39.6s. Start each narration line at its time:
+Total 46.0s. Start each narration line at its time:
 
 [00:00.1]  Your daily coffee costs one hundred seventy two thousand dollars
 [00:03.1]  Five dollars a day sounds like nothing.
-[00:06.2]  But that is eighteen twenty five dollars every single year.
-[00:10.6]  Now invest that same money every year, at an average of seven percent
-[00:15.8]  In ten years, it is twenty five thousand dollars In twenty, seventy five thousand
-[00:22.1]  After thirty years, it grows to one hundred seventy two thousand dollars
-[00:27.4]  You only put in fifty five thousand dollars Growth did the rest.
-[00:32.5]  Time does the heavy lifting, so start small and start early.
-[00:37.1]  Follow for more money math.
+[00:06.8]  But that is eighteen twenty five dollars every single year.
+[00:11.9]  Now invest that same money every year, at an average of seven percent
+[00:18.1]  In ten years, it is twenty five thousand dollars In twenty, seventy five thousand
+[00:25.5]  After thirty years, it grows to one hundred seventy two thousand dollars
+[00:31.7]  You only put in fifty five thousand dollars Growth did the rest.
+[00:37.7]  Time does the heavy lifting, so start small and start early.
+[00:43.1]  Follow for more money math.

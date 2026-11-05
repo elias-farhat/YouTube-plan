@@ -1,18 +1,21 @@
 import React from 'react';
 import {AbsoluteFill, Audio, OffthreadVideo, Sequence, continueRender, delayRender, staticFile} from 'remotion';
 import {Plan, Seg} from './lib/types';
-import {loadFonts} from './lib/fonts';
+import {fontPromises, loadFonts} from './lib/fonts';
 import {Background} from './components/Background';
 import {Chrome} from './components/Chrome';
 import {Captions} from './components/Captions';
 import {SceneShell} from './components/SceneShell';
+import {Fx} from './components/Fx';
 import {Kinetic, Stat, Stage, SceneProps} from './scenes/common';
 import {BarChart, LineChart} from './scenes/charts';
 import {MapScene} from './history/MapScene';
+import {Battle} from './history/Battle';
+import {Stamps} from './history/Stamps';
 
 loadFonts();
 
-const SCENES: Record<string, React.FC<SceneProps>> = {kinetic: Kinetic, stat: Stat, line: LineChart, bar: BarChart, map: MapScene};
+const SCENES: Record<string, React.FC<SceneProps>> = {kinetic: Kinetic, stat: Stat, line: LineChart, bar: BarChart, map: MapScene, battle: Battle, stamps: Stamps};
 
 /** Hook = the first ~2 s: the hook sentence as huge kinetic text, last row highlighted. */
 const hookRows = (shown: string) => {
@@ -33,7 +36,7 @@ const autoRows = (shown: string) => {
 };
 
 const SceneFor: React.FC<{seg: Seg; plan: Plan; dur: number}> = ({seg, plan, dur}) => {
-  if (seg.isHook) {
+  if (seg.isHook && !seg.visual) {
     const v = {type: 'kinetic', text: hookRows(seg.shown ?? seg.say)};
     return <Stage plan={plan}><Kinetic v={v} plan={plan} dur={dur} big /></Stage>;
   }
@@ -48,10 +51,7 @@ const useFontsReady = () => {
   const [ready, setReady] = React.useState(false);
   React.useEffect(() => {
     const h = delayRender('fonts');
-    Promise.all([
-      ...['500', '700', '800', '900'].map((w) => document.fonts.load(`${w} 100px ShortsInter`)),
-      document.fonts.load('700 100px ShortsSerif'),
-    ]).catch(() => undefined).then(() => { setReady(true); continueRender(h); });
+    Promise.all(fontPromises).catch(() => undefined).then(() => document.fonts.ready).then(() => { setReady(true); continueRender(h); });
   }, []);
   return ready;
 };
@@ -66,15 +66,21 @@ export const Shorts: React.FC<Plan> = (plan) => {
       {space && plan.bgVideo ? <OffthreadVideo src={staticFile(plan.bgVideo)} muted style={{width: 1080, height: 1920}} /> : <Background plan={plan} />}
       {!space && plan.segs.map((seg, i) => {
         const last = i === plan.segs.length - 1;
-        const len = seg.endFrame - seg.startFrame + (last ? 0 : n);
+        const h = Math.max(2, Math.round(n / 2));
+        const a = i === 0 ? 0 : h, b = last ? 0 : h;          // enter after the previous scene left; leave after the boundary
+        const from = seg.startFrame + a;
+        const len = Math.max(1, seg.endFrame - seg.startFrame + b - a);
+        const dark = !!seg.visual?.dark;
         return (
-          <Sequence key={seg.idx} from={seg.startFrame} durationInFrames={Math.max(1, len)} layout="none">
-            <SceneShell plan={plan} length={len} first={i === 0} last={last}>
-              <SceneFor seg={seg} plan={plan} dur={(seg.endFrame - seg.startFrame) / plan.fps} />
+          <Sequence key={seg.idx} from={from} durationInFrames={len} layout="none">
+            <SceneShell plan={plan} from={from} length={len} first={i === 0} last={last}>
+              {dark && <div style={{position: 'absolute', inset: -80, background: 'rgba(0,0,0,0.93)'}} />}
+              <SceneFor seg={seg} plan={plan} dur={len / plan.fps} />
             </SceneShell>
           </Sequence>
         );
       })}
+      <Fx plan={plan} />
       <Chrome plan={plan} />
       <Captions plan={plan} />
       {plan.audio && <Audio src={staticFile(plan.audio)} />}

@@ -1,36 +1,49 @@
-# HISTORY v2 - punchier retelling, built around ONE peak moment (Cannae) and a payoff.
-# Beats: HOOK -> setup -> PEAK ("It didn't.") -> comeback -> payoff line that loops back to the hook.
-# No "follow for more" line: the channel name goes in the end card / pinned comment instead.
+# HISTORY v2 - built for tension.  Structure:
+#   HOOK (a number that shocks)  ->  setup (the trap)  ->  dread ("everyone waited")  ->  PEAK ("NO.")
+#   ->  Rome's insane answer  ->  comeback  ->  payoff that loops back to the hook.
+# `sfx:` hints place extra sounds (riser = tension build that ends where the line starts; boom lands on the line).
+# Everything else (whooshes, hits, stamps, ticks, ambient drone) is added automatically from what is on screen.
 title: Rome Should Have Died in 216 BC
-hook: "Rome should have died in 216 BC."
-handle: "@HistoryForNoobs"        # placeholder channel name, change when you pick one
-style: {pacing: snappy}
+hook: "In one afternoon, Rome lost {50,000|fifty thousand} soldiers."
+hook_visual: {type: stat, label: "Roman soldiers lost in one afternoon", from: 0, to: 50000, trend: down, impact: true, note: "Ancient sources say 50,000 to 70,000."}
+handle: "@HistoryForNoobs"        # placeholder channel name
+style: {pacing: snappy, kinetic: pop, caption: bar}
 territories:
   - {year: 264 BC, countries: [Italy]}
   - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece, North Macedonia, Albania]}
   - {year: 44 BC, countries: [France, Belgium, Switzerland, Slovenia, Croatia, Bosnia and Herz., Montenegro, Turkey, Cyprus, N. Cyprus, Syria, Lebanon, Israel, Palestine]}
   - {year: 117 AD, countries: [Egypt, Libya, Algeria, Morocco, United Kingdom, Luxembourg, Austria, Hungary, Serbia, Kosovo, Romania, Bulgaria, Jordan, Iraq]}
 lines:
-  - say: "Hannibal had just marched elephants over the Alps."
-    visual: {type: map, year: 218 BC, view: west_med, route: [Carthago Nova, Pyrenees, Alps, Po Valley], label: "218 BC: Hannibal invades"}
+  - say: "Hannibal had fewer men. So he built a trap."
+    visual: {type: map, year: 216 BC, view: "europe>italy", route: [Carthago Nova, Pyrenees, Alps, Po Valley], icon: elephant, battles: [Cannae], tint: red, label: "Cannae, 216 BC"}
 
-  - say: "Then, in one afternoon at Cannae, he crushed the Roman army. Tens of thousands dead."
-    visual: {type: map, year: 216 BC, view: "west_med>italy", cities: [Cannae, Rome], label: "Cannae: Rome's worst day"}
+  - say: "He let the Romans push his center back. Then he closed in from both sides."
+    visual: {type: battle, title: "CANNAE · 216 BC", dead: 50000}
 
-  - say: "Everyone expected Rome to give up."
-    visual: {type: kinetic, text: ["Everyone expected", "*Rome* to give up"]}
+  - say: "Everyone waited for Rome to surrender."
+    visual: {type: kinetic, text: ["Everyone waited for", "*Rome* to surrender"]}
 
-  - say: "It didn't."
-    visual: {type: kinetic, text: ["*It didn't.*"]}
+  - say: "Rome said no."
+    visual: {type: kinetic, dark: true, text: ["*NO.*"]}
+    sfx: [riser]
 
-  - say: "So Rome sailed to Africa and hit Carthage itself."
-    visual: {type: map, year: 204 BC, view: west_med, route: [Syracuse, Carthage], label: "Rome strikes back"}
+  - say: "It armed slaves. It refused to pay ransom for its prisoners."
+    visual: {type: stamps, title: "Rome's answer", items: [{text: "Armed slaves", tag: "8,000"}, {text: "Paid no ransom", tag: "REFUSED"}]}
 
-  - say: "Hannibal lost. Carthage was burned to the ground."
-    visual: {type: kinetic, text: ["Hannibal *lost.*", "Carthage *burned.*"]}
+  - say: "The general who lost? The Senate thanked him."
+    visual: {type: kinetic, text: ["The general who *lost?*", "The Senate *thanked* him."]}
 
-  - say: "And the whole Mediterranean became Rome's."
+  - say: "Hannibal sat in Italy for fifteen years. Rome never broke."
+    visual: {type: stat, label: "Hannibal in Italy", from: 0, to: 15, suffix: " years", sub: "Rome never broke", trend: up}
+
+  - say: "So Rome did the unthinkable. It sailed to Carthage."
+    visual: {type: map, year: 204 BC, view: "11.5,37.2,24", route: [Syracuse, Carthage], icon: ship, label: "Rome strikes back"}
+
+  - say: "Carthage burned for seventeen days."
+    visual: {type: map, year: 146 BC, view: "10.3,36.9,9", burn: [Carthage], tint: red, label: "146 BC: Carthage burns"}
+
+  - say: "Rome ended up owning the entire Mediterranean."
     visual: {type: map, year: 117 AD, view: "med>wide", label: "The whole sea", note: "Shown by modern country. Borders approximate."}
 
-  - say: "Rome lost the biggest battles. It just never lost the war."
-    visual: {type: kinetic, text: ["Rome lost the *biggest battles.*", "It never lost the *war.*"]}
+  - say: "Rome lost the battles. It never lost the war."
+    visual: {type: kinetic, text: ["Rome lost the *battles.*", "It never lost the *war.*"]}

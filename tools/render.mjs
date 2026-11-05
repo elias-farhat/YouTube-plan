@@ -16,13 +16,14 @@ import { fileURLToPath } from 'node:url';
 import { loadScript, findScripts, CHANNELS } from './lib/script.mjs';
 import { pickStyle, describeStyle, NAMES, HANDLES } from './lib/variation.mjs';
 import { buildSegments, FPS, MIN_LEN, MAX_LEN, srtTime, clock } from './lib/timeline.mjs';
+import { buildCues } from './lib/sfx.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 process.chdir(ROOT);
 
 // ---------------------------------------------------------------- args ---
 const argv = process.argv.slice(2);
-const flags = { tts: 'auto', concurrency: Math.max(1, os.cpus().length - 0), anyLength: false, check: false, stills: null, out: 'output', voice: null };
+const flags = { tts: 'auto', concurrency: Math.max(1, os.cpus().length - 0), anyLength: false, check: false, stills: null, out: 'output', voice: null, sfx: true };
 const targets = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
@@ -31,6 +32,7 @@ for (let i = 0; i < argv.length; i++) {
   else if (a === '--any-length') flags.anyLength = true;
   else if (a === '--check') flags.check = true;
   else if (a === '--out') flags.out = argv[++i];
+  else if (a === '--no-sfx') flags.sfx = false; // skip sound effects + ambient bed
   else if (a === '--voice') flags.voice = argv[++i]; // a recorded/CapCut voice-over to align the video to
   else if (a === '--stills') flags.stills = argv[++i].split(',').map(Number); // dev: render PNG stills at these seconds
   else if (a.startsWith('--')) { console.error(`unknown flag ${a}`); process.exit(1); }
@@ -50,6 +52,13 @@ for (const t of targets) {
 if (!files.length) { console.error('no scripts found (put YAML files in scripts/<channel>/)'); process.exit(1); }
 
 // ------------------------------------------------------------ helpers ---
+function* walk(dir) {
+  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+    const f = path.join(dir, e.name);
+    if (e.isDirectory()) yield* walk(f); else yield f;
+  }
+}
+
 const py = fs.existsSync('.venv/bin/python') ? path.resolve('.venv/bin/python') : 'python3';
 const sh = (cmd, args, opts = {}) => {
   const r = spawnSync(cmd, args, { encoding: 'utf8', ...opts });
@@ -160,14 +169,25 @@ for (const file of files) {
       channel: script.channel, title: script.title, handle: script.handle ?? HANDLES[script.channel], channelName: NAMES[script.channel],
       fps: FPS, totalFrames: Math.round(total * FPS), style, segs, territories: script.territories, audio: null, bgVideo: null,
     };
-    if (voiced) { mixVoice(segs, voice.lines, total, path.join(genDir, 'voice.wav')); plan.audio = `gen/${key}/voice.wav`; }
+    const { cues, impacts } = buildCues(plan);
+    plan.cues = cues; plan.impacts = flags.sfx ? impacts : impacts.filter((c) => false);
+    if (voiced) mixVoice(segs, voice.lines, total, path.join(genDir, 'voice.wav'));
+    if (flags.sfx) {
+      // sound design: effects + ambient bed (+ the voice if there is one), ducked under speech
+      fs.writeFileSync(path.join(buildDir, 'plan-audio.json'), JSON.stringify(plan));
+      const args = ['tools/sfx.py', path.join(buildDir, 'plan-audio.json'), path.join(genDir, 'audio.wav')];
+      if (voiced) args.push('--voice', path.join(genDir, 'voice.wav'));
+      sh(py, args);
+      plan.audio = `gen/${key}/audio.wav`;
+    } else if (voiced) plan.audio = `gen/${key}/voice.wav`;
+    const hasAudio = !!plan.audio;
 
     const planFile = path.join(buildDir, 'plan.json');
     const Comp = script.channel[0].toUpperCase() + script.channel.slice(1);
     if (script.channel === 'space') {
       fs.writeFileSync(planFile, JSON.stringify(plan));
       // the Manim video only depends on the plan (minus audio paths) and the scene code: reuse it when unchanged
-      const hash = createHash('sha1').update(JSON.stringify({ ...plan, audio: null })).update(fs.readFileSync('manim/space_scene.py')).update(fs.readFileSync('manim/planets.py')).digest('hex');
+      const hash = createHash('sha1').update(JSON.stringify({ ...plan, audio: null, cues: null, impacts: null })).update(fs.readFileSync('manim/space_scene.py')).update(fs.readFileSync('manim/planets.py')).digest('hex');
       const cached = path.join(buildDir, 'manim.sha1'), bgFile = path.join(genDir, 'bg.mp4');
       if (fs.existsSync(cached) && fs.readFileSync(cached, 'utf8') === hash && fs.existsSync(bgFile)) {
         console.log('  manim: unchanged, reusing last render');
@@ -182,6 +202,8 @@ for (const file of files) {
       }
       plan.bgVideo = `gen/${key}/bg.mp4`;
     }
+    const audioFile = plan.audio ? path.join('public', plan.audio) : null;
+    plan.audio = null;                       // audio is muxed afterwards: changing the voice/sfx never re-renders the frames
     fs.writeFileSync(planFile, JSON.stringify(plan));
 
     if (flags.stills) {
@@ -195,14 +217,23 @@ for (const file of files) {
       continue;
     }
     const rawOut = path.join(buildDir, 'remotion.mp4');
-    const args = ['remotion', 'render', 'src/index.ts', Comp, rawOut, `--props=${planFile}`, `--concurrency=${flags.concurrency}`, '--log=warn', '--overwrite'];
-    if (BROWSER) args.push(`--browser-executable=${BROWSER}`);
-    await runWithProgress('npx', args, 'remotion');
+    const srcHash = createHash('sha1').update(JSON.stringify({ ...plan, cues: null })); // cues only affect audio; impacts (shake) are part of the frames
+    for (const f of walk('src')) srcHash.update(fs.readFileSync(f));
+    srcHash.update(fs.readFileSync('data/world_110m.json'));
+    const vh = srcHash.digest('hex'), vhFile = path.join(buildDir, 'video.sha1');
+    if (fs.existsSync(rawOut) && fs.existsSync(vhFile) && fs.readFileSync(vhFile, 'utf8') === vh) {
+      console.log('  remotion: frames unchanged, reusing last render');
+    } else {
+      const args = ['remotion', 'render', 'src/index.ts', Comp, rawOut, `--props=${planFile}`, `--concurrency=${flags.concurrency}`, '--log=warn', '--overwrite', '--muted'];
+      if (BROWSER) args.push(`--browser-executable=${BROWSER}`);
+      await runWithProgress('npx', args, 'remotion');
+      fs.writeFileSync(vhFile, vh);
+    }
 
     fs.mkdirSync(flags.out, { recursive: true });
     const outMp4 = path.join(flags.out, `${script.channel}_${script.slug}.mp4`);
-    if (voiced) fs.copyFileSync(rawOut, outMp4);
-    else sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo', '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '128k', '-shortest', '-movflags', '+faststart', outMp4]);
+    const audioIn = audioFile ? ['-i', audioFile] : ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo'];
+    sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, ...audioIn, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-t', total.toFixed(3), '-movflags', '+faststart', outMp4]);
 
     // sidecars: narration text (for CapCut), cue sheet, SRT
     const base = outMp4.replace(/\.mp4$/, '');
@@ -217,7 +248,7 @@ for (const file of files) {
       }
     }
     fs.writeFileSync(`${base}.srt`, srt.join('\n'));
-    console.log(`  -> ${outMp4}  (${(fs.statSync(outMp4).size / 1e6).toFixed(1)} MB, ${voiced ? 'with voice' : 'silent'})`);
+    console.log(`  -> ${outMp4}  (${(fs.statSync(outMp4).size / 1e6).toFixed(1)} MB, ${voiced ? 'with voice' : 'no voice'}${flags.sfx ? ' + sound effects' : ''})`);
   } catch (e) {
     failures++;
     console.error(`  ERROR: ${e.message}`);

@@ -39,6 +39,39 @@ const Chip: React.FC<{x: number; y: number; text: string; q: number; W: number}>
   );
 };
 
+const hash = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+/** Route head: elephant / ship / (default) arrow */
+const Head: React.FC<{kind: string; x: number; y: number; ang: number; col: string; t: number}> = ({kind, x, y, ang, col, t}) => {
+  const flip = Math.cos(ang) < 0 ? -1 : 1;
+  const bob = Math.sin(t * 11) * 2.2;
+  if (kind === 'elephant') {
+    return (
+      <g transform={`translate(${x} ${y + bob}) scale(${flip * 1.5} 1.5)`} stroke="#241a10" strokeWidth={2.4} strokeLinejoin="round">
+        <rect x={-30} y={-17} width={52} height={30} rx={14} fill="#9a8f80" />
+        {[-22, -10, 8, 18].map((lx, i) => <rect key={i} x={lx} y={8} width={8} height={17 + (Math.sin(t * 11 + i * 1.6) > 0 ? 2 : -1)} rx={3} fill="#857a6b" />)}
+        <circle cx={26} cy={-8} r={14} fill="#a89d8e" />
+        <circle cx={17} cy={-12} r={9} fill="#8d8273" />
+        <path d="M36 -3 q13 6 7 23 q-3 7 -9 2" fill="none" stroke="#a89d8e" strokeWidth={7} strokeLinecap="round" />
+        <path d="M34 3 q9 6 15 3" fill="none" stroke="#fff6e2" strokeWidth={3.5} strokeLinecap="round" />
+        <circle cx={30} cy={-12} r={2.2} fill="#241a10" stroke="none" />
+        <path d="M-28 -17 l-9 -6 l2 12" fill="#9a8f80" />
+      </g>
+    );
+  }
+  if (kind === 'ship') {
+    return (
+      <g transform={`translate(${x} ${y + bob}) rotate(${Math.sin(t * 5) * 4}) scale(${flip * 1.7} 1.7)`} stroke="#241a10" strokeWidth={2.4} strokeLinejoin="round">
+        <path d="M-32 4 L32 4 L22 22 L-24 22 Z" fill="#6b4627" />
+        <line x1={0} y1={4} x2={0} y2={-34} strokeWidth={3.5} />
+        <path d="M2 -32 L30 -2 L2 -2 Z" fill="#f6eed8" />
+        <path d="M-2 -28 L-22 -4 L-2 -4 Z" fill="#e9dfc4" />
+      </g>
+    );
+  }
+  return <polygon transform={`translate(${x} ${y}) rotate(${(ang * 180) / Math.PI})`} points="26,0 -14,-20 -14,20" fill={col} stroke="rgba(20,14,8,0.95)" strokeWidth={3} />;
+};
+
 /**
  * visual: {type: map, year: "117 AD", from: "133 BC", view: "italy>empire", cities: [Rome], route: [A,B,C],
  *          labels: [{text: GAUL, at: [2.5, 46.5]}], label: "Greatest extent", origin: Rome, note}
@@ -65,6 +98,7 @@ export const MapScene: React.FC<SceneProps> = ({v, plan, dur}) => {
     const drift = ((st.seed % 5) - 2) * 0.6;
     cx = views[0][0] + drift * q; cy = views[0][1]; span = views[0][2] * (1 - st.pace.zoom * q);
   }
+  cx += 0.10 * Math.sin(t * 0.9); cy += 0.07 * Math.cos(t * 0.7);   // slight camera life
   const [Xc, Yc] = merc(cx, cy);
   const z = w / toRad(span) / K;
   const px = (lon: number, lat: number): [number, number] => { const [X, Y] = merc(lon, lat); return [(X - Xc) * z + w / 2, (Y - Yc) * z + h / 2]; };
@@ -109,16 +143,46 @@ export const MapScene: React.FC<SceneProps> = ({v, plan, dur}) => {
     yearText = {n: String(Math.abs(yv)), era: yv < 0 ? 'BC' : 'AD'};
   }
   const cities: Place[] = (v.cities ?? []).map(resolvePlace);
+  const burns: Place[] = (v.burn ?? []).map(resolvePlace);
+  const battles: Place[] = (v.battles ?? []).map(resolvePlace);
+  // soldiers marching behind the head
+  const dcum: number[] = [0];
+  drawn.forEach((d, i) => { if (i) dcum.push(dcum[i - 1] + Math.hypot(d[0] - drawn[i - 1][0], d[1] - drawn[i - 1][1])); });
+  const pointAt = (dist: number): [number, number] | null => {
+    if (dist < 0 || drawn.length < 2) return null;
+    for (let i = 1; i < drawn.length; i++) if (dcum[i] >= dist) { const f = (dist - dcum[i - 1]) / Math.max(1e-6, dcum[i] - dcum[i - 1]); return [lerp(drawn[i - 1][0], drawn[i][0], f), lerp(drawn[i - 1][1], drawn[i][1], f)]; }
+    return null;
+  };
+  const headDist = dcum[dcum.length - 1] ?? 0;
   const labels: {text: string; at: [number, number]}[] = v.labels ?? [];
   const ink = '#faf0dc';
   const lab = v.label as string | undefined;
   const q = easeOut(seg(t, 0.2, 0.7));
+
+  type Spec = {key: string; x: number; y: number; text: string; q: number; offs: [number, number][]};
+  const specs: Spec[] = [];
+  route.forEach((r, i) => { const wpIdx = rpts.findIndex((s2) => s2.wp === i); if (wpIdx < 0 || cum[wpIdx] > ru + 0.5) return; const [x, y] = px(r.lon, r.lat); specs.push({key: 'w' + i, x, y, text: r.name, q: 1, offs: [[0, -46], [0, 46], [80, -46], [-80, 46], [0, -94], [0, 94]]}); });
+  cities.forEach((c, i) => { const qq = easeOutBack(seg(t, 0.5 + i * 0.35, 1.0 + i * 0.35)); if (qq <= 0) return; const [x, y] = px(c.lon, c.lat); specs.push({key: 'c' + i, x, y, text: c.name, q: clamp01(qq), offs: [[0, -40], [0, 40], [90, -40], [-90, 40]]}); });
+  battles.forEach((c, i) => { const qq = easeOutBack(seg(t, 0.6 + i * 0.4, 1.1 + i * 0.4)); if (qq <= 0) return; const [x, y] = px(c.lon, c.lat); specs.push({key: 'b' + i, x, y, text: c.name, q: clamp01(qq), offs: [[0, 52], [0, -52], [96, 52], [-96, -52]]}); });
+  burns.forEach((c, i) => { const qq = easeOutBack(seg(t, 0.6 + i * 0.3, 1.2 + i * 0.3)); if (qq <= 0) return; const [x, y] = px(c.lon, c.lat); specs.push({key: 'f' + i, x, y, text: c.name, q: clamp01(qq), offs: [[0, 56], [0, -90], [96, 56], [-96, 56]]}); });
+  const placed: {x0: number; y0: number; x1: number; y1: number}[] = [{x0: 0, y0: 0, x1: 250, y1: 150}];
+  if (lab) placed.push({x0: 0, y0: h - 110, x1: lab.length * 21 + 80, y1: h});
+  const chips = specs.map((sp) => {
+    const cw = sp.text.length * 16.5 + 34;
+    const tryOff = (dx: number, dy: number) => { const x0 = Math.min(Math.max(sp.x + dx - cw / 2, 8), w - 8 - cw); return {x0, y0: sp.y + dy - 24, x1: x0 + cw, y1: sp.y + dy + 24}; };
+    let pick = tryOff(...sp.offs[0]);
+    for (const [dx, dy] of sp.offs) { const r = tryOff(dx, dy); if (!placed.some((q2) => !(r.x1 < q2.x0 || r.x0 > q2.x1 || r.y1 < q2.y0 || r.y0 > q2.y1))) { pick = r; break; } }
+    placed.push(pick);
+    return {...sp, cx: (pick.x0 + pick.x1) / 2, cy: (pick.y0 + pick.y1) / 2};
+  });
+  const tintA = v.tint === 'red' ? 0.18 + 0.05 * Math.sin(t * 6) : 0;
 
   return (
     <div style={{position: 'absolute', inset: 0, borderRadius: 38, overflow: 'hidden', border: `4px solid ${withAlpha(p.accent2, 0.9)}`, boxSizing: 'border-box'}}>
       <svg width={w} height={h} style={{position: 'absolute', left: -4, top: -4}}>
         <defs>
           <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.sea} /><stop offset="1" stopColor={p.sea2} /></linearGradient>
+          <radialGradient id="fire"><stop offset="0" stopColor="rgba(255,170,60,0.85)" /><stop offset="0.5" stopColor="rgba(255,90,30,0.35)" /><stop offset="1" stopColor="rgba(255,60,20,0)" /></radialGradient>
           <mask id="sweep" maskUnits="userSpaceOnUse" x={-9999} y={-9999} width={19999} height={19999}>
             <circle cx={ox} cy={oy} r={R} fill="#fff" />
           </mask>
@@ -144,13 +208,24 @@ export const MapScene: React.FC<SceneProps> = ({v, plan, dur}) => {
         {rpts.length > 0 && drawn.length > 1 && <>
           <polyline points={drawn.map((d) => d.join(',')).join(' ')} fill="none" stroke="rgba(20,14,8,0.92)" strokeWidth={13} strokeLinecap="round" strokeLinejoin="round" />
           <polyline points={drawn.map((d) => d.join(',')).join(' ')} fill="none" stroke={p.accent2} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" strokeDasharray="26 14" strokeDashoffset={-frame * 2.4} />
-          {head && <polygon transform={`translate(${head[0]} ${head[1]}) rotate(${(ang * 180) / Math.PI})`} points="26,0 -14,-20 -14,20" fill={p.accent2} stroke="rgba(20,14,8,0.95)" strokeWidth={3} />}
+          {Array.from({length: 13}, (_, k) => { const pt = pointAt(headDist - 24 - k * 15); if (!pt) return null; const j = (hash(k * 7) - 0.5) * 14;
+            return <circle key={'sd' + k} cx={pt[0] + Math.sin(ang + 1.57) * j} cy={pt[1] + Math.cos(ang + 1.57) * j + Math.sin(t * 9 + k) * 1.6} r={5.2 - k * 0.12} fill="#fff6e2" stroke="rgba(20,14,8,0.95)" strokeWidth={2} />; })}
+          {head && <Head kind={v.icon ?? 'army'} x={head[0]} y={head[1]} ang={ang} col={p.accent2} t={t} />}
         </>}
-        {route.map((r, i) => { const wpIdx = rpts.findIndex((s) => s.wp === i); if (wpIdx < 0 || cum[wpIdx] > ru + 0.5) return null; const [x, y] = px(r.lon, r.lat);
-          return <g key={'w' + i}><circle cx={x} cy={y} r={9} fill={p.accent2} stroke="rgba(20,14,8,1)" strokeWidth={3} /><Chip x={x} y={y + (i % 2 ? 46 : -46)} text={r.name} q={1} W={w} /></g>; })}
+        {route.map((r, i) => { const wpIdx = rpts.findIndex((s2) => s2.wp === i); if (wpIdx < 0 || cum[wpIdx] > ru + 0.5) return null; const [x, y] = px(r.lon, r.lat);
+          return <circle key={'w' + i} cx={x} cy={y} r={9} fill={p.accent2} stroke="rgba(20,14,8,1)" strokeWidth={3} />; })}
         {cities.map((c, i) => { const [x, y] = px(c.lon, c.lat); const qq = easeOutBack(seg(t, 0.5 + i * 0.35, 1.0 + i * 0.35)); if (qq <= 0) return null; const ph = (t * 1.3 + i * 0.4) % 1;
-          return <g key={'c' + i}><circle cx={x} cy={y} r={8 + 34 * ph} fill="none" stroke={withAlpha(p.accent2, (1 - ph) * 0.8)} strokeWidth={3} />
-            <circle cx={x} cy={y} r={11 * qq} fill={p.accent2} stroke="rgba(20,14,8,1)" strokeWidth={3} /><Chip x={x} y={y - 38} text={c.name} q={clamp01(qq)} W={w} /></g>; })}
+          return <g key={'c' + i}><circle cx={x} cy={y} r={8 + 34 * ph} fill="none" stroke={withAlpha(p.accent2, (1 - ph) * 0.8)} strokeWidth={3} /><circle cx={x} cy={y} r={11 * qq} fill={p.accent2} stroke="rgba(20,14,8,1)" strokeWidth={3} /></g>; })}
+        {battles.map((c, i) => { const [x, y] = px(c.lon, c.lat); const qq = easeOutBack(seg(t, 0.6 + i * 0.4, 1.1 + i * 0.4)); if (qq <= 0) return null; const ph = (t * 1.6 + i * 0.3) % 1; const r = 20 * qq;
+          return <g key={'b' + i}><circle cx={x} cy={y} r={10 + 60 * ph} fill="none" stroke={withAlpha('#ff4a36', (1 - ph) * 0.9)} strokeWidth={4} />
+            <circle cx={x} cy={y} r={r + 8} fill="rgba(20,8,6,0.8)" /><g stroke="#ff5a46" strokeWidth={6} strokeLinecap="round"><line x1={x - r * 0.7} y1={y - r * 0.7} x2={x + r * 0.7} y2={y + r * 0.7} /><line x1={x + r * 0.7} y1={y - r * 0.7} x2={x - r * 0.7} y2={y + r * 0.7} /></g></g>; })}
+        {burns.map((c, i) => { const [x, y] = px(c.lon, c.lat); const on = easeOut(seg(t, 0.6 + i * 0.3, 1.4 + i * 0.3)); if (on <= 0) return null;
+          return <g key={'f' + i}><circle cx={x} cy={y} r={150 * on * (1 + 0.08 * Math.sin(t * 13))} fill="url(#fire)" />
+            {Array.from({length: 22}, (_, k) => { const life = (t * 1.25 + k / 22 + hash(k + i * 9) * 0.3) % 1; const fx = x + (hash(k * 3 + 1) - 0.5) * 80 * (1 - life * 0.4) + Math.sin(t * 8 + k) * 5;
+              const fy = y + 10 - life * 150 * on; const smoke = life > 0.62;
+              return <circle key={k} cx={smoke ? fx + (life - 0.62) * 40 : fx} cy={smoke ? fy - (life - 0.62) * 50 : fy} r={smoke ? 12 + (life - 0.62) * 70 : 18 * (1 - life) + 3} fill={smoke ? `rgba(60,50,46,${0.42 * (1 - life)})` : life < 0.3 ? '#ffe27a' : life < 0.55 ? '#ff8a2a' : '#e0391e'} opacity={smoke ? 1 : (1 - life) * on} />; })}</g>; })}
+        {chips.map((cp) => <Chip key={cp.key} x={cp.cx} y={cp.cy} text={cp.text} q={cp.q} W={w} />)}
+        {tintA > 0 && <rect width={w} height={h} fill={`rgba(150,12,8,${tintA})`} />}
       </svg>
       {yearText && (
         <div style={{position: 'absolute', left: 22, top: 22, height: 116, padding: '0 28px 0 22px', borderRadius: 22, background: 'rgba(12,10,8,0.76)', border: `2px solid ${withAlpha(p.accent2, 0.9)}`, display: 'flex', alignItems: 'baseline', gap: 14, fontFamily: SERIF, color: ink}}>

@@ -1,10 +1,10 @@
 The Sun You See Is 8 Minutes Old
-Total 39.5s. Start each narration line at its time:
+Total 46.2s. Start each narration line at its time:
 
 [00:00.1]  The Sun you see is eight minutes old.
 [00:03.1]  Light is the fastest thing there is, about three hundred thousand kilometers every second.
-[00:09.3]  But the Sun is one hundred fifty million kilometers away, so the trip takes eight minutes and nineteen seconds.
-[00:17.0]  If the Sun vanished right now, we would keep seeing it shine for eight more minutes.
-[00:23.1]  Sunlight takes forty three minutes to reach Jupiter, and over four hours to reach Neptune.
-[00:29.4]  And it has a lot to light up. A hundred and nine Earths fit across the Sun.
-[00:35.4]  So tonight, look up. You are seeing the past.
+[00:10.5]  But the Sun is one hundred fifty million kilometers away, so the trip takes eight minutes and nineteen seconds.
+[00:19.6]  If the Sun vanished right now, we would keep seeing it shine for eight more minutes.
+[00:26.9]  Sunlight takes forty three minutes to reach Jupiter, and over four hours to reach Neptune.
+[00:34.4]  And it has a lot to light up. A hundred and nine Earths fit across the Sun.
+[00:41.5]  So tonight, look up. You are seeing the past.

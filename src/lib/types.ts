@@ -1,7 +1,7 @@
 export type Word = {text: string; spoken: string; start: number; end: number}; // seconds
 export type Visual = {type: string; [k: string]: any};
 export type Seg = {
-  idx: number; isHook: boolean; say: string; shown?: string; visual: Visual | null;
+  idx: number; isHook: boolean; say: string; shown?: string; sfx?: string[]; visual: Visual | null;
   startFrame: number; endFrame: number; speechStart: number; speechEnd: number; words: Word[];
 };
 export type Palette = {
@@ -21,6 +21,7 @@ export type Plan = {
   fps: number; totalFrames: number; style: Style; segs: Seg[];
   territories: {year: number; countries: string[]}[];
   audio?: string | null; bgVideo?: string | null;
+  impacts?: {t: number; amp: number}[];   // sound hits -> camera shake + flash
 };
 export const W = 1080;
 export const H = 1920;

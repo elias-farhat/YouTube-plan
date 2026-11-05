@@ -5,3 +5,4 @@ edge-tts>=6.1       # free neural voices (needs internet)
 piper-tts>=1.2      # offline voices (needs a model in models/piper/, see README)
 pyshp               # only for tools/build_map_data.py
 pocketsphinx      # offline speech recognition, used by tools/voice_import.py to align a recorded voice to the script
+scipy              # sound-effect synthesis (tools/sfx.py)
