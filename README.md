@@ -159,3 +159,6 @@ public/fonts/              Inter (OFL) + DejaVu Serif, bundled so renders look i
 
 ### Dr. Bit placement (`bit:`)
 Per line (and `hook_bit:` / `outro_bit:`): `bit: {x: 0.2, y: 0.8, s: 5}` = full-body Dr. Bit standing IN the scene (feet at x,y as fractions of the frame, `s` = pixel scale, `flip: true` to face left) with the text box above his head; `bit: off` = he leaves so the diagram/close-up is unobstructed (text box stays at the top); no `bit:` = small in the bottom-left corner. Costume via `outfit:` (lab, storm, gardener, astronaut, diver, hardhat).
+
+Pointer + walking: `bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.5, y: 0.3}}` makes Dr. Bit raise a pointer stick at that spot (with a pulsing marker; he turns to face it). `to: {x: 0.7, y: 0.8}` makes him walk there during the first second of the line (legs step). Both can be combined.
+Scenes added: `ocean` (reef/glow/pressure), `sky` (prism/scatter/sunset), `microwave` (oven/molecule/depth), `touch` (grid/charge/finger/scan/glove). Songs: arcade, storm, sunny, mystery, epic, dream, funk, glitch. Blips: retro, zap, bubble, robot, bell, chirp.

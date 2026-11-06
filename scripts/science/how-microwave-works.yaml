@@ -1,0 +1,58 @@
+# SCIENCE with DR. BIT.  Retention: hook on frame 0, open loop in line 1, one new visual per line, twist, payoff, loop outro.
+title: How a Microwave Heats Food
+channel: science
+mode: bits
+hook: "YOUR MICROWAVE MAKES WATER DANCE."
+hook_visual: {type: pixel, scene: microwave, phase: oven}
+hook_bit: {x: 0.2, y: 0.8, s: 5}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+song: funk
+blip: robot
+outfit: hardhat
+pace: quick
+talk: 14
+outro: "SO STIR, THEN LET IT REST."
+outro_bit: {x: 0.2, y: 0.8, s: 5}
+bpm: 150
+pixel: {full: true, bits: 32, palette: day, bpm: 150}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "How a Microwave Really Works (It Doesn't Cook From the Inside Out)"
+  description: |
+    A magnetron makes microwaves at 2.45 GHz. The electric field flips about 2.45 billion times a second, and polar water molecules keep trying to turn with it. The twisting and jostling becomes heat. Microwaves only penetrate a few centimeters, so the outer layer heats first and the rest warms by conduction. That is why stirring and resting help, and why microwaves do not cook from the inside out.
+
+    Dr. Bit explains science with pixels. Simplified, illustrative animation.
+  tags: [Science, Microwave, Physics, HowItWorks, Kitchen, DrBit, PixelArt]
+  pinned_comment: "Did you know it doesn't cook from the inside out? Tell me what to explain next."
+lines:
+  - say: "A MAGNETRON MAKES INVISIBLE WAVES."
+    mood: talk
+    visual: {type: pixel, scene: microwave, phase: oven}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.17, y: 0.13}}
+  - say: "THEY FLIP 2.45 BILLION TIMES A SECOND."
+    mood: shock
+    visual: {type: pixel, scene: microwave, phase: molecule}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "WATER MOLECULES TRY TO FOLLOW."
+    mood: talk
+    visual: {type: pixel, scene: microwave, phase: molecule}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.62, y: 0.23}}
+  - say: "ALL THAT TWISTING MAKES FRICTION: HEAT."
+    mood: worried
+    visual: {type: pixel, scene: microwave, phase: molecule}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "BUT WAVES REACH ONLY A FEW CM DEEP."
+    mood: talk
+    visual: {type: pixel, scene: microwave, phase: depth}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.5, y: 0.2}}
+  - say: "THE REST HEATS BY CONDUCTION."
+    mood: talk
+    visual: {type: pixel, scene: microwave, phase: depth, conduct: true}
+    bit: {x: 0.2, y: 0.8, s: 5, to: {x: 0.7, y: 0.8}}
+  - say: "SO IT DOESN'T COOK FROM THE INSIDE OUT."
+    mood: aha
+    visual: {type: pixel, scene: microwave, phase: depth}
+    bit: {x: 0.2, y: 0.8, s: 5}

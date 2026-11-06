@@ -1,0 +1,58 @@
+# SCIENCE with DR. BIT.  Retention: hook on frame 0, open loop in line 1, one new visual per line, twist, payoff, loop outro.
+title: Why Is the Sky Blue?
+channel: science
+mode: bits
+hook: "THE SKY ISN'T PAINTED BLUE."
+hook_visual: {type: pixel, scene: sky, phase: prism}
+hook_bit: {x: 0.2, y: 0.8, s: 5}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+song: dream
+blip: bubble
+outfit: astronaut
+pace: quick
+talk: 14
+outro: "NOW GO LOOK AT THE SKY."
+outro_bit: {x: 0.2, y: 0.8, s: 5}
+bpm: 120
+pixel: {full: true, bits: 32, palette: day, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "Why Is the Sky Blue? (And Why Sunsets Are Red)"
+  description: |
+    Sunlight looks white but hides every color. Air molecules scatter short blue wavelengths about 6 times more than long red ones, so blue light reaches your eyes from every direction and the sky looks blue. At sunset the light crosses far more air, most blue is scattered out of the beam, and red and orange survive. (Violet scatters even more, but the Sun emits less of it and our eyes are less sensitive to it.)
+
+    Dr. Bit explains science with pixels. Simplified, illustrative animation.
+  tags: [Science, Sky, Light, Physics, Sunset, HowItWorks, DrBit, PixelArt]
+  pinned_comment: "Did you know blue scatters about 6x more than red? Tell me what to explain next."
+lines:
+  - say: "SUNLIGHT HIDES EVERY COLOR."
+    mood: talk
+    visual: {type: pixel, scene: sky, phase: prism}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "AIR MOLECULES BOUNCE IT AROUND."
+    mood: talk
+    visual: {type: pixel, scene: sky, phase: scatter}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.6, y: 0.27}}
+  - say: "BLUE BOUNCES ABOUT 6X MORE THAN RED."
+    mood: aha
+    visual: {type: pixel, scene: sky, phase: scatter}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.55, y: 0.3}}
+  - say: "SO BLUE ARRIVES FROM EVERYWHERE."
+    mood: happy
+    visual: {type: pixel, scene: sky, phase: scatter}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "AT SUNSET, LIGHT TAKES A LONGER PATH."
+    mood: talk
+    visual: {type: pixel, scene: sky, phase: sunset, h0: 1, h1: 0.35}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.78, y: 0.7}}
+  - say: "BLUE IS SCATTERED OUT. RED SURVIVES."
+    mood: shock
+    visual: {type: pixel, scene: sky, phase: sunset, h0: 0.35, h1: 0}
+    bit: {x: 0.2, y: 0.8, s: 5, to: {x: 0.45, y: 0.8}, point: {x: 0.72, y: 0.12}}
+  - say: "SAME LIGHT. DIFFERENT DISTANCE."
+    mood: aha
+    visual: {type: pixel, scene: sky, phase: sunset, h0: 0, h1: 0}
+    bit: {x: 0.2, y: 0.8, s: 5}

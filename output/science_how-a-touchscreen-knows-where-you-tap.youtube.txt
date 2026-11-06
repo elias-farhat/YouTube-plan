@@ -1,0 +1,12 @@
+TITLE (60/100)
+How a Touchscreen Knows Where You Tap (It Feels Electricity)
+
+DESCRIPTION
+Most phone screens are capacitive. Under the glass is a grid of tiny transparent wires. Each crossing holds a small electric charge. Your finger conducts electricity, so it steals a little of that charge. The chip scans the grid, finds the crossing with the biggest change, and that is where you tapped. Insulating gloves block it, while many conductive things (even a banana) can work.
+
+Dr. Bit explains science with pixels. Simplified, illustrative animation.
+
+#Shorts #Science #Touchscreen #Phones #Electronics #HowItWorks #DrBit #PixelArt
+
+PINNED COMMENT
+Did you know a banana can work on a touchscreen? Tell me what to explain next.

@@ -41,11 +41,11 @@ lines:
     mood: talk
     visual: {type: pixel, scene: storm, phase: charge}
   - say: "THEN A HIDDEN LEADER STEPS DOWN."
-    bit: {x: 0.78, y: 0.80, s: 5}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.5, y: 0.3}}
     mood: worried
     visual: {type: pixel, scene: storm, phase: leader}
   - say: "THE FLASH YOU SEE SHOOTS UP!"
-    bit: {x: 0.22, y: 0.80, s: 5}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.52, y: 0.32}}
     mood: aha
     visual: {type: pixel, scene: storm, phase: return}
   - say: "30,000 DEGREES. 5X THE SUN."

@@ -1,0 +1,12 @@
+Why Is the Sky Blue?
+Total 35.0s. Start each narration line at its time:
+
+[00:00.1]  
+[00:03.5]  
+[00:07.5]  
+[00:11.5]  
+[00:15.5]  
+[00:19.5]  
+[00:23.5]  
+[00:27.5]  
+[00:31.1]  

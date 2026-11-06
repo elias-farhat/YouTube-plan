@@ -387,6 +387,119 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         for (let i = 0; i < 10; i++) { const fr = (t * 0.5 + i / 10) % 1, x = R * 0.5, y = hillY(x) - h * (0.65 - 0.65 * fr); blob(x + Math.sin(i + fr * 5) * 4, y, 1.4, '#ffe14a'); }
         for (let i = 0; i < 10; i++) { const fr = (t * 0.3 + i / 10) % 1, sx = R * (0.04 + 0.92 * hash(i)), sy = RH * (0.05 + 0.2 * hash(i + 4)), tg: [number, number] = [R * 0.5, hillY(R * 0.5) - h * 0.65]; if (fr < 0.92) co2(sx + (tg[0] - sx) * ease(fr), sy + (tg[1] - sy) * ease(fr), 1.1); }
       }
+    } else if (scene === 'sky') {
+      const ph = v.phase ?? 'prism';
+      const bgRows = (a: string, b: string, h2 = RH) => { for (let y = 0; y < h2; y++) rect(0, y, R, 1, mix(a, b, y / h2)); };
+      if (ph === 'prism') {
+        bgRows('#0a1030', '#1c2c66');
+        const px = Math.round(R * 0.5), py = Math.round(RH * 0.3), PH = 26, bw = 3 + Math.round(kick * 2);
+        sunAt(22, py, 11);
+        for (let x = 36; x < px - 10; x++) rect(x, py - Math.floor(bw / 2), 1, bw, '#ffffff');
+        for (let y = -PH; y <= PH; y++) { const hw = Math.round(((y + PH) / (2 * PH)) * PH * 1.05); rect(px - hw, py + y, hw * 2 + 1, 1, mix('#bfe0ff', '#6aa0e0', (y + PH) / (2 * PH))); rect(px - hw, py + y, 1, 1, '#ffffff'); rect(px + hw, py + y, 1, 1, '#ffffff'); }
+        ['#ff3b3b', '#ff9a2a', '#ffe14a', '#4ee05a', '#3ad0ff', '#4a6aff', '#b05aff'].forEach((c, i) => { const ang = -0.34 + i * 0.115; for (let x = px + 14; x < R; x++) rect(x, py + (x - px - 14) * Math.tan(ang) - 1, 1, 3, c); });
+        draw('ALL COLORS', 6, py - 36, 1, '#ffffff'); draw('SUNLIGHT', 6, py + 18, 1, '#ffe14a');
+      } else if (ph === 'scatter') {
+        bgRows('#050a22', '#0b1a4a');
+        const a0 = Math.round(RH * 0.2), a1 = Math.round(RH * 0.41);
+        for (let y = a0; y < a1; y++) for (let x = Math.round(R * 0.3); x < R; x++) if (bayer(x, y) < 0.38) dot(x, y, mix('#1c4fb0', '#3a8aff', (y - a0) / (a1 - a0)));
+        sunAt(18, Math.round(RH * 0.3), 10);
+        for (let k = 0; k < 4; k++) {
+          const y0 = RH * 0.23 + k * RH * 0.045, xs = R * (0.42 + 0.06 * k), f = (t * 0.7 + k * 0.25) % 1, c = Math.floor(t * 0.7 + k * 0.25), ang = hash(c * 7 + k * 3) * 6.283;
+          if (f < 0.5) { const hx = 30 + (f / 0.5) * (xs - 30); for (let q = 0; q < 8; q++) rect(hx - q, y0, 1, 2, mix('#ffffff', '#0b1a4a', q / 8)); }
+          else {
+            const g = (f - 0.5) / 0.5, rx = xs + g * (R - xs);
+            for (let q = 0; q < 8; q++) rect(rx - q, y0, 1, 2, mix('#ff4a4a', '#0b1a4a', q / 8));
+            for (let q = 0; q < 6; q++) { const gg = Math.max(0, g - q * 0.03); rect(xs + Math.cos(ang) * gg * 80 - 1, y0 + Math.sin(ang) * gg * 80, 3, 3, mix('#4ab0ff', '#0b1a4a', q / 6)); }
+          }
+        }
+        draw('BLUE BOUNCES AROUND', 6, a0 - 16, 1, '#6ab8ff'); draw('RED GOES STRAIGHT', R - 106, a1 + 8, 1, '#ff6a6a');
+        const ex = Math.round(R * 0.86), ey = Math.round(RH * 0.5); rect(ex - 9, ey - 5, 18, 10, '#ffffff'); rect(ex - 4, ey - 4, 8, 8, '#2a7aff'); rect(ex - 2, ey - 2, 4, 4, '#05103a'); draw('YOU', ex - 9, ey + 10, 1, '#ffffff');
+        draw('ABOUT 6X', 10, RH * 0.5 + 0, 2, '#6ab8ff'); draw('MORE BLUE', 10, RH * 0.5 + 20, 1, '#6ab8ff');
+      } else if (ph === 'sunset') {
+        const hgt = (v.h0 ?? 1) + ((v.h1 ?? 0) - (v.h0 ?? 1)) * ease(pr), warm = Math.pow(1 - hgt, 1.5), hor = Math.round(RH * 0.56);
+        for (let y = 0; y < hor; y++) rect(0, y, R, 1, mix(mix('#2a9aff', '#0a52c8', y / hor * 0.0 + (1 - y / hor) * 0.0), mix('#ff7a2a', '#6a2a8a', 1 - y / hor), warm));
+        const sx = Math.round(R * 0.72), sy = hor - 6 - hgt * RH * 0.3;
+        blob(sx, sy, 12, mix('#ffe14a', '#ff3a1a', warm));
+        for (let y = hor; y < RH; y++) for (let x = 0; x < R; x++) dot(x, y, y < hor + 3 + Math.sin(x * 0.07) * 3 ? '#161a2e' : '#0c1020');
+        const px0 = Math.round(R * 0.5), py0 = Math.round(RH * 0.64), pw = R - 6 - px0, ph3 = Math.round(RH * 0.27);
+        rect(px0, py0, pw, ph3, '#0a1430'); rect(px0, py0, pw, 1, '#ffd23f'); rect(px0, py0 + ph3 - 1, pw, 1, '#ffd23f'); rect(px0, py0, 1, ph3, '#ffd23f'); rect(px0 + pw - 1, py0, 1, ph3, '#ffd23f');
+        const cx = px0 + pw / 2, cy = py0 + ph3 + 6, rE = 26;
+        for (let y = -rE - 8; y <= 0; y++) for (let x = -rE - 8; x <= rE + 8; x++) { const d = Math.hypot(x, y); if (cy + y < py0 + ph3 - 1) { if (d <= rE) dot(cx + x, cy + y, '#2f6fe0'); else if (d <= rE + 7) dot(cx + x, cy + y, bayer(x, y) < 0.45 ? '#6ab8ff' : '#1c3a7a'); } }
+        const ang = hgt * 1.5, ox = cx, oy = cy - rE;
+        for (let q = 0; q < 70; q++) dot(ox + Math.cos(ang) * q * -1 * 0 + (-Math.cos(ang)) * 0 + Math.cos(Math.PI - ang) * q * -1, oy - Math.sin(ang) * q, mix('#ffe14a', '#ff6a2a', 1 - hgt));
+        blob(ox, oy, 2.2, '#ffffff');
+        draw(hgt > 0.5 ? 'SHORT PATH' : 'LONG PATH', px0 + 6, py0 + 6, 1, '#ffe14a');
+      }
+    } else if (scene === 'microwave') {
+      const ph = v.phase ?? 'oven';
+      const bgRows = (a: string, b: string) => { for (let y = 0; y < RH; y++) rect(0, y, R, 1, mix(a, b, y / RH)); };
+      if (ph === 'oven') {
+        bgRows('#141a2e', '#0a0e1c');
+        rect(12, 24, 192, 142, '#9aa4c4'); rect(16, 28, 184, 134, '#0b0f1c');
+        rect(22, 36, 24, 18, '#ff9a2a'); rect(22, 36, 24, 3, '#ffd28a'); draw('MAGNETRON', 22, 58, 1, '#ffd23f');
+        for (let i = 0; i < 6; i++) { const r = ((t * 70 + i * 28) % 170); for (let a = -0.15; a < 1.45; a += 0.02) { const x = 46 + Math.cos(a) * r, y = 45 + Math.sin(a) * r; if (x < 198 && y < 158) dot(x, y, mix('#ffd23f', '#0b0f1c', Math.min(0.85, r / 200))); } }
+        rect(60, 146, 100, 4, '#cfd6e8'); blob(110, 136, 16, '#c8853a'); blob(100, 133, 6, '#e8a45a');
+        draw('2.45 GHZ', 110, 40, 2, '#ffffff');
+      } else if (ph === 'molecule') {
+        const heat = Math.min(1, pr * 1.1);
+        bgRows(mix('#10141f', '#6a2a10', heat * 0.8), '#0a0e1c');
+        const sgn = Math.sin(t * 7), col = sgn > 0 ? '#ff6a6a' : '#6ab8ff';
+        for (let y = 0; y < 60; y++) rect(24, 34 + y, 2, 1, col);
+        for (let k = 0; k < 8; k++) { const a = sgn > 0 ? 1 : -1; rect(18 + k - (a > 0 ? 0 : 0), a > 0 ? 34 + k : 94 - k, 14 - 2 * k < 1 ? 1 : 14 - 2 * k, 1, col); }
+        draw('WAVE', 6, 100, 1, '#ffffff'); draw('PUSH', 6, 112, 1, col);
+        const mol = (cx: number, cy: number, k: number, ph0: number) => {
+          const th = Math.sin(t * 7 + ph0) * 0.9 + (heat * Math.sin(t * 31 + ph0 * 3) * 0.15), jit = heat * 1.2;
+          const ox = cx + (hash(Math.floor(t * 20) + ph0) - 0.5) * jit, oy = cy + (hash(Math.floor(t * 20) + ph0 + 5) - 0.5) * jit;
+          for (const s2 of [-1, 1]) { const a = th + s2 * 0.91 - 1.57; sphere(ox + Math.cos(a) * 14 * k, oy + Math.sin(a) * 14 * k, 5 * k, mix('#ffffff', '#ffb070', heat), 'plain'); }
+          sphere(ox, oy, 8.5 * k, '#ff3a3a', 'plain');
+        };
+        mol(R * 0.62, 88, 1.8, 0);
+        [[0.3, 140], [0.5, 150], [0.78, 142], [0.9, 100], [0.38, 112]].forEach(([fx, fy], i) => mol(R * fx, fy, 0.9, i + 1));
+        draw('H2O', R * 0.62 - 14, 30, 2, '#9fd8ff'); draw('HEAT', R - 66, 8, 2, mix('#9aa4c4', '#ff6a2a', heat));
+      } else if (ph === 'depth') {
+        bgRows('#141a2e', '#0a0e1c');
+        const fx0 = 26, fy0 = 62, fw = R - 52, fh = 96, sp = Math.min(1, pr * 1.15);
+        for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
+          const dEdge = Math.min(x, fw - 1 - x, y, fh - 1 - y), shell = Math.max(0, 1 - dEdge / 14), spread = Math.max(0, sp * 1.3 - dEdge / 44);
+          const heat = v.conduct ? Math.max(shell, Math.min(1, spread)) : shell;
+          dot(fx0 + x, fy0 + y, mix(mix('#3a5a8a', '#4a6aa0', bayer(x, y)), mix('#ff9a2a', '#ff4a1a', bayer(x + 1, y)), heat));
+        }
+        for (let i = 0; i < 10; i++) { const x = fx0 + 14 + i * 17, f = (t * 0.9 + i * 0.13) % 1; for (let y = 0; y < 16; y++) dot(x + Math.sin(y * 0.8 + t * 9) * 2, fy0 - 28 + y + f * 0, mix('#ffd23f', '#141a2e', y / 18)); }
+        for (let k = 0; k < 14; k++) rect(fx0 - 6, fy0 + k, 3, 1, '#ffffff'); rect(fx0 - 6, fy0, 3, 1, '#ffffff'); rect(fx0 - 6, fy0 + 14, 3, 1, '#ffffff');
+        draw('A FEW CM', fx0 + 4, fy0 + 20, 1, '#ffffff');
+        if (!v.conduct) draw('COLD CENTER', fx0 + fw / 2 - 33, fy0 + fh / 2 - 3, 1, '#cfe9ff'); else draw('HEAT SPREADS', fx0 + fw / 2 - 36, fy0 + fh / 2 - 3, 1, '#ffffff');
+      }
+    } else if (scene === 'touch') {
+      const st = v.step ?? 'grid';
+      for (let y = 0; y < RH; y++) rect(0, y, R, 1, mix('#0c1020', '#182040', y / RH));
+      const X0 = 22, Y0 = 44, DX = 20, DY = 20, NC = 9, NR = 6;
+      rect(10, 24, R - 20, 146, '#9aa4c4'); rect(14, 28, R - 28, 138, '#070a14');
+      for (let c = 0; c < NC; c++) rect(X0 + c * DX, 34, 1, 126, '#2ad8ff');
+      for (let r = 0; r < NR; r++) rect(16, Y0 + r * DY, R - 32, 1, '#ff5ad8');
+      let fx = X0 + 4.4 * DX, fy = Y0 + 2.6 * DY;
+      const down = st === 'finger' ? Math.min(1, pr * 1.6) : st === 'scan' || st === 'glove' ? 1 : 0;
+      const gloveNow = st === 'glove' && pr < 0.5, banana = st === 'glove' && pr >= 0.5;
+      const sig = gloveNow ? 0 : down;
+      for (let r = 0; r < NR; r++) for (let c = 0; c < NC; c++) {
+        const x = X0 + c * DX, y = Y0 + r * DY, d = Math.hypot(x - fx, y - fy), change = sig * Math.exp(-((d / 24) ** 2));
+        let col = '#ffffff';
+        if (st === 'grid') col = '#cfe9ff'; else col = mix('#ffd23f', '#ff2a2a', change);
+        rect(x - 2, y - 2, 5, 5, mix('#202a48', col, st === 'grid' ? 0.7 : 1 - change * 0.55));
+        if (st !== 'grid') { const hh = Math.round(change * 12); if (hh > 1) rect(x - 1, y - 3 - hh, 3, hh, '#ff2a2a'); }
+        if ((st === 'charge' || st === 'finger') && change < 0.5) { const pu = (Math.floor(beats * 2) + c + r) % 3 === 0; if (pu) { rect(x + 3, y - 4, 3, 1, '#ffd23f'); rect(x + 4, y - 5, 1, 3, '#ffd23f'); } }
+      }
+      if (st === 'scan') {
+        const sw = (t * 2.2) % 1, sx = X0 - 6 + sw * (NC * DX + 4);
+        rect(sx, 32, 2, 130, 'rgba(120,255,255,0.6)'); rect(14, Y0 - 8 + ((t * 3.1) % 1) * (NR * DY + 6), R - 28, 2, 'rgba(255,140,255,0.6)');
+        if (pr > 0.45) { const flash = Math.floor(beats * 2) % 2 === 0; for (let a = -14; a <= 14; a++) if (flash ? Math.abs(a) % 2 === 0 : Math.abs(a) % 3 === 0) { dot(fx + a, fy, '#ffffff'); dot(fx, fy + a, '#ffffff'); } draw(`COL ${Math.round((fx - X0) / DX) + 1} ROW ${Math.round((fy - Y0) / DY) + 1}`, 18, 6, 2, '#ffffff'); }
+      }
+      if (st === 'finger' || st === 'scan' || st === 'glove') {
+        const lift = (1 - down) * 60 + (st === 'glove' ? Math.max(0, Math.sin(pr * 12.56) * 0) : 0), tx = fx + 6, ty = fy + 6 - lift;
+        if (banana) { for (let a = -0.9; a < 1.0; a += 0.03) for (let w = 0; w < 9; w++) dot(tx + 0 + Math.sin(a) * 44 - 4, ty + 6 + w + (1 - Math.cos(a)) * 16 + 24 * 0 - a * 0, w < 2 ? '#c8a020' : '#ffe14a'); rect(tx + 38, ty + 18, 4, 6, '#5a3a10'); }
+        else { for (let y = 0; y < 90; y++) { const hw = 9 - Math.max(0, 8 - y) * 0.9; rect(tx - hw, ty + y, hw * 2, 1, gloveNow ? (y % 6 < 5 ? '#2a5ae8' : '#1c40b0') : '#f2c9a3'); } rect(tx - 4, ty + 1, 8, 5, gloveNow ? '#6a8aff' : '#ffe6d0'); }
+        if (gloveNow) draw('GLOVE: NO SIGNAL', 18, 138, 1, '#ff6a6a'); if (banana) draw('BANANA: TAP!', 18, 138, 2, '#ffe14a');
+      }
+      if (st === 'grid') { draw('GLASS', 18, 10, 2, '#ffffff'); }
     } else if (scene === 'ocean') {
       const ph = v.phase ?? 'reef';
       const dep = (v.from ?? 0) + ((v.to ?? v.from ?? 0) - (v.from ?? 0)) * ease(pr);

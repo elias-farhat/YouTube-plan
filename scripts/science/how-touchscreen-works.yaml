@@ -1,0 +1,58 @@
+# SCIENCE with DR. BIT.  Retention: hook on frame 0, open loop in line 1, one new visual per line, twist, payoff, loop outro.
+title: How a Touchscreen Knows Where You Tap
+channel: science
+mode: bits
+hook: "YOUR TOUCHSCREEN FEELS ELECTRICITY, NOT PRESSURE."
+hook_visual: {type: pixel, scene: touch, step: grid}
+hook_bit: {x: 0.2, y: 0.8, s: 5}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+song: glitch
+blip: chirp
+outfit: lab
+pace: quick
+talk: 14
+outro: "NOW TAP YOUR SCREEN."
+outro_bit: {x: 0.2, y: 0.8, s: 5}
+bpm: 120
+pixel: {full: true, bits: 32, palette: day, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "How a Touchscreen Knows Where You Tap (It Feels Electricity)"
+  description: |
+    Most phone screens are capacitive. Under the glass is a grid of tiny transparent wires. Each crossing holds a small electric charge. Your finger conducts electricity, so it steals a little of that charge. The chip scans the grid, finds the crossing with the biggest change, and that is where you tapped. Insulating gloves block it, while many conductive things (even a banana) can work.
+
+    Dr. Bit explains science with pixels. Simplified, illustrative animation.
+  tags: [Science, Touchscreen, Phones, Electronics, HowItWorks, DrBit, PixelArt]
+  pinned_comment: "Did you know a banana can work on a touchscreen? Tell me what to explain next."
+lines:
+  - say: "UNDER THE GLASS: A GRID OF TINY WIRES."
+    mood: talk
+    visual: {type: pixel, scene: touch, step: grid}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.3, y: 0.2}}
+  - say: "EACH CROSSING HOLDS A SMALL CHARGE."
+    mood: talk
+    visual: {type: pixel, scene: touch, step: charge}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "YOUR FINGER STEALS A LITTLE OF IT."
+    mood: shock
+    visual: {type: pixel, scene: touch, step: finger}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.52, y: 0.27}}
+  - say: "THE CHIP SCANS FOR THE BIGGEST DROP."
+    mood: talk
+    visual: {type: pixel, scene: touch, step: scan}
+    bit: {x: 0.2, y: 0.8, s: 5, point: {x: 0.52, y: 0.27}}
+  - say: "THAT CROSSING IS WHERE YOU TAPPED."
+    mood: aha
+    visual: {type: pixel, scene: touch, step: scan}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "GLOVES BLOCK IT. A BANANA WORKS."
+    mood: happy
+    visual: {type: pixel, scene: touch, step: glove}
+    bit: {x: 0.2, y: 0.8, s: 5, to: {x: 0.75, y: 0.8}}
+  - say: "IT IS A TINY ELECTRIC SENSOR."
+    mood: aha
+    visual: {type: pixel, scene: touch, step: grid}
+    bit: {x: 0.2, y: 0.8, s: 5}

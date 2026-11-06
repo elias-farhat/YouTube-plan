@@ -40,7 +40,11 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
   const hidden = place === 'off';
   const sCh = stage ? (stage.s ?? 5) : CHAR_PX;
   const nlines = Math.max(1, lines.length), bhPx = (nlines * 10 + 10);
-  const feetX = stage ? stage.x * W : 0, feetY = stage ? stage.y * 1920 : 0;
+  const walkT = stage?.to ? clamp01(segT / 1.0) : 1, mvT = walkT * walkT * (3 - 2 * walkT);   // walks from (x,y) to `to` in the first second
+  const moving = !!stage?.to && walkT < 1 && segT > 0;
+  const feetX = stage ? (stage.x + (stage.to ? (stage.to.x - stage.x) * mvT : 0)) * W : 0, feetY = stage ? (stage.y + (stage.to ? (stage.to.y - stage.y) * mvT : 0)) * 1920 : 0;
+  const pt = stage?.point ?? null, pointing = !!pt && segT > 0.25;
+  const flipped = stage ? (stage.flip ?? (pt ? pt.x * W < feetX - 40 : (stage.to ? stage.to.x < stage.x : false))) : false;
   const headTop = feetY - CH * sCh + 10 * sCh;                                  // top of his hair
   const bubbleW = (Math.max(8, ...lines.map((l) => l.length)) * 6 + 12) * BPIX;
   const boxL = stage ? Math.max(16, Math.min(W - 16 - bubbleW, feetX - bubbleW / 2)) : 0;         // text box centred over his head, kept on screen
@@ -131,7 +135,7 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
 
     // legs + shoes (full body), stepping on the beat
     const TR: Record<string, string> = {lab: '#3b4a8c', storm: '#e0a800', gardener: '#6a4f2a', astronaut: '#eef1fb', diver: '#b9792f', hardhat: '#ff8a1f'};
-    const trc = TR[plan.outfit ?? 'lab'] ?? TR.lab, step = beatIdx % 2 === 0 ? 1 : 0, lift2 = phase < 0.25 ? 1 : 0;
+    const trc = TR[plan.outfit ?? 'lab'] ?? TR.lab, step = moving ? Math.floor(frame / 4) % 2 : beatIdx % 2 === 0 ? 1 : 0, lift2 = moving ? 1 : phase < 0.25 ? 1 : 0;
     P(9, 53, 6, 11 - (step ? lift2 : 0), trc); P(19, 53, 6, 11 - (step ? 0 : lift2), trc);
     P(15, 53, 4, 6, trc === '#eef1fb' ? '#cdd3ee' : '#222a55');
     P(7, 64 - (step ? lift2 : 0), 9, 3, '#23233a'); P(18, 64 - (step ? 0 : lift2), 9, 3, '#23233a');
@@ -168,6 +172,8 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     // arms: the gesturing arm (screen left) and the flask arm (screen right)
     const arm = (sx: number, sy: number, hx: number, hy: number) => { line(ox + sx, oy + sy, ox + hx, oy + hy, COAT, 4); line(ox + sx + 3, oy + sy + 1, ox + hx + 3, oy + hy + 1, COATd, 1); P(hx - 1, hy - 2, 4, 3, SK); };
     if (shock) arm(4, 38, -1, 20); else if (aha) { arm(4, 38, 1, 14); P(1, 10, 2, 4, SK); } else if (happy) arm(4, 38, -2 + Math.round(Math.sin(beats * 3) * 2), 24); else arm(4, 39, -1, 30 - (talking ? 2 : 0) - (phase < 0.2 ? 2 : 0));
+    if (pointing) { line(ox + 27, oy + 39, ox + 34, oy + 31, COAT, 4); P(33, 28, 4, 3, SK); P(34, 27, 2, 1, SK); }
+    else {
     const fy = shock || happy ? 16 : 40, fxo = 38;
     line(ox + 27, oy + 39, ox + 34, oy + fy + 8, COAT, 4); P(33, fy + 7, 4, 3, SK);
     // the flask: green liquid with bubbles, glowing on the beat
@@ -176,6 +182,7 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     for (let i = 0; i < 4; i++) { const by3 = fy + 8 - ((t * 7 + i * 2.5) % 10); if (by3 > fy + 2) Q(fxo - 2 + (i % 3) * 2, by3, '#eaffff'); }
     if (phase < 0.25) for (let a = 0; a < 6.283; a += 0.5) Q(fxo + Math.cos(a) * 8, fy + 4 + Math.sin(a) * 8, '#5cff9c');
 
+    }
     // mood extras
     if (worried) { const sy = 13 + ((t * 8) % 6); P(25, sy, 2, 3, '#7fe3ff'); }
     if (aha) { disc(ox + 17, oy - 8, 4, '#ffe27a'); P(15, -4, 4, 3, '#8a93b4'); if (phase < 0.5) for (let a = 0; a < 6.283; a += 0.8) line(ox + 17 + Math.cos(a) * 6, oy - 8 + Math.sin(a) * 6, ox + 17 + Math.cos(a) * 9, oy - 8 + Math.sin(a) * 9, '#ffe27a', 1); }
@@ -188,18 +195,18 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) ctxC.drawImage(tmp, dx, dy);
       ctxC.globalCompositeOperation = 'source-over';
     }
-  }, [frame, text, shown, talking, phase, mood, place]);
+  }, [frame, text, shown, talking, phase, mood, place, pointing, moving]);
 
   if (!b) return null;
   const sc = 0.92 + 0.08 * pop, op = Math.min(1, pop * 1.2) * leave;
   const bubbleTop = stage ? headTop - (11 + bhPx + 6) * BPIX : 150;
   return (
     <>
-      <div style={{position: 'absolute', left: stage ? bubbleLeft : 0, width: stage ? BW * BPIX : W, display: 'flex', justifyContent: 'center', top: bubbleTop, transform: `scale(${sc})`, transformOrigin: stage ? 'bottom center' : 'top center', opacity: op}}>
+      <div style={{position: 'absolute', left: stage ? bubbleLeft : 0, width: stage ? BW * BPIX : W, display: 'flex', justifyContent: 'center', top: bubbleTop, zIndex: 5, transform: `scale(${sc})`, transformOrigin: stage ? 'bottom center' : 'top center', opacity: op}}>
         <canvas ref={refB} width={BW} height={BH} style={{width: BW * BPIX, height: BH * BPIX, imageRendering: 'pixelated', display: 'block'}} />
       </div>
       {!hidden && (stage ? (
-        <div style={{position: 'absolute', left: feetX - (CW * sCh) / 2, top: feetY - CH * sCh, transform: `scale(${sc}) ${stage.flip ? 'scaleX(-1)' : ''}`, transformOrigin: 'bottom center', opacity: op}}>
+        <div style={{position: 'absolute', left: feetX - (CW * sCh) / 2, top: feetY - CH * sCh, transform: `scale(${sc}) ${flipped ? 'scaleX(-1)' : ''}`, transformOrigin: 'bottom center', opacity: op}}>
           <canvas ref={ref} width={CW} height={CH} style={{width: CW * sCh, height: CH * sCh, imageRendering: 'pixelated', display: 'block'}} />
         </div>
       ) : (
@@ -207,6 +214,18 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
           <canvas ref={ref} width={CW} height={CH} style={{width: CW * CHAR_PX, height: CH * CHAR_PX, imageRendering: 'pixelated', display: 'block'}} />
         </div>
       ))}
+      {stage && !hidden && pt && pointing && (() => {
+        const left = feetX - (CW * sCh) / 2, top = feetY - CH * sCh;
+        const hx = left + (flipped ? CW - 40 : 40) * sCh, hy = top + 42 * sCh, tx = pt.x * W, ty = pt.y * 1920;
+        const ext = clamp01((segT - 0.25) / 0.25), len = Math.max(0, Math.hypot(tx - hx, ty - hy) - 30) * ext, ang = (Math.atan2(ty - hy, tx - hx) * 180) / Math.PI;
+        const pulse = 1 + 0.3 * Math.exp(-phase * 6);
+        return (
+          <>
+            <div style={{position: 'absolute', left: hx, top: hy - 6, width: len, height: 12, transformOrigin: '0 50%', transform: `rotate(${ang}deg)`, background: 'repeating-linear-gradient(90deg,#d99a45 0 24px,#8a5a1c 24px 30px)', boxShadow: '0 0 0 6px #0a0822', opacity: op}} />
+            <div style={{position: 'absolute', left: tx - 44, top: ty - 44, width: 88, height: 88, border: '10px solid #ffd23f', boxShadow: '0 0 0 6px #0a0822', transform: `rotate(45deg) scale(${pulse * ext})`, opacity: op * ext}} />
+          </>
+        );
+      })()}
     </>
   );
 };
