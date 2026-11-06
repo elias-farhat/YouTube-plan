@@ -9,12 +9,14 @@ import {clamp01, easeOutBack} from '../lib/anim';
  * speaks to the viewer. His line is typed in a speech bubble, one letter per 16th note, mouth in sync; he bobs on the beat
  * and reacts to the story (moods: talk | shock | worried | aha | happy).  No narration, no captions.
  */
-const PIXEL = 6, CW = 160, CH = 66, CHAR_W = 50, TEXT_X = CHAR_W + 6;
+const PIXEL = 6, CHAR_PX = 5, CW = 50, CH = 82, CHAR_W = 50;   // Dr. Bit: small canvas, bottom-left.  Text: its own box at the TOP, next to the action
+const BW = 150, BH = 66, BPIX = 6;
 const hash = (n: number) => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 
 export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
   const frame = useCurrentFrame();
   const ref = React.useRef<HTMLCanvasElement>(null);
+  const refB = React.useRef<HTMLCanvasElement>(null);
   const t = frame / plan.fps;
   const seg = [...plan.segs].reverse().find((s) => frame >= s.startFrame) ?? plan.segs[0];
   const b = seg.bits;
@@ -24,7 +26,7 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
   const mood = (seg as any).mood ?? 'talk';
   const accent = '#ffd23f';
   const lines: string[] = [];
-  if (text) { let cur = ''; for (const w of text.split(' ')) { const tr = (cur + ' ' + w).trim(); if (tr.length <= 17 || !cur) cur = tr; else { lines.push(cur); cur = w; } } if (cur) lines.push(cur); }
+  if (text) { let cur = ''; for (const w of text.split(' ')) { const tr = (cur + ' ' + w).trim(); if (tr.length <= 22 || !cur) cur = tr; else { lines.push(cur); cur = w; } } if (cur) lines.push(cur); }
   const shown = b ? Math.max(0, Math.min(text.length, Math.floor((t - b.start) / b.charT) + 1)) : 0;
   const lastReveal = b ? b.start + (shown - 1) * b.charT : -1;
   const typing = !!b && shown > 0 && t < b.start + text.length * b.charT + 0.05;
@@ -32,10 +34,25 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
   const pop = easeOutBack(clamp01((t - seg.startFrame / plan.fps) / 0.3), 1.3);
   const leave = clamp01((seg.endFrame - frame) / 8);
   const segT = t - seg.startFrame / plan.fps;
+  // placement: default = small in the bottom-left corner; bit:{x,y,s} = full-body Dr. Bit standing IN the scene (feet at x,y as fractions of the frame), bubble above his head; bit:'off' = he leaves, text box stays at the top
+  const place = (seg as any).bit ?? null;
+  const stage = place && place !== 'off' ? place : null;
+  const hidden = place === 'off';
+  const sCh = stage ? (stage.s ?? 5) : CHAR_PX;
+  const nlines = Math.max(1, lines.length), bhPx = (nlines * 10 + 10);
+  const feetX = stage ? stage.x * W : 0, feetY = stage ? stage.y * 1920 : 0;
+  const headTop = feetY - CH * sCh + 10 * sCh;                                  // top of his hair
+  const bubbleW = (Math.max(8, ...lines.map((l) => l.length)) * 6 + 12) * BPIX;
+  const boxL = stage ? Math.max(16, Math.min(W - 16 - bubbleW, feetX - bubbleW / 2)) : 0;         // text box centred over his head, kept on screen
+  const bubbleLeft = stage ? boxL - (BW * BPIX - bubbleW) / 2 : 0;                                   // canvas left edge
+  const tailX = stage ? Math.max(8, Math.min(BW - 8, Math.round((feetX - bubbleLeft) / BPIX))) : 0;
 
   React.useLayoutEffect(() => {
-    const ctx = ref.current!.getContext('2d')!;
-    ctx.clearRect(0, 0, CW, CH);
+    if (!refB.current) return;
+    const cvC = ref.current ?? document.createElement('canvas'); cvC.width = CW; cvC.height = CH;
+    const ctxC = cvC.getContext('2d')!, ctxB = refB.current.getContext('2d')!;
+    let ctx = ctxB;
+    ctxC.clearRect(0, 0, CW, CH); ctxB.clearRect(0, 0, BW, BH);
     const R = (x: number, y: number, w: number, h: number, c: string) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h))); };
     const D = (x: number, y: number, c: string) => R(x, y, 1, 1, c);
     const disc = (cx: number, cy: number, r: number, c: string) => { for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) if (x * x + y * y <= r * r + 0.5) D(cx + x, cy + y, c); };
@@ -44,10 +61,10 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     const glyph = (ch: string, x: number, y: number, c: string) => { const g = FONT[ch] ?? FONT[' ']; ctx.fillStyle = c; for (let k = 0; k < 35; k++) if (g[k] === '#') ctx.fillRect(x + (k % 5), y + Math.floor(k / 5), 1, 1); };
 
     // ------------------------------------------------------------ speech bubble
-    const nl = Math.max(1, lines.length), bx = TEXT_X - 4, bw = CW - bx - 1, bh = nl * 10 + 10, by = Math.round(Math.max(12, Math.min(CH - bh - 4, 33 - bh / 2)));   // bubble fits the text, level with his face
-    R(bx + 1, by, bw - 2, bh, 'rgba(8,6,24,0.9)'); R(bx, by + 1, bw, bh - 2, 'rgba(8,6,24,0.9)');
+    const TEXT_X0 = 6, nl = Math.max(1, lines.length), maxc = Math.max(8, ...lines.map((l) => l.length));
+    const bw = maxc * 6 + 12, bx = Math.round((BW - bw) / 2), TEXT_X = bx + 6, bh = nl * 10 + 10, by = 11;      // box fits the text, centred
+    R(bx + 1, by, bw - 2, bh, 'rgba(8,6,24,0.92)'); R(bx, by + 1, bw, bh - 2, 'rgba(8,6,24,0.92)');
     for (const [x, y, w, h] of [[bx + 1, by, bw - 2, 1], [bx + 1, by + bh - 1, bw - 2, 1], [bx, by + 1, 1, bh - 2], [bx + bw - 1, by + 1, 1, bh - 2]] as number[][]) R(x, y, w, h, accent);
-    for (let k = 0; k < 4; k++) { R(bx - 3 + k, by + bh / 2 - 3 + k, 1, 7 - 2 * k, accent); R(bx - 2 + k, by + bh / 2 - 2 + k, 1, 5 - 2 * k, 'rgba(8,6,24,0.9)'); }   // tail towards Dr. Bit
     let remaining = shown;
     lines.forEach((ln, li) => {
       const y = by + 6 + li * 10;
@@ -57,10 +74,14 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     });
     if (b && shown >= text.length && phase < 0.5) { const li = Math.max(0, lines.length - 1), x = TEXT_X + (lines[li]?.length ?? 0) * 6; R(x, by + 6 + li * 10, 3, 7, accent); }
     if (seg.idx === 0 && segT < 3.4) { R(bx, 0, 40, 10, '#0a0e22'); R(bx, 0, 40, 1, accent); R(bx, 9, 40, 1, accent); R(bx, 0, 1, 10, accent); R(bx + 39, 0, 1, 10, accent); [...'DR. BIT'].forEach((ch, i) => glyph(ch, bx + 3 + i * 5, 1, '#ffffff')); }
+    void TEXT_X0;
+    if (stage) { const ty = by + bh; for (let k = 0; k < 4; k++) { R(tailX - 3 + k, ty + k, 7 - 2 * k, 1, 'rgba(8,6,24,0.92)'); } R(tailX - 4, ty - 1, 1, 1, accent); R(tailX + 4, ty - 1, 1, 1, accent); for (let k = 0; k < 4; k++) { R(tailX - 3 + k, ty + k, 1, 1, accent); R(tailX + 3 - k, ty + k, 1, 1, accent); } }
+    if (shown === 0) ctxB.clearRect(0, by - 1, BW, BH);                                    // no empty box before the first letter
+    ctx = ctxC;
 
     // ------------------------------------------------------------ DR. BIT
     // dark spotlight behind him so the white coat/hair stand out on bright scenes (daylight, lightning flashes)
-    for (let y = 2; y < CH; y++) for (let x = 0; x < CHAR_W; x++) { const d = Math.hypot((x - 25) / 25, (y - 36) / 32); if (d < 1 && (1 - d) * 1.1 > ((x * 7 + y * 13) % 16) / 16 * 0.9) { ctx.fillStyle = 'rgba(10,8,34,0.62)'; ctx.fillRect(x, y, 1, 1); } }
+    if (!stage) for (let y = 2; y < CH; y++) for (let x = 0; x < CHAR_W; x++) { const d = Math.hypot((x - 25) / 25, (y - 36) / 32); if (d < 1 && (1 - d) * 1.1 > ((x * 7 + y * 13) % 16) / 16 * 0.9) { ctx.fillStyle = 'rgba(10,8,34,0.62)'; ctx.fillRect(x, y, 1, 1); } }
     const SK = '#f2c9a3', SKd = '#d4a27a', HR = '#f6f6ff', HRd = '#b9bddf', COAT = '#f4f6ff', COATd = '#cdd3ee', LN = '#1a1d3a', TEAL = '#2ec4b6', TIE = '#ff4fa3', GL = '#bfeaff';
     const shock = mood === 'shock', worried = mood === 'worried', aha = mood === 'aha', happy = mood === 'happy';
     const bob = plan.outfit === 'astronaut' ? Math.round(Math.sin(t * 1.7) * 2) : plan.outfit === 'diver' ? Math.round(Math.sin(t * 1.2) * 1.5) : phase < 0.18 ? -1 : 0;   // space/sea: float instead of bounce
@@ -108,6 +129,13 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     // bow tie on top of the shirt
     P(12, 33, 4, 3, TIE); P(18, 33, 4, 3, TIE); P(15, 33, 3, 3, '#c02f78');
 
+    // legs + shoes (full body), stepping on the beat
+    const TR: Record<string, string> = {lab: '#3b4a8c', storm: '#e0a800', gardener: '#6a4f2a', astronaut: '#eef1fb', diver: '#b9792f', hardhat: '#ff8a1f'};
+    const trc = TR[plan.outfit ?? 'lab'] ?? TR.lab, step = beatIdx % 2 === 0 ? 1 : 0, lift2 = phase < 0.25 ? 1 : 0;
+    P(9, 53, 6, 11 - (step ? lift2 : 0), trc); P(19, 53, 6, 11 - (step ? 0 : lift2), trc);
+    P(15, 53, 4, 6, trc === '#eef1fb' ? '#cdd3ee' : '#222a55');
+    P(7, 64 - (step ? lift2 : 0), 9, 3, '#23233a'); P(18, 64 - (step ? 0 : lift2), 9, 3, '#23233a');
+    P(7, 64 - (step ? lift2 : 0), 9, 1, '#4a4a6a'); P(18, 64 - (step ? 0 : lift2), 9, 1, '#4a4a6a');
     // ---- outfit: costume + ambient effects so Dr. Bit lives inside the scene (diver, astronaut, storm, gardener, hardhat)
     const outfit = plan.outfit ?? 'lab';
     const bowl = (rim: string, glass: string, shine: string) => {                    // glass helmet over the whole head
@@ -152,12 +180,33 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     if (worried) { const sy = 13 + ((t * 8) % 6); P(25, sy, 2, 3, '#7fe3ff'); }
     if (aha) { disc(ox + 17, oy - 8, 4, '#ffe27a'); P(15, -4, 4, 3, '#8a93b4'); if (phase < 0.5) for (let a = 0; a < 6.283; a += 0.8) line(ox + 17 + Math.cos(a) * 6, oy - 8 + Math.sin(a) * 6, ox + 17 + Math.cos(a) * 9, oy - 8 + Math.sin(a) * 9, '#ffe27a', 1); }
     if (happy) for (let i = 0; i < 5; i++) { const a = beats * 2 + i * 1.3, sx = 17 + Math.cos(a) * (16 + i), sy = 8 + Math.sin(a) * 9; if (phase < 0.7) { Q(sx, sy, '#ffffff'); Q(sx - 1, sy, '#ffe27a'); Q(sx + 1, sy, '#ffe27a'); Q(sx, sy - 1, '#ffe27a'); Q(sx, sy + 1, '#ffe27a'); } }
-  }, [frame, text, shown, talking, phase, mood]);
+    // dark 1-px outline so the white coat/hair read on any background (used instead of the spotlight when he stands in the scene)
+    if (stage) {
+      const tmp = document.createElement('canvas'); tmp.width = CW; tmp.height = CH; const tc = tmp.getContext('2d')!;
+      tc.drawImage(cvC, 0, 0); tc.globalCompositeOperation = 'source-in'; tc.fillStyle = '#0a0822'; tc.fillRect(0, 0, CW, CH);
+      ctxC.globalCompositeOperation = 'destination-over';
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) ctxC.drawImage(tmp, dx, dy);
+      ctxC.globalCompositeOperation = 'source-over';
+    }
+  }, [frame, text, shown, talking, phase, mood, place]);
 
   if (!b) return null;
+  const sc = 0.92 + 0.08 * pop, op = Math.min(1, pop * 1.2) * leave;
+  const bubbleTop = stage ? headTop - (11 + bhPx + 6) * BPIX : 150;
   return (
-    <div style={{position: 'absolute', left: 0, width: W, display: 'flex', justifyContent: 'center', top: plan.style.capY, transform: `translateY(-50%) scale(${0.92 + 0.08 * pop})`, opacity: Math.min(1, pop * 1.2) * leave}}>
-      <canvas ref={ref} width={CW} height={CH} style={{width: CW * PIXEL, height: CH * PIXEL, imageRendering: 'pixelated', display: 'block'}} />
-    </div>
+    <>
+      <div style={{position: 'absolute', left: stage ? bubbleLeft : 0, width: stage ? BW * BPIX : W, display: 'flex', justifyContent: 'center', top: bubbleTop, transform: `scale(${sc})`, transformOrigin: stage ? 'bottom center' : 'top center', opacity: op}}>
+        <canvas ref={refB} width={BW} height={BH} style={{width: BW * BPIX, height: BH * BPIX, imageRendering: 'pixelated', display: 'block'}} />
+      </div>
+      {!hidden && (stage ? (
+        <div style={{position: 'absolute', left: feetX - (CW * sCh) / 2, top: feetY - CH * sCh, transform: `scale(${sc}) ${stage.flip ? 'scaleX(-1)' : ''}`, transformOrigin: 'bottom center', opacity: op}}>
+          <canvas ref={ref} width={CW} height={CH} style={{width: CW * sCh, height: CH * sCh, imageRendering: 'pixelated', display: 'block'}} />
+        </div>
+      ) : (
+        <div style={{position: 'absolute', left: 26, bottom: 230, transform: `scale(${sc})`, transformOrigin: 'bottom left', opacity: op}}>
+          <canvas ref={ref} width={CW} height={CH} style={{width: CW * CHAR_PX, height: CH * CHAR_PX, imageRendering: 'pixelated', display: 'block'}} />
+        </div>
+      ))}
+    </>
   );
 };

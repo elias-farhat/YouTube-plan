@@ -6,6 +6,7 @@ channel: science
 mode: bits
 hook: "LIGHTNING IS 5X HOTTER THAN THE SUN."
 hook_visual: {type: pixel, scene: storm, phase: strike}
+hook_bit: {x: 0.22, y: 0.80, s: 5}
 hook_mood: shock
 engine: remotion
 chrome: minimal
@@ -13,6 +14,7 @@ music: chip
 song: storm
 outfit: storm
 pace: quick
+outro_bit: {x: 0.22, y: 0.80, s: 5}
 outro: "NEXT STORM, COUNT THE SECONDS."
 blip: zap
 talk: 14
@@ -31,23 +33,30 @@ youtube:
   pinned_comment: "Did you know the flash goes UP? Tell me what to explain next."
 lines:
   - say: "IT ALL STARTS WITH TINY ICE."
+    bit: off
     mood: talk
     visual: {type: pixel, scene: storm, phase: ice}
   - say: "IT SPLITS CHARGE: + UP, - DOWN."
+    bit: off
     mood: talk
     visual: {type: pixel, scene: storm, phase: charge}
   - say: "THEN A HIDDEN LEADER STEPS DOWN."
+    bit: {x: 0.78, y: 0.80, s: 5}
     mood: worried
     visual: {type: pixel, scene: storm, phase: leader}
   - say: "THE FLASH YOU SEE SHOOTS UP!"
+    bit: {x: 0.22, y: 0.80, s: 5}
     mood: aha
     visual: {type: pixel, scene: storm, phase: return}
   - say: "30,000 DEGREES. 5X THE SUN."
+    bit: off
     mood: shock
     visual: {type: pixel, scene: storm, phase: heat}
   - say: "HOT AIR EXPLODES: THUNDER."
+    bit: {x: 0.78, y: 0.80, s: 5}
     mood: shock
     visual: {type: pixel, scene: storm, phase: thunder}
   - say: "COUNT 3 SECONDS = 1 KM AWAY."
+    bit: {x: 0.22, y: 0.80, s: 5}
     mood: happy
     visual: {type: pixel, scene: storm, phase: count}

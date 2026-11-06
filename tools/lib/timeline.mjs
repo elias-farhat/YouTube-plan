@@ -93,7 +93,7 @@ export function buildBitsSegments(script, style, bpm = 120) {
       idx: i, isHook: !!it.isHook, sfx: it.sfx ?? [], say: it.say, shown: text, visual: it.visual,
       startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
       speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
-      bits: { text, start: start + typeStart, charT: cT }, mood: it.mood ?? autoMood(it, i, items.length),
+      bits: { text, start: start + typeStart, charT: cT }, mood: it.mood ?? autoMood(it, i, items.length), bit: it.bit ?? null,
     });
     t += dur;
   });
@@ -106,7 +106,7 @@ export function buildBitsSegments(script, style, bpm = 120) {
       idx: items.length, isHook: false, isOutro: true, sfx: [], say: text, shown: text, visual: first.visual,
       startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
       speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
-      bits: { text, start: start + typeStart, charT }, mood: 'happy',
+      bits: { text, start: start + typeStart, charT }, mood: 'happy', bit: script.outroBit ?? null,
     });
     t += dur;
   }

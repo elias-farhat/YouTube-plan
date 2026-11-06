@@ -4,6 +4,7 @@ channel: science
 mode: bits
 hook: "A TREE IS MOSTLY MADE OF AIR."
 hook_visual: {type: pixel, scene: plant, phase: tree}
+hook_bit: {x: 0.20, y: 0.80, s: 5}
 hook_mood: shock
 engine: remotion
 chrome: minimal
@@ -11,6 +12,7 @@ music: chip
 song: sunny
 outfit: gardener
 pace: quick
+outro_bit: {x: 0.20, y: 0.80, s: 5}
 outro: "NOW LOOK AT A TREE AGAIN."
 blip: bubble
 talk: 14
@@ -27,23 +29,30 @@ youtube:
   pinned_comment: "Did you know the oxygen comes from water? Tell me what to explain next."
 lines:
   - say: "IT EATS LIGHT. BUT WHERE'S THE FOOD?"
+    bit: off
     mood: talk
     visual: {type: pixel, scene: plant, phase: sunleaf}
   - say: "WATER RISES FROM THE ROOTS."
+    bit: off
     mood: talk
     visual: {type: pixel, scene: plant, phase: roots}
   - say: "CO2 ENTERS THROUGH TINY PORES."
+    bit: off
     mood: talk
     visual: {type: pixel, scene: plant, phase: stomata}
   - say: "THE OXYGEN COMES FROM WATER!"
+    bit: off
     mood: aha
     visual: {type: pixel, scene: plant, phase: split}
   - say: "CARBON IS BUILT INTO SUGAR."
+    bit: off
     mood: talk
     visual: {type: pixel, scene: plant, phase: sugar}
   - say: "SUGAR BUILDS LEAVES AND WOOD."
+    bit: {x: 0.20, y: 0.80, s: 5}
     mood: talk
     visual: {type: pixel, scene: plant, phase: grow}
   - say: "SO YES: A TREE IS MADE OF AIR."
+    bit: {x: 0.20, y: 0.80, s: 5}
     mood: happy
     visual: {type: pixel, scene: plant, phase: tree}

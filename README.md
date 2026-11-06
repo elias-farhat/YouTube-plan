@@ -156,3 +156,6 @@ public/fonts/              Inter (OFL) + DejaVu Serif, bundled so renders look i
 * Rendering takes roughly 1 min (money), 2 min (history), 3 min (space) on 4 cores.
 * Remotion is free for individuals and small teams but has a company license above that size: check <https://www.remotion.dev/docs/license>.
 * History territory is drawn by modern country on a 110 m map, an intentional simplification (the sample says so on screen).
+
+### Dr. Bit placement (`bit:`)
+Per line (and `hook_bit:` / `outro_bit:`): `bit: {x: 0.2, y: 0.8, s: 5}` = full-body Dr. Bit standing IN the scene (feet at x,y as fractions of the frame, `s` = pixel scale, `flip: true` to face left) with the text box above his head; `bit: off` = he leaves so the diagram/close-up is unobstructed (text box stays at the top); no `bit:` = small in the bottom-left corner. Costume via `outfit:` (lab, storm, gardener, astronaut, diver, hardhat).
