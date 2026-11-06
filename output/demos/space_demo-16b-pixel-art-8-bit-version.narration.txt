@@ -1,0 +1,3 @@
+Demo 16b - Pixel art: 8-bit version
+
+The same scene in true 8-bit.

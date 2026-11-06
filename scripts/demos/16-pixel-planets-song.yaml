@@ -9,4 +9,4 @@ bpm: 120
 lines:
   - say: "Pixel art locked to the beat, with lyrics."
     hold: 8
-    visual: {type: pixel, scene: planets, palette: neon, bpm: 120, title: "PLANET SONG", lyrics: ["MERCURY IS HOT", "VENUS IS HOTTER", "EARTH IS HOME", "MARS IS RED"]}
+    visual: {type: pixel, scene: planets, bits: 32, palette: neon, bpm: 120, title: "PLANET SONG", lyrics: ["MERCURY IS HOT", "VENUS IS HOTTER", "EARTH IS HOME", "MARS IS RED"]}

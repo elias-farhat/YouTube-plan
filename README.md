@@ -78,7 +78,7 @@ A scene with `year: 133 BC` shows earlier territory solid, and the countries gai
 
 | type | what | fields |
 |---|---|---|
-| `pixel` | retro pixel art on a tiny canvas, **locked to a BPM** (sun/planets pulse, equalizer, typed lyrics, 1 px screen kick) | `scene: planets\|rocket`, `res: 96` (canvas width in pixels; smaller = chunkier), `palette: neon\|gameboy\|pico8\|sunset`, `bpm`, `lyrics: [one per bar]`, `title`. Works in every channel. For a song feel add `music: chip` and `bpm:` at the top of the script: a chiptune (kick, snare, hats, square bass + arpeggio) is generated on the same beat grid |
+| `pixel` | retro pixel art on a tiny canvas, **locked to a BPM** (sun/planets pulse, equalizer, typed lyrics, 1 px screen kick) | `scene: planets\|rocket`, `bits: 32\|16\|8` (32 = ~216 px wide, rich shading, readable 5x7 text; 16 = 128 px; 8 = 80 px, four Game-Boy greens), `res` (override the canvas width), `palette: neon\|sunset\|aurora\|gameboy`, `bpm`, `lyrics: [one per bar]`, `title`. Works in every channel. For a song feel add `music: chip` and `bpm:` at the top of the script: a chiptune (kick, snare, hats, square bass + arpeggio) is generated on the same beat grid |
 | `clip` | any pre-rendered video as a scene (Blender renders, footage) | `src: "gen/blender/earth.mp4"` (inside `public/`), `full: true` for full-frame |
 
 `engine: remotion` on a space script draws it with Remotion instead of Manim (needed for `pixel` / `clip` in the space channel).

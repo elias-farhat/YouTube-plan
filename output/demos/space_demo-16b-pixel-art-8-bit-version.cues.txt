@@ -1,0 +1,4 @@
+Demo 16b - Pixel art: 8-bit version
+Total 8.0s. Start each narration line at its time:
+
+[00:00.3]  The same scene in true 8-bit.

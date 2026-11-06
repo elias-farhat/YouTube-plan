@@ -1,0 +1,12 @@
+# Same song, true 8-bit look (4 Game-Boy greens, 80 px wide) for comparison with demo 16 (32-bit).  bits: 8 | 16 | 32
+demo: true
+channel: space
+engine: remotion
+title: "Demo 16b - Pixel art: 8-bit version"
+badge: "ANIMATION DEMO"
+music: chip
+bpm: 120
+lines:
+  - say: "The same scene in true 8-bit."
+    hold: 8
+    visual: {type: pixel, scene: planets, bits: 8, bpm: 120, title: "PLANET SONG", lyrics: ["MERCURY IS HOT", "VENUS IS HOTTER", "EARTH IS HOME", "MARS IS RED"]}
