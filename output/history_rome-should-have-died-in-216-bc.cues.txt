@@ -1,15 +1,15 @@
 Rome Should Have Died in 216 BC
-Total 46.0s. Start each narration line at its time:
+Total 46.7s. Start each narration line at its time:
 
 [00:00.1]  In one afternoon, Rome lost fifty thousand soldiers.
-[00:03.0]  Hannibal had fewer men. So he built a trap.
-[00:06.8]  He let the Romans push his center back. Then he closed in from both sides.
-[00:12.9]  Everyone waited for Rome to surrender.
-[00:16.0]  Rome said no.
-[00:17.5]  It armed slaves. It refused to pay ransom for its prisoners.
-[00:22.5]  The general who lost? The Senate thanked him.
-[00:26.3]  Hannibal sat in Italy for fifteen years. Rome never broke.
-[00:31.1]  So Rome did the unthinkable. It sailed to Carthage.
-[00:35.4]  Carthage burned for seventeen days.
-[00:38.2]  Rome ended up owning the entire Mediterranean.
-[00:41.8]  Rome lost the battles. It never lost the war.
+[00:04.5]  Hannibal had fewer men. So he built a trap.
+[00:08.6]  He let the Romans push his center back. Then he closed in from both sides.
+[00:13.7]  Everyone waited for Rome to surrender.
+[00:16.3]  Rome said no.
+[00:18.1]  It armed slaves. It refused to pay ransom for its prisoners.
+[00:23.6]  The general who lost? The Senate thanked him.
+[00:26.9]  Hannibal sat in Italy for fifteen years. Rome never broke.
+[00:31.9]  So Rome did the unthinkable. It sailed to Carthage.
+[00:36.4]  Carthage burned for seventeen days.
+[00:39.4]  Rome ended up owning the entire Mediterranean.
+[00:42.6]  Rome lost the battles. It never lost the war.

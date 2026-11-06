@@ -42,7 +42,7 @@ def decode(path, out):
     return x, w.getframerate()
 
 
-def chunks_from_audio(x, sr, min_gap=0.22, min_len=0.15):
+def chunks_from_audio(x, sr, min_gap=0.22, min_len=0.15, return_db=False):
     hop = int(sr * HOP)
     n = len(x) // hop
     e = np.sqrt(np.mean(x[: n * hop].reshape(n, hop) ** 2, axis=1))
@@ -64,7 +64,8 @@ def chunks_from_audio(x, sr, min_gap=0.22, min_len=0.15):
             merged[-1][1] = b
         else:
             merged.append([a, b])
-    return [(a * HOP, b * HOP) for a, b in merged if (b - a) * HOP >= min_len]
+    chunks_ = [(a * HOP, b * HOP) for a, b in merged if (b - a) * HOP >= min_len]
+    return (chunks_, db) if return_db else chunks_
 
 
 ONES = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split()
@@ -111,6 +112,7 @@ def asr_texts(x, sr, chunks):
 
 def align(chunks, lines, asr=None):
     """-> (words, spans, used): spans[i] = (first_word, end_word) for chunk i; chunks after `used` are ignored.
+    A chunk may span several lines (speaker ran sentences together); cuts inside a chunk are refined later.
     Cost = how well the recognised text matches the script words + how well the duration fits + pauses at punctuation."""
     from difflib import SequenceMatcher
     words = []  # (line, idx_in_line, text, weight, ends_phrase, ends_line, letters)
@@ -133,8 +135,6 @@ def align(chunks, lines, asr=None):
                 if dp[i][j] >= INF:
                     continue
                 for k in range(j + 1, N + 1):
-                    if words[k - 1][0] != words[j][0]:
-                        break  # a chunk can't cross a line boundary
                     pred = rate * (cw[k] - cw[j])
                     cost = 0.5 * ((dur[i] - pred) / (0.4 + pred)) ** 2 + (0.0 if words[k - 1][4] or words[k - 1][5] else 0.6)
                     if asr and asr[i]:
@@ -167,33 +167,64 @@ def main():
     req = json.load(sys.stdin)
     lines, out = req["lines"], req["outdir"]
     os.makedirs(out, exist_ok=True)
-    x, sr = decode(req["voiceFile"], os.path.join(out, "voice_full.wav"))
-    chunks = chunks_from_audio(x, sr)
+    full = os.path.join(out, "voice_full.wav")
+    x, sr = decode(req["voiceFile"], full)
+    chunks, db = chunks_from_audio(x, sr, return_db=True)
     asr = asr_texts(x, sr, chunks)
-    words, spans, ci = align(chunks, lines, asr)
+    words, spans, used = align(chunks, lines, asr)
+
+    # per-word times: proportional inside each chunk
+    wt = [None] * len(words)
+    chunk_of = [None] * len(words)
+    for c, (j, k) in enumerate(spans):
+        a, b = chunks[c]
+        ws = [words[m][3] for m in range(j, k)]
+        tot, t = sum(ws), a
+        for m, w in zip(range(j, k), ws):
+            wt[m] = [t, t + (b - a) * w / tot]
+            chunk_of[m] = c
+            t += (b - a) * w / tot
+
+    first = {}
+    last = {}
+    for m, w in enumerate(words):
+        first.setdefault(w[0], m)
+        last[w[0]] = m
+    n_lines = len(lines)
+    for li in range(n_lines):
+        if li not in first:
+            raise RuntimeError(f"no audio found for line {li}: {lines[li]!r}")
+
+    def quietest(t0, half=0.35):
+        a, b = int(max(0, t0 - half) / HOP), int((t0 + half) / HOP)
+        seg = db[a:b]
+        return (a + int(np.argmin(seg))) * HOP if len(seg) else t0
+
+    # cut points between consecutive lines
+    cuts = []
+    for li in range(1, n_lines):
+        pw, nw = last[li - 1], first[li]
+        if chunk_of[pw] == chunk_of[nw]:      # no pause between the lines: cut at the quietest moment near the estimate
+            cuts.append(quietest(wt[nw][0]))
+        else:                                  # pause between them: cut in the middle of the gap
+            cuts.append((wt[pw][1] + wt[nw][0]) / 2)
+
+    total_dur = len(x) / sr
     res = []
-    for li, text in enumerate(lines):
-        mine = [(c, s) for c, s in enumerate(spans) if words[s[0]][0] == li]
-        if not mine:
-            raise RuntimeError(f"no audio found for line {li}: {text!r}")
-        first, last = mine[0][0], mine[-1][0]
-        prev_end = chunks[first - 1][1] if first > 0 else 0.0
-        nxt_start = chunks[last + 1][0] if last + 1 < len(chunks) else len(x) / sr
-        t0 = max(chunks[first][0] - 0.08, (prev_end + chunks[first][0]) / 2)
-        t1 = min(chunks[last][1] + 0.12, (chunks[last][1] + nxt_start) / 2)
+    for li in range(n_lines):
+        w0, w1 = wt[first[li]][0], wt[last[li]][1]
+        c0 = cuts[li - 1] if li > 0 else 0.0
+        c1 = cuts[li] if li < n_lines - 1 else total_dur
+        t0 = max(c0, w0 - 0.10)
+        t1 = min(c1, w1 + 0.14)
+        if t1 - t0 < 0.2:
+            t1 = t0 + 0.2
         f = os.path.join(out, f"line_{li:02d}.wav")
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", f"{t0:.3f}", "-t", f"{t1 - t0:.3f}", "-i", os.path.join(out, "voice_full.wav"),
-                        "-af", f"afade=t=in:d=0.015,afade=t=out:st={max(0, t1 - t0 - 0.03):.3f}:d=0.03", f], check=True)
-        wt = []
-        for c, (j, k) in mine:
-            a, b = chunks[c]
-            ws = [words[m][3] for m in range(j, k)]
-            tot, t = sum(ws), a
-            for w in ws:
-                wt.append([t - t0, t + (b - a) * w / tot - t0])
-                t += (b - a) * w / tot
-        res.append({"file": f, "duration": t1 - t0, "words": wt, "tight": True})
-    extra = len(chunks) - ci
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", f"{t0:.3f}", "-t", f"{t1 - t0:.3f}", "-i", full,
+                        "-af", f"afade=t=in:d=0.012,afade=t=out:st={max(0, t1 - t0 - 0.03):.3f}:d=0.03", f], check=True)
+        rel = [[max(0.0, wt[m][0] - t0), max(0.01, wt[m][1] - t0)] for m in range(first[li], last[li] + 1)]
+        res.append({"file": f, "duration": t1 - t0, "words": rel, "tight": True})
+    extra = len(chunks) - used
     status = f"imported voice {os.path.basename(req['voiceFile'])} ({len(chunks)} speech chunks" + (f", ignored {extra} trailing" if extra else "") + ")"
     print(json.dumps({"engine": "imported", "status": status, "lines": res}))
 
