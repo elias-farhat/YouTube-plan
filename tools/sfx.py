@@ -267,16 +267,18 @@ def pulse_bed(channel, d, bpm, seed, rng):
     beat = 60.0 / bpm
     for b in range(int(d / beat) + 1):
         t0 = b * beat
-        th = sound("thud", rng)
-        i = int(t0 * SR)
-        m = min(len(th), n - i)
-        if m > 0:
-            out[i:i + m] += th[:m] * (0.5 if b % 4 == 0 else 0.32)
-        tk = sound("tick", rng)
-        j = int((t0 + beat / 2) * SR)
-        m = min(len(tk), n - j)
-        if m > 0:
-            out[j:j + m] += tk[:m] * 0.07
+        def put(sig, tt, g):
+            i = int(tt * SR)
+            m = min(len(sig), n - i)
+            if i >= 0 and m > 0:
+                out[i:i + m] += sig[:m] * g
+        put(sound("thud", rng), t0, 0.55 if b % 4 == 0 else 0.4)                       # soft kick on every beat
+        if b % 2 == 1:                                                                    # light clap on 2 and 4
+            cl = hp(rng.standard_normal(int(0.12 * SR)), 1200) * env_exp(int(0.12 * SR), 0.035)
+            put(cl / (np.max(np.abs(cl)) + 1e-9), t0, 0.16)
+        for q in range(4):                                                                # hats: off-beat louder, 16ths faint
+            ht = hp(rng.standard_normal(int(0.03 * SR)), 7000) * env_exp(int(0.03 * SR), 0.008)
+            put(ht / (np.max(np.abs(ht)) + 1e-9), t0 + q * beat / 4, 0.12 if q == 2 else 0.05)
     return out
 
 

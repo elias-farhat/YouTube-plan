@@ -59,7 +59,7 @@ export function pickStyle(channel, seed, overrides = {}) {
   return {
     seed, paletteName, palette: pal, layout, ...LAYOUTS[layout],
     pacing, pace: PACING[pacing],
-    caption: choose(CAPTIONS[channel], 'caption'),
+    caption: overrides.caption === 'pixel' ? 'pixel' : choose(CAPTIONS[channel], 'caption'),   // pixel captions are opt-in (they match the pixel scenes)
     transition: choose(TRANSITIONS, 'transition'),
     kinetic: choose(KINETIC, 'kinetic'),
     motif: choose(MOTIFS[channel], 'motif'),

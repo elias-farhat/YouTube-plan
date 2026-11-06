@@ -1,4 +1,4 @@
-# SPACE (pixel-art science video).  32-bit pixel scenes fill the whole frame; motion lands on a soft pulse (100 BPM),
+# SPACE (pixel-art science video).  32-bit pixel scenes fill the whole frame; motion lands on a soft pulse (124 BPM),
 # not a song: no lyrics, no title cards, minimal chrome.  Structure: hook -> setup -> build -> PEAK (supernova) -> payoff.
 title: You Are Made of Dead Stars
 hook: "You are made of dead stars."
@@ -6,9 +6,9 @@ hook_visual: {type: pixel, scene: star}
 engine: remotion          # pixel scenes are drawn by Remotion
 chrome: minimal           # only a thin progress line: no header, no title, no handle
 music: pulse              # ambient drone + soft beat on the same BPM grid as the visuals
-bpm: 100
-pixel: {full: true, bits: 32, palette: neon, bpm: 100}     # defaults for every pixel scene below
-style: {layout: C, pacing: steady, caption: bar, transition: fade}
+bpm: 124
+pixel: {full: true, bits: 32, palette: neon, bpm: 124}     # defaults for every pixel scene below
+style: {layout: C, pacing: snappy, caption: pixel, transition: fade}
 youtube:
   title: "You Are Made of Dead Stars (Here's How)"
   description: |
@@ -31,7 +31,7 @@ lines:
     visual: {type: pixel, scene: supernova, phase: collapse}
 
   - say: "And the star explodes."
-    hold: 3.4
+    hold: 2.9
     visual: {type: pixel, scene: supernova, phase: blast}
 
   - say: "That blast scatters carbon, oxygen and iron across space."

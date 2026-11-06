@@ -1,99 +1,131 @@
 1
-00:00:03,022 --> 00:00:04,460
-The Big Bang made
+00:00:02,630 --> 00:00:03,595
+The Big Bang
 
 2
-00:00:04,460 --> 00:00:06,470
-almost nothing but hydrogen
+00:00:03,595 --> 00:00:04,930
+made almost nothing
 
 3
-00:00:06,470 --> 00:00:07,403
-and helium.
+00:00:04,930 --> 00:00:06,106
+but hydrogen and
 
 4
-00:00:08,050 --> 00:00:09,946
-Everything else was built
+00:00:06,106 --> 00:00:06,668
+helium.
 
 5
-00:00:09,946 --> 00:00:10,994
-inside stars.
+00:00:07,095 --> 00:00:08,430
+Everything else was
 
 6
-00:00:11,641 --> 00:00:13,422
-They fuse hydrogen into
+00:00:08,430 --> 00:00:09,811
+built inside stars.
 
 7
-00:00:13,422 --> 00:00:15,478
-helium, helium into carbon
+00:00:10,238 --> 00:00:11,520
+They fuse hydrogen
 
 8
-00:00:15,478 --> 00:00:17,361
-and oxygen, and heavier
+00:00:11,520 --> 00:00:12,949
+into helium, helium
 
 9
-00:00:17,361 --> 00:00:18,799
-atoms all the way
+00:00:12,949 --> 00:00:14,072
+into carbon and
 
 10
-00:00:18,799 --> 00:00:19,833
-up to iron.
+00:00:14,072 --> 00:00:15,501
+oxygen, and heavier
 
 11
-00:00:20,480 --> 00:00:22,146
-But fusing iron costs
+00:00:15,501 --> 00:00:16,519
+atoms all the
 
 12
-00:00:22,146 --> 00:00:23,985
-energy instead of making
+00:00:16,519 --> 00:00:17,326
+way up to
 
 13
-00:00:23,985 --> 00:00:25,513
-it. In under a
+00:00:17,326 --> 00:00:17,783
+iron.
 
 14
-00:00:25,513 --> 00:00:27,669
-second, the core collapses.
+00:00:18,210 --> 00:00:19,333
+But fusing iron
 
 15
-00:00:28,315 --> 00:00:30,082
-And the star explodes.
+00:00:19,333 --> 00:00:20,721
+costs energy instead
 
 16
-00:00:31,715 --> 00:00:33,828
-That blast scatters carbon,
+00:00:20,721 --> 00:00:21,980
+of making it.
 
 17
-00:00:33,828 --> 00:00:35,552
-oxygen and iron across
+00:00:21,980 --> 00:00:22,840
+In under a
 
 18
-00:00:35,552 --> 00:00:36,098
-space.
+00:00:22,840 --> 00:00:24,111
+second, the core
 
 19
-00:00:36,744 --> 00:00:38,685
-Billions of years later,
+00:00:24,111 --> 00:00:24,832
+collapses.
 
 20
-00:00:38,685 --> 00:00:40,295
-that dust formed new
+00:00:25,258 --> 00:00:26,224
+And the star
 
 21
-00:00:40,295 --> 00:00:42,381
-stars, planets, and you.
+00:00:26,224 --> 00:00:26,891
+explodes.
 
 22
-00:00:43,028 --> 00:00:45,141
-Apart from hydrogen, nearly
+00:00:28,158 --> 00:00:29,493
+That blast scatters
 
 23
-00:00:45,141 --> 00:00:46,636
-every atom in your
+00:00:29,493 --> 00:00:30,869
+carbon, oxygen and
 
 24
-00:00:46,636 --> 00:00:48,015
-body was made in
+00:00:30,869 --> 00:00:32,198
+iron across space.
 
 25
-00:00:48,015 --> 00:00:48,561
+00:00:32,625 --> 00:00:33,854
+Billions of years
+
+26
+00:00:33,854 --> 00:00:35,124
+later, that dust
+
+27
+00:00:35,124 --> 00:00:36,448
+formed new stars,
+
+28
+00:00:36,448 --> 00:00:37,819
+planets, and you.
+
+29
+00:00:38,245 --> 00:00:39,727
+Apart from hydrogen,
+
+30
+00:00:39,727 --> 00:00:40,956
+nearly every atom
+
+31
+00:00:40,956 --> 00:00:41,921
+in your body
+
+32
+00:00:41,921 --> 00:00:42,834
+was made in
+
+33
+00:00:42,834 --> 00:00:43,344
 stars.

@@ -13,7 +13,7 @@ export type Style = {
   seed: number; paletteName: string; palette: Palette; layout: 'A' | 'B' | 'C';
   stage: {x: number; y: number; w: number; h: number}; capY: number;
   pacing: string; pace: {speed: number; trans: number; gap: number; chunk: number; zoom: number; spring: {damping: number; stiffness: number}};
-  caption: 'pop' | 'bar' | 'underline' | 'glow' | 'serif'; transition: 'fade' | 'slide' | 'wipe' | 'zoom' | 'push';
+  caption: 'pop' | 'bar' | 'underline' | 'glow' | 'serif' | 'pixel'; transition: 'fade' | 'slide' | 'wipe' | 'zoom' | 'push';
   kinetic: 'pop' | 'slide' | 'drop' | 'stack'; motif: string; header: 'chip' | 'line' | 'banner'; orient: 'v' | 'h'; pill: boolean;
 };
 export type Plan = {
