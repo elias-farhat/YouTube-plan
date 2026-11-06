@@ -402,7 +402,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         for (let x = 36; x < px - 10; x++) rect(x, py - Math.floor(bw / 2), 1, bw, '#ffffff');
         for (let y = -PH; y <= PH; y++) { const hw = Math.round(((y + PH) / (2 * PH)) * PH * 1.05); rect(px - hw, py + y, hw * 2 + 1, 1, mix('#bfe0ff', '#6aa0e0', (y + PH) / (2 * PH))); rect(px - hw, py + y, 1, 1, '#ffffff'); rect(px + hw, py + y, 1, 1, '#ffffff'); }
         ['#ff3b3b', '#ff9a2a', '#ffe14a', '#4ee05a', '#3ad0ff', '#4a6aff', '#b05aff'].forEach((c, i) => { const ang = -0.34 + i * 0.115; for (let x = px + 14; x < R; x++) rect(x, py + (x - px - 14) * Math.tan(ang) - 1, 1, 3, c); });
-        draw('ALL COLORS', 6, py - 36, 1, '#ffffff'); draw('SUNLIGHT', 6, py + 18, 1, '#ffe14a');
+        draw('ALL COLORS', 18, py - 36, 1, '#ffffff'); draw('SUNLIGHT', 18, py + 18, 1, '#ffe14a');
       } else if (ph === 'scatter') {
         bgRows('#050a22', '#0b1a4a');
         const a0 = Math.round(RH * 0.2), a1 = Math.round(RH * 0.41);
@@ -417,9 +417,9 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
             for (let q = 0; q < 6; q++) { const gg = Math.max(0, g - q * 0.03); rect(xs + Math.cos(ang) * gg * 80 - 1, y0 + Math.sin(ang) * gg * 80, 3, 3, mix('#4ab0ff', '#0b1a4a', q / 6)); }
           }
         }
-        draw('BLUE BOUNCES AROUND', 6, a0 - 16, 1, '#6ab8ff'); draw('RED GOES STRAIGHT', R - 106, a1 + 8, 1, '#ff6a6a');
+        draw('BLUE BOUNCES AROUND', 18, a0 - 16, 1, '#6ab8ff'); draw('RED GOES STRAIGHT', R - 124, a1 + 8, 1, '#ff6a6a');
         const ex = Math.round(R * 0.86), ey = Math.round(RH * 0.5); rect(ex - 9, ey - 5, 18, 10, '#ffffff'); rect(ex - 4, ey - 4, 8, 8, '#2a7aff'); rect(ex - 2, ey - 2, 4, 4, '#05103a'); draw('YOU', ex - 9, ey + 10, 1, '#ffffff');
-        draw('ABOUT 6X', 10, RH * 0.5 + 0, 2, '#6ab8ff'); draw('MORE BLUE', 10, RH * 0.5 + 20, 1, '#6ab8ff');
+        draw('ABOUT 6X', 18, RH * 0.5 + 0, 2, '#6ab8ff'); draw('MORE BLUE', 18, RH * 0.5 + 20, 1, '#6ab8ff');
       } else if (ph === 'sunset') {
         const hgt = (v.h0 ?? 1) + ((v.h1 ?? 0) - (v.h0 ?? 1)) * ease(pr), warm = Math.pow(1 - hgt, 1.5), hor = Math.round(RH * 0.56);
         for (let y = 0; y < hor; y++) rect(0, y, R, 1, mix(mix('#2a9aff', '#0a52c8', y / hor * 0.0 + (1 - y / hor) * 0.0), mix('#ff7a2a', '#6a2a8a', 1 - y / hor), warm));
@@ -451,7 +451,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         const sgn = Math.sin(t * 7), col = sgn > 0 ? '#ff6a6a' : '#6ab8ff';
         for (let y = 0; y < 60; y++) rect(24, 34 + y, 2, 1, col);
         for (let k = 0; k < 8; k++) { const a = sgn > 0 ? 1 : -1; rect(18 + k - (a > 0 ? 0 : 0), a > 0 ? 34 + k : 94 - k, 14 - 2 * k < 1 ? 1 : 14 - 2 * k, 1, col); }
-        draw('WAVE', 6, 100, 1, '#ffffff'); draw('PUSH', 6, 112, 1, col);
+        draw('WAVE', 16, 100, 1, '#ffffff'); draw('PUSH', 16, 112, 1, col);
         const mol = (cx: number, cy: number, k: number, ph0: number) => {
           const th = Math.sin(t * 7 + ph0) * 0.9 + (heat * Math.sin(t * 31 + ph0 * 3) * 0.15), jit = heat * 1.2;
           const ox = cx + (hash(Math.floor(t * 20) + ph0) - 0.5) * jit, oy = cy + (hash(Math.floor(t * 20) + ph0 + 5) - 0.5) * jit;
@@ -460,7 +460,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         };
         mol(R * 0.62, 88, 1.8, 0);
         [[0.3, 140], [0.5, 150], [0.78, 142], [0.9, 100], [0.38, 112]].forEach(([fx, fy], i) => mol(R * fx, fy, 0.9, i + 1));
-        draw('H2O', R * 0.62 - 14, 30, 2, '#9fd8ff'); draw('HEAT', R - 66, 8, 2, mix('#9aa4c4', '#ff6a2a', heat));
+        draw('H2O', R * 0.62 - 14, 30, 2, '#9fd8ff'); draw('HEAT', R - 78, 10, 2, mix('#9aa4c4', '#ff6a2a', heat));
       } else if (ph === 'depth') {
         bgRows('#141a2e', '#0a0e1c');
         const fx0 = 26, fy0 = 62, fw = R - 52, fh = 96, sp = Math.min(1, pr * 1.15);
@@ -538,9 +538,9 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         }
         for (let i = 0; i < 9; i++) { const fr = (t * 0.35 + i / 9) % 1, bx = R * 0.2 + Math.sin(i * 2 + fr * 6) * 3 + 6, by = RH * 0.62 - fr * RH * 0.5; sphere(bx, by, 1 + (i % 2), '#e8fbff', 'plain'); }
         raw = true;
-        draw(`${Math.round(oD)} M`, 10, 12, 3, '#ffffff');
-        [['#ff2a2a', 4.5], ['#ff8a1f', 9], ['#ffe14a', 22], ['#3cd84a', 40], ['#2a7aff', 120]].forEach(([c, e], i) => { const vis = Math.exp(-oD / (e as number)); rect(R - 72 + i * 13, 14, 11, 11, '#101820'); rect(R - 72 + i * 13, 14, 11, 11, mix('#101820', c as string, vis)); rect(R - 72 + i * 13, 14, 11, 1, '#ffffff'); });
-        draw('COLOR LEFT', R - 72, 28, 1, '#ffffff');
+        draw(`${Math.round(oD)} M`, 18, 14, 3, '#ffffff');
+        [['#ff2a2a', 4.5], ['#ff8a1f', 9], ['#ffe14a', 22], ['#3cd84a', 40], ['#2a7aff', 120]].forEach(([c, e], i) => { const vis = Math.exp(-oD / (e as number)); rect(R - 84 + i * 13, 14, 11, 11, '#101820'); rect(R - 84 + i * 13, 14, 11, 11, mix('#101820', c as string, vis)); rect(R - 84 + i * 13, 14, 11, 1, '#ffffff'); });
+        draw('COLOR LEFT', R - 84, 28, 1, '#ffffff');
         raw = false;
       } else if (ph === 'glow') {
         raw = true;
@@ -567,7 +567,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         rect(R - 20, RH * 0.1, 2, RH * 0.8, '#ffffff');
         for (let m = 0; m <= 30; m += 10) { const y = RH * 0.1 + (m / 30) * RH * 0.8; rect(R - 26, y, 8, 1, '#ffffff'); draw(String(m), R - 52, y - 3, 1, '#ffffff'); }
         const my = RH * 0.1 + (d / 30) * RH * 0.8; for (let k = 0; k < 6; k++) rect(R - 30 + k, my - k, 1, 2 * k + 1, '#ffd23f');
-        draw(`${Math.round(d)} M`, 10, 78, 3, '#ffffff'); draw(`${P2.toFixed(1)} ATM`, 10, 104, 2, '#ffd23f'); draw(`AIR ${Math.round(100 / P2)}%`, 10, 122, 2, '#ff9aa6');
+        draw(`${Math.round(d)} M`, 18, 78, 3, '#ffffff'); draw(`${P2.toFixed(1)} ATM`, 18, 104, 2, '#ffd23f'); draw(`AIR ${Math.round(100 / P2)}%`, 18, 122, 2, '#ff9aa6');
         raw = false;
       }
     } else if (scene === 'pulsar') {
@@ -835,7 +835,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
   const box: React.CSSProperties = full ? {position: 'absolute', left: -stX, top: -stY, width: 1080, height: 1920, background: '#000'} : {position: 'absolute', inset: 0, borderRadius: 38, overflow: 'hidden', border: `4px solid ${plan.style.palette.accent2}`, boxSizing: 'border-box', background: '#000'};
   const punch = beatIdx % 4 === 0 ? 1 + 0.018 * Math.exp(-phase * 12) : 1 + 0.006 * Math.exp(-phase * 12);   // tiny camera zoom on every beat, bigger on the downbeat
   // 2.5D camera for the 64-bit look: perspective tilt + slow dolly, bloom, tilt-shift blur (far top / near bottom) and a vignette
-  const cam = hd ? `perspective(1500px) rotateX(${7 + 2 * Math.sin(t * 0.55)}deg) rotateY(${4 * Math.sin(t * 0.37 + at * 0.2)}deg) scale(${1.13 + 0.035 * pr})` : undefined;
+  const cam = hd ? `perspective(1500px) rotateX(${5.5 + 1.5 * Math.sin(t * 0.55)}deg) rotateY(${2.4 * Math.sin(t * 0.37 + at * 0.2)}deg) scale(${1.065 + 0.02 * pr})` : undefined;
   return <div style={{...box, overflow: hd ? 'hidden' : undefined}}>
     <div style={{position: 'absolute', inset: 0, transform: cam, transformOrigin: '50% 62%'}}>
       <canvas ref={ref} width={hd ? R * 2 : R} height={hd ? RH * 2 : RH} style={{width: '100%', height: '100%', imageRendering: hd ? 'auto' : 'pixelated', display: 'block', transform: `scale(${punch})`}} />
