@@ -1,0 +1,39 @@
+# SPACE niche #2: humanity's address on the Pioneer 10 plaque is written in pulsars.  Peak = "so they can tell the date".
+# 32-bit pixel scenes, pixel captions, soft pulse at 120 BPM (pulsar beams sweep past Earth exactly on the beat).
+title: Humanity's Address Is Written in Pulsars
+hook: "Humanity's address is written in pulsars."
+hook_visual: {type: pixel, scene: pulsar}
+engine: remotion
+chrome: minimal
+music: pulse
+bpm: 120
+pixel: {full: true, bits: 32, palette: pulsar, bpm: 120}
+style: {layout: C, pacing: snappy, caption: pixel, transition: fade}
+youtube:
+  title: "Humanity's Address Is Written in Pulsars"
+  description: |
+    In 1972, NASA bolted a plaque to the Pioneer 10 spacecraft. On it is a map of where we are, made from 14 pulsars: dead stars that spin like lighthouses and keep time almost as well as atomic clocks.
+
+    The tick marks beside each line write that pulsar's spin rate in binary. And because pulsars slowly slow down at a known rate, anyone who finds the plaque can work out when it was launched.
+
+    The map in this video is a simplified illustration, not the exact plaque.
+  tags: [Space, Science, Astronomy, Pulsar, Pioneer10, SpaceFacts, Universe]
+  pinned_comment: "If you could add one thing to the plaque, what would it be?"
+lines:
+  - say: "A pulsar is a dead star spinning so fast that its beam sweeps past like a lighthouse."
+    visual: {type: pixel, scene: pulsar}
+
+  - say: "Some spin hundreds of times a second, and keep time almost as well as an atomic clock."
+    visual: {type: pixel, scene: pulsars}
+
+  - say: "In 1972, NASA bolted a plaque to the Pioneer 10 spacecraft."
+    visual: {type: pixel, scene: plaque, phase: probe}
+
+  - say: "On it, fourteen lines point from the Sun to fourteen pulsars, and tick marks write each spin rate in binary."
+    visual: {type: pixel, scene: plaque, phase: map}
+
+  - say: "But pulsars slow down at a known rate. So whoever finds the plaque can work out when it was launched."
+    visual: {type: pixel, scene: drift}
+
+  - say: "No language needed. The stars give our address, and the date."
+    visual: {type: pixel, scene: galaxy}

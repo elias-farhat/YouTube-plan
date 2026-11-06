@@ -13,6 +13,7 @@ const PALS: Record<string, Pal> = {
   neon: {sky: ['#05001a', '#0c0533', '#190a4d', '#2d1068'], neb: ['#6a1bd6', '#ff2a6d'], hi: '#d9f7ff', a: '#ff2a6d', b: '#05d9e8', c: '#ffd23f', text: '#ffffff', panel: '#07001f'},
   sunset: {sky: ['#14092e', '#2f1670', '#8e1a9e', '#e0287a'], neb: ['#ff8a00', '#ffd60a'], hi: '#fff3b0', a: '#ff5d73', b: '#ffb703', c: '#ffe66d', text: '#fff8e1', panel: '#14092e'},
   aurora: {sky: ['#020b12', '#052a2e', '#07483f', '#0b6a50'], neb: ['#18d6a0', '#3a7bff'], hi: '#e6fff6', a: '#5cffb0', b: '#4aa8ff', c: '#ffe27a', text: '#f3fffa', panel: '#020b12'},
+  pulsar: {sky: ['#02030c', '#050a24', '#08153f', '#0c2260'], neb: ['#1c4bd0', '#18d6ff'], hi: '#e6fbff', a: '#ff4fa3', b: '#37e6ff', c: '#ffe27a', text: '#ffffff', panel: '#02030c'},
   gameboy: {sky: ['#0f380f', '#0f380f', '#306230', '#306230'], neb: ['#306230', '#8bac0f'], hi: '#9bbc0f', a: '#8bac0f', b: '#8bac0f', c: '#9bbc0f', text: '#9bbc0f', panel: '#0f380f', limit: ['#0f380f', '#306230', '#8bac0f', '#9bbc0f']},
 };
 const PRESET = {8: {res: 80, levels: 3}, 16: {res: 128, levels: 4}, 32: {res: 216, levels: 5}} as const;
@@ -188,7 +189,118 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
       });
     };
 
-    if (scene === 'star') {
+    // ------------------------------------------------------------------ pulsar family
+    const beam = (cx: number, cy: number, ang: number, len: number, wid: number, c1: string, c2: string) => {
+      const ca = Math.cos(ang), sa = Math.sin(ang);
+      for (let d = 5; d < len; d++) {
+        const w = wid * (0.12 + 0.88 * d / len);
+        for (let off = -w; off <= w; off++) {
+          const a = Math.abs(off) / w, alpha = (1 - d / len) ** 0.8 * (1 - a * a);
+          const px = cx + ca * d - sa * off, py = cy + sa * d + ca * off;
+          if (alpha > bayer(Math.round(px), Math.round(py))) dot(px, py, a < 0.35 ? c1 : c2);
+        }
+      }
+    };
+    const pulsarAt = (cx: number, cy: number, ang: number, sz: number, len: number, wid: number) => {
+      for (const k of [0, Math.PI]) beam(cx, cy, ang + k, len, wid, '#ffffff', P.b);
+      for (let a = 0; a < 6.283; a += 0.1) { const rr = sz * (2.6 + kick * 0.8); dot(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr, mix(P.b, '#000000', 0.55)); }
+      for (let f = 0; f < 3; f++) for (let a = 0; a < 6.283; a += 0.12) { const r1 = sz * (1.6 + f * 1.1), x = Math.cos(a) * r1, y = Math.sin(a) * r1 * 0.55, ra = ang + 1.57; dot(cx + x * Math.cos(ra) - y * Math.sin(ra), cy + x * Math.sin(ra) + y * Math.cos(ra), mix(P.hi, '#000000', 0.62)); }
+      sphere(cx, cy, sz + kick * 0.8, '#bfeaff', 'plain');
+      dot(cx, cy, '#ffffff');
+    };
+    if (scene === 'pulsar') {
+      const ang = beats * Math.PI + (v.offset ?? 0);
+      const ex = R * 0.88, ey = cy0;                                  // a small Earth on the right: the beam hits it on every beat
+      pulsarAt(cx0, cy0, ang, R * 0.035, R * 0.72, R * 0.07);
+      const hit = Math.exp(-phase * 7);
+      sphere(ex, ey, R * 0.035, '#2f6fe0', 'earth', t * 0.1);
+      if (hit > 0.12) for (let a = 0; a < 6.283; a += 0.18) dot(ex + Math.cos(a) * (R * 0.05 + (1 - hit) * 8), ey + Math.sin(a) * (R * 0.05 + (1 - hit) * 8), mix(P.hi, '#000000', 1 - hit));
+      dot(ex - 2, ey - 2, P.hi);
+    } else if (scene === 'pulsars') {
+      const rows: [string, string, number, number, string][] = [['VELA', '11 HZ', 0.7, 0.2, EL.H], ['CRAB', '30 HZ', 1.9, 0.5, '#ffe27a'], ['FASTEST', '716 HZ', 5.1, 0.8, '#ff4fa3']];
+      rows.forEach(([name, hz, spd, at0, col], i) => {
+        const g = ease((pr - at0 * 0.35 - i * 0.12) / 0.2); if (g <= 0) return;
+        const y = RH * (0.13 + i * 0.165), x = R * 0.26;
+        pulsarAt(x, y, beats * Math.PI * spd, R * 0.022, R * 0.2 * g, R * 0.025);
+        draw(name, Math.round(R * 0.5), Math.round(y - 12), 1, mix(col, '#ffffff', 0.35));
+        draw(hz, Math.round(R * 0.5), Math.round(y - 1), 2, col);
+      });
+    } else if (scene === 'plaque') {
+      const gold = '#e8c06a', gd = mix(gold, '#000000', 0.5);
+      if (v.phase !== 'map') {
+        // Pioneer 10: big shaded dish with ribs, feed struts, hex bus, booms, and the gold plaque glinting on the beat
+        const px = R * (0.34 + 0.12 * easeO(pr)) + Math.sin(beats * 0.5) * 2, py = cy0 + Math.sin(beats * 0.4) * 3;
+        for (let i = 0; i < 22; i++) rect((hash(i) * R + R - (t * 110 * (0.5 + hash(i + 8))) % R) % R, hash(i + 3) * RH * 0.62, 6 + hash(i) * 14, 1, mix(P.hi, '#000000', 0.7));
+        const rx = R * 0.105, ry = R * 0.17, dc = ramp('#cfd6e6', L);
+        for (let y = -Math.ceil(ry); y <= Math.ceil(ry); y++) for (let x = -Math.ceil(rx); x <= Math.ceil(rx); x++) {
+          const d = Math.hypot(x / rx, y / ry); if (d > 1) continue;
+          const sh = Math.max(0, Math.min(L - 1, Math.floor((0.35 + (x / rx) * 0.55 - Math.abs(y / ry) * 0.2 + (bayer(x + 50, y) - 0.5) * 0.3) * L)));
+          dot(px + x, py + y, Math.round(d * 9) % 3 === 0 ? mix(dc[sh], '#000000', 0.25) : dc[sh]);   // concentric ribs
+        }
+        for (let a = 0; a < 6.283; a += 0.03) dot(px + Math.cos(a) * rx, py + Math.sin(a) * ry, '#ffffff');
+        const fx = px + R * 0.17, fy = py;                                                       // feed horn in front of the dish
+        for (const sy of [-ry * 0.92, 0, ry * 0.92]) for (let k = 0; k <= 30; k++) dot(px + (fx - px) * k / 30, py + sy + (fy - py - sy) * k / 30 + (sy === 0 ? 0 : 0), '#9aa3b4');
+        rect(fx - 1, fy - 3, 6, 7, '#8a93a6'); rect(fx - 1, fy - 3, 6, 1, '#ffffff');
+        const bx = px + R * 0.03, by = py - 7;                                                    // hex bus behind the dish centre
+        rect(bx, by, 20, 15, '#9aa3b4'); rect(bx, by, 20, 2, '#ffffff'); rect(bx + 3, by + 4, 14, 8, '#6c768a');
+        for (let k = 0; k < 40; k++) { dot(bx + 20 + k, by + 4 - Math.floor(k * 0.05), '#c4cad8'); dot(bx + 20 + k, by + 12 + Math.floor(k * 0.05), '#c4cad8'); }
+        rect(bx + 58, by + 1, 12, 7, '#7a8296'); rect(bx + 58, by + 9, 12, 7, '#7a8296');         // RTG power packs on the booms
+        const plx = px + R * 0.075, ply = py + ry * 0.62;                                          // the plaque, on the lower strut
+        rect(plx, ply, 13, 9, '#e8c06a'); rect(plx + 1, ply + 1, 11, 7, '#8a6a2a'); rect(plx, ply, 13, 1, '#fff0c0');
+        for (let k = 0; k < 5; k++) { rect(plx + 3 + k * 1.6, ply + 2 + (k % 2) * 3, 1, 2, '#e8c06a'); }
+        if (phase < 0.35) { const gl = 3 + Math.round(phase * 14); for (let k = -gl; k <= gl; k++) { dot(plx + 6 + k, ply + 4, '#ffffff'); dot(plx + 6, ply + 4 + k, '#ffffff'); } }
+        draw('PIONEER 10', Math.round(R * 0.5 - 30), Math.round(RH * 0.07), 1, P.hi); draw('1972', Math.round(R * 0.5 - 12), Math.round(RH * 0.07 + 11), 1, gold);
+      } else {
+        // the plaque's pulsar map: the Sun in the middle, 14 lines to 14 pulsars, binary tick marks for each spin rate
+        const x0 = 14, y0 = Math.round(RH * 0.04), pw = R - 28, ph = Math.round(RH * 0.55);
+        rect(x0, y0, pw, ph, '#0a0e22'); for (let k = 0; k < 2; k++) rect(x0 + k, y0 + k, pw - 2 * k, 1, gold), rect(x0 + k, y0 + ph - 1 - k, pw - 2 * k, 1, gold), rect(x0 + k, y0 + k, 1, ph - 2 * k, gold), rect(x0 + pw - 1 - k, y0 + k, 1, ph - 2 * k, gold);
+        const mx = x0 + pw / 2 + 6, my = y0 + ph / 2;
+        const angs = [20, 48, 75, 100, 128, 150, 172, 195, 215, 238, 262, 290, 318, 345], lens = [0.22, 0.35, 0.28, 0.4, 0.18, 0.33, 0.26, 0.38, 0.2, 0.3, 0.42, 0.24, 0.36, 0.31];
+        const beatsPer = 60 / bpm, per = Math.max(0.16, Math.min(0.5, (dur - 0.8) / 15));
+        const line = (a: number, len: number, prog: number, ticks: number, col: string) => {
+          const ca = Math.cos(a), sa = Math.sin(a), L2 = len * prog;
+          for (let d = 3; d < L2; d++) dot(mx + ca * d, my + sa * d * 0.78, col);
+          if (prog >= 1) for (let k = 0; k < ticks; k++) { const d = len - 3 - k * 3, bit = hash(k * 7 + Math.round(len)) > 0.45 ? 4 : 2; for (let o = -bit; o <= bit; o++) dot(mx + ca * d - sa * o * 0.78 * 0.0 - sa * o, my + sa * d * 0.78 + ca * o, col); }
+        };
+        angs.forEach((deg, i) => {
+          const prog = ease((t - 0.5 - i * per) / (per * 1.4)); if (prog <= 0) return;
+          const a = (deg * Math.PI) / 180, len = lens[i] * R * 0.95;
+          line(a, len, prog, 3 + (i % 3), gold);
+          if (prog >= 1) { const ex = mx + Math.cos(a) * len, ey = my + Math.sin(a) * len * 0.78, bl = (beatIdx + i) % 4 === 0 && phase < 0.4; sphere(ex, ey, bl ? 2.4 : 1.6, bl ? '#ffffff' : '#bfeaff', 'plain'); }
+        });
+        const gp = ease((t - 0.3) / 0.8); line(Math.PI, R * 0.36, gp, 4, mix(gold, '#ffffff', 0.2));
+        star(mx, my, 4 + kick, '#ffd23f', 0);
+        if (t > 0.9) draw('SUN', Math.round(mx - 9), Math.round(my + 12), 1, P.c);
+      }
+    } else if (scene === 'drift') {
+      const rc = R * 0.27, yr = Math.round(1972 + (2026 - 1972) * ease(pr));
+      const ref = beats * 0.5 * Math.PI, lag = ease(pr) * 1.15, pul = ref - lag;
+      for (let a = 0; a < 6.283; a += 0.02) { dot(cx0 + Math.cos(a) * rc, cy0 + Math.sin(a) * rc, '#6a78a8'); dot(cx0 + Math.cos(a) * (rc - 1), cy0 + Math.sin(a) * (rc - 1), '#2a3768'); }
+      for (let k = 0; k < 12; k++) { const a = (k / 12) * 6.283, big = k % 3 === 0; for (let d = rc - (big ? 6 : 3); d < rc - 1; d++) dot(cx0 + Math.cos(a) * d, cy0 + Math.sin(a) * d, big ? P.hi : '#6a78a8'); }
+      // the lag arc between the perfect clock and the pulsar
+      for (let a = pul; a < ref; a += 0.02) for (let d = rc * 0.55; d < rc * 0.62; d++) dot(cx0 + Math.cos(a) * d, cy0 + Math.sin(a) * d, P.a);
+      const hand = (a: number, len: number, col: string) => { for (let d = 0; d < len; d++) { dot(cx0 + Math.cos(a) * d, cy0 + Math.sin(a) * d, col); dot(cx0 + Math.cos(a) * d + 1, cy0 + Math.sin(a) * d, mix(col, '#000000', 0.5)); } };
+      hand(ref, rc - 8, '#ffffff'); hand(pul, rc - 10, P.b);
+      sphere(cx0, cy0, 3, '#ffffff', 'plain'); sphere(cx0 + Math.cos(pul) * (rc - 10), cy0 + Math.sin(pul) * (rc - 10), 2.2 + kick, P.b, 'plain');
+      const ys = String(yr); draw(ys, Math.round(R / 2 - (ys.length * 6 - 1) * 1.5), Math.round(cy0 + rc + 16), 3, P.c);
+      rect(10, 24, 6, 6, '#ffffff'); draw('CLOCK', 20, 23, 1, P.hi); rect(10, 38, 6, 6, P.b); draw('PULSAR', 20, 37, 1, P.hi);
+    } else if (scene === 'galaxy') {
+      const rot = beats * 0.012;
+      for (let i = 0; i < 900; i++) {
+        const arm = i % 4, u = hash(i * 1.7), rr = R * (0.03 + 0.44 * Math.pow(u, 0.75)), a = rot + arm * 1.5708 + Math.log(1 + rr * 0.08) * 3.1 + (hash(i + 9) - 0.5) * (0.5 - rr / R * 0.6);
+        const x = cx0 + Math.cos(a) * rr, y = cy0 + Math.sin(a) * rr * 0.55, q = rr / (R * 0.47);
+        dot(x, y, mix('#ffe9a8', i % 5 === 0 ? '#ff7fc8' : '#5aa8ff', Math.min(1, q * 1.1)));
+      }
+      star(cx0, cy0, R * 0.05, '#ffd9a0', 0);
+      const sx = cx0 + R * 0.24, sy = cy0 + R * 0.09;                  // our Sun
+      const pp: [number, number][] = [[-0.34, -0.1], [-0.12, -0.2], [0.04, 0.18], [-0.26, 0.14], [0.2, -0.17], [0.34, 0.02]];
+      pp.forEach(([dx, dy], i) => { const g = ease((pr - 0.2 - i * 0.07) / 0.15); if (g <= 0) return; const px = cx0 + dx * R, py = cy0 + dy * R;
+        const n = 26; for (let k = 0; k < n * g; k++) if (k % 2 === 0) dot(px + (sx - px) * (k / n), py + (sy - py) * (k / n), mix(P.hi, '#000000', 0.45));
+        const bl = (beatIdx + i) % 3 === 0 && phase < 0.5; sphere(px, py, bl ? 2.6 : 1.6, bl ? '#ffffff' : P.b, 'plain'); });
+      for (let a = 0; a < 6.283; a += 0.15) dot(sx + Math.cos(a) * (4 + kick * 4), sy + Math.sin(a) * (4 + kick * 4), P.c);
+      sphere(sx, sy, 2.2, '#ffd23f', 'plain');
+      if (pr > 0.45) draw('WE ARE HERE', Math.round(sx - 33), Math.round(sy + 11), 1, P.c);
+    } else if (scene === 'star') {
       star(cx0, cy0, Math.round(R * 0.15 + kick * 3), v.color ?? '#ffa23a', 0.1);
       for (let i = 0; i < 7; i++) { const a = beats * (0.35 + i * 0.05) + i * 0.9, rr = R * (0.28 + 0.03 * (i % 3)); dot(cx0 + Math.cos(a) * rr, cy0 + Math.sin(a) * rr * 0.55, P.hi); dot(cx0 + Math.cos(a - 0.12) * rr, cy0 + Math.sin(a - 0.12) * rr * 0.55, mix(P.hi, '#000000', 0.6)); }
     } else if (scene === 'cosmos') {

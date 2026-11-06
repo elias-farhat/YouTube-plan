@@ -69,6 +69,12 @@ export function buildCues(plan) {
       else if (sc === 'cosmos') add(enter + 0.2, 'swell', 0.35, { dur: Math.min(dur, 2.5) });
       else if (sc === 'earth') { add(enter + 0.4, 'ping', 0.5, { f: 988 }); add(enter + 0.9, 'ping', 0.4, { f: 1318 }); }
       else if (sc === 'star' && s.isHook) add(0.0, 'sting', 0.6);
+      else if (sc === 'pulsar' && s.isHook) add(0.0, 'sting', 0.6);
+      else if (sc === 'pulsars') [0.2, 0.55, 0.9].forEach((k, j) => add(enter + 0.3 + dur * 0.35 * k + j * 0.15, 'ping', 0.45, { f: 660 + 220 * j }));
+      else if (sc === 'plaque' && v.phase === 'map') { const per = Math.max(0.16, Math.min(0.5, (dur - 0.8) / 15)); for (let i = 0; i < 14; i++) add(enter + 0.5 + i * per + per * 0.5, 'ping', 0.3, { f: 700 + 40 * i }); add(enter + 0.3, 'swell', 0.3, { dur: 1.2 }); }
+      else if (sc === 'plaque') add(enter + 0.3, 'whoosh', 0.45);
+      else if (sc === 'drift') { add(enter + 0.4, 'riser', 0.55, { dur: Math.max(1.5, dur - 1.2) }); add(enter + dur - 0.6, 'hit', 0.7); }
+      else if (sc === 'galaxy') { add(enter + 0.2, 'swell', 0.4, { dur: 2 }); add(enter + dur * 0.5, 'ping', 0.5, { f: 1175 }); }
     } else if (v.type === 'lightbeam') {
       add(enter + 0.45, 'draw', 0.35, { dur: dur * 0.82 }); add(enter + 0.45 + dur * 0.82, 'ping', 0.5, { f: 1318 });
     } else if (v.type === 'ladder') {
