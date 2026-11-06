@@ -65,6 +65,17 @@ export function buildSegments(script, style, audio) {
  * "bits" mode: nobody narrates. A little pixel character types each line on screen, one letter per 16th note, with a
  * speech blip per letter. Scenes last a whole number of bars, so every cut lands on a downbeat.
  */
+/** Dr. Bit reacts to what is on screen unless the script sets `mood:` (talk | shock | worried | aha | happy) */
+function autoMood(it, i, n) {
+  const v = it.visual;
+  if (v?.type === 'pixel') {
+    if (v.scene === 'supernova') return v.phase === 'blast' ? 'shock' : 'worried';
+    if (v.scene === 'drift') return 'aha';
+    if (v.scene === 'earth' || v.scene === 'galaxy') return 'happy';
+  }
+  return i === n - 1 ? 'happy' : 'talk';
+}
+
 export function buildBitsSegments(script, style, bpm = 120) {
   const beat = 60 / bpm, bar = beat * 4, charT = beat / 4;
   const items = script.demo ? [...script.lines] : [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
@@ -81,7 +92,7 @@ export function buildBitsSegments(script, style, bpm = 120) {
       idx: i, isHook: !!it.isHook, sfx: it.sfx ?? [], say: it.say, shown: text, visual: it.visual,
       startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
       speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
-      bits: { text, start: start + typeStart, charT },
+      bits: { text, start: start + typeStart, charT }, mood: it.mood ?? autoMood(it, i, items.length),
     });
     t += dur;
   });

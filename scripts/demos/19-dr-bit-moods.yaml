@@ -1,0 +1,27 @@
+# Meet DR. BIT, the pixel scientist who speaks for every "bits" video. His mood follows the story (or set `mood:` on a line).
+demo: true
+mode: bits
+channel: space
+engine: remotion
+title: "Demo 19 - Meet Dr. Bit"
+music: chip
+bpm: 120
+chrome: minimal
+style: {layout: C, pacing: snappy, transition: fade}
+pixel: {full: true, bits: 32, palette: neon, bpm: 120}
+lines:
+  - say: "HI! I AM DR. BIT."
+    mood: talk
+    visual: {type: pixel, scene: star}
+  - say: "WHAT?!"
+    mood: shock
+    visual: {type: pixel, scene: star}
+  - say: "UH OH."
+    mood: worried
+    visual: {type: pixel, scene: star}
+  - say: "AH-HA!"
+    mood: aha
+    visual: {type: pixel, scene: star}
+  - say: "SCIENCE!"
+    mood: happy
+    visual: {type: pixel, scene: star}
