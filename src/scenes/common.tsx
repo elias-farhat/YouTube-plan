@@ -20,7 +20,7 @@ export const Stage: React.FC<{plan: Plan; v?: Visual; children: React.ReactNode}
   );
 };
 
-const KFONT = {money: {f: SANS, w: 900}, space: {f: SANS, w: 800}, history: {f: SERIF, w: 700}} as const;
+const KFONT = {money: {f: SANS, w: 900}, space: {f: SANS, w: 800}, science: {f: SANS, w: 800}, history: {f: SERIF, w: 700}} as const;
 
 export const Kinetic: React.FC<SceneProps & {big?: boolean}> = ({v, plan, dur, big}) => {
   const frame = useCurrentFrame();

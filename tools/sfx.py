@@ -107,6 +107,17 @@ def _sound(name, rng, dur=None, f=None):
         f0 = f or 600.0
         t = t_axis(0.055)
         return fade(np.where((t * f0) % 1.0 < 0.5, 1.0, -1.0) * np.exp(-t * 38), 0.001, 0.01) * 0.6
+    if name == "crack":                                   # lightning crack: sharp noise burst + falling rumble
+        t = t_axis(1.6)
+        c = hp(rng.standard_normal(len(t)), 900) * env_exp(len(t), 0.05)
+        r = lp(rng.standard_normal(len(t)), 220) * env_exp(len(t), 0.5) * 2.0
+        return fade(c * 1.1 + r, 0.001, 0.2)
+    if name == "thunder":                                 # long rolling rumble
+        d = dur or 2.8
+        n = int(d * SR)
+        x = np.linspace(0, 1, n)
+        r = lp(rng.standard_normal(n), 260) * (np.sin(np.pi * x) ** 0.8) * (1 + 0.6 * np.sin(2 * np.pi * 5.5 * x + rng.random() * 6))
+        return fade(r * 2.2, 0.15, 0.4)
     if name == "tick":
         t = t_axis(0.05)
         return fade(bp(rng.standard_normal(len(t)), 1800, 6000) * env_exp(len(t), 0.006)) * 0.9
@@ -299,6 +310,8 @@ def speech_duck(plan, n):
 def main():
     args = sys.argv[1:]
     plan = json.load(open(args[0]))
+    if plan["channel"] not in ("history", "money", "space"):
+        plan["channel"] = "space"          # e.g. `science` reuses the space sound bed
     out = args[1]
     voice = args[args.index("--voice") + 1] if "--voice" in args else None
     use_bed = "--no-bed" not in args

@@ -1,0 +1,47 @@
+# SCIENCE with DR. BIT (no narration).  Format that keeps people watching:
+#   HOOK in <3 s (a shocking fact, typed fast + a bolt on frame 1)  ->  open loop ("stay for the twist")  ->  one new visual every 6 s
+#   ->  PEAK = the twist (the flash goes UP)  ->  payoff that calls back the hook (30,000 degrees = 5x the Sun)  ->  useful bonus tip.
+title: How Lightning Works
+channel: science
+mode: bits
+hook: "LIGHTNING IS 5X HOTTER THAN THE SUN."
+hook_visual: {type: pixel, scene: storm, phase: strike}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+bpm: 120
+pixel: {full: true, bits: 32, palette: storm, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "Lightning Is 5x Hotter Than the Sun. Here's How It Works"
+  description: |
+    How does lightning work? Ice crashes inside the storm cloud and splits electric charge. Air resists until it snaps, a hidden "stepped leader" feels its way down, and when it touches the ground the bright flash you actually see shoots UP, not down. It heats the air to about 30,000 degrees C, roughly five times the surface of the Sun, and the exploding air is thunder.
+
+    Bonus tip: count the seconds between flash and thunder. About 3 seconds is 1 km (5 seconds is 1 mile).
+
+    Dr. Bit explains science with pixels. Illustrative animation, not to scale.
+  tags: [Science, Lightning, Physics, HowItWorks, Weather, DrBit, PixelArt]
+  pinned_comment: "Did you know the flash goes UP? Tell me what to explain next."
+lines:
+  - say: "ICE CRASHES. STAY FOR THE TWIST."
+    mood: talk
+    visual: {type: pixel, scene: storm, phase: ice}
+  - say: "IT SPLITS CHARGE: + UP, - DOWN."
+    mood: talk
+    visual: {type: pixel, scene: storm, phase: charge}
+  - say: "THEN A HIDDEN LEADER STEPS DOWN."
+    mood: worried
+    visual: {type: pixel, scene: storm, phase: leader}
+  - say: "THE FLASH YOU SEE SHOOTS UP!"
+    mood: aha
+    visual: {type: pixel, scene: storm, phase: return}
+  - say: "30,000 DEGREES. 5X THE SUN."
+    mood: shock
+    visual: {type: pixel, scene: storm, phase: heat}
+  - say: "HOT AIR EXPLODES: THUNDER."
+    mood: shock
+    visual: {type: pixel, scene: storm, phase: thunder}
+  - say: "COUNT 3 SECONDS = 1 KM AWAY."
+    mood: happy
+    visual: {type: pixel, scene: storm, phase: count}

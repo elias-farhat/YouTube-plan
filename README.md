@@ -95,6 +95,18 @@ A scene with `year: 133 BC` shows earlier territory solid, and the countries gai
 
 `mode: bits` at the top of a script removes the voice completely. A little pixel character types each line (`hook:` and every `say:`) on screen, one letter per 16th note, with a speech blip per letter, over a chiptune (`music: chip`, `bpm: 120`) and the sound effects. Each scene lasts a whole number of bars, so every cut lands on a downbeat (use 120 or 150 BPM so bars are whole frames). Keep lines short (~30 characters = a 6 s scene). See `scripts/space/hello-i-am-a-pulsar.yaml` and `stardust-you.yaml`.
 
+### Science with Dr. Bit (`channel: science`)
+
+General "how does it work?" videos (lightning, plants, devices...). Same `mode: bits` format, Dr. Bit speaks. The retention recipe baked into the scripts:
+
+1. **Hook in under 3 s**: one shocking, true fact (`hook:` is typed twice as fast and starts on frame 1) with a visual hit on frame 1.
+2. **Open loop** on the first or second line ("STAY FOR THE TWIST").
+3. **A new visual every 6 s** (one scene per line, whole bars), so nothing sits still.
+4. **Peak = the twist** (`mood: aha`, riser, boom/shake).
+5. **Payoff that calls back the hook**, then a useful bonus line.
+
+Pixel science scenes so far: `storm` (strike, ice, charge, leader, return, heat, thunder, count) and `plant` (tree, sunleaf, roots, stomata, split, sugar, grow). See `scripts/science/`. Palettes for pixel scenes: `neon`, `sunset`, `aurora`, `pulsar`, `storm`, `day`, `gameboy`.
+
 ### Hook and peak
 
 `hook` is the first ~2 s. By default it becomes giant kinetic text; give it a visual with `hook_visual:` (e.g. a counting number) and the spoken hook is captioned as usual. A line can carry `sfx: [riser]` (a tension build that ends where the line starts), `boom`, `hit`, `stamp` or `sting`. Put the riser on the line *before the peak* and `kinetic: {dark: true}` on the peak itself.

@@ -17,7 +17,7 @@ export type Style = {
   kinetic: 'pop' | 'slide' | 'drop' | 'stack'; motif: string; header: 'chip' | 'line' | 'banner'; orient: 'v' | 'h'; pill: boolean;
 };
 export type Plan = {
-  channel: 'money' | 'space' | 'history'; title: string; handle: string; channelName: string;
+  channel: 'money' | 'space' | 'history' | 'science'; title: string; handle: string; channelName: string;
   fps: number; totalFrames: number; style: Style; segs: Seg[];
   territories: {year: number; countries: string[]}[];
   audio?: string | null; bgVideo?: string | null;

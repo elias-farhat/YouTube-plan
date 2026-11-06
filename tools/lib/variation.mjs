@@ -26,13 +26,13 @@ export const PACING = {
   cinematic: { speed: 1.1, trans: 16, gap: 0.4, chunk: 4, zoom: 0.15, spring: { damping: 20, stiffness: 90 }, rate: '-6%' },
 };
 export const TRANSITIONS = ['fade', 'slide', 'wipe', 'zoom', 'push'];
-export const CAPTIONS = { money: ['pop', 'bar', 'underline'], space: ['glow', 'pop', 'bar'], history: ['serif', 'bar', 'glow'] };
+export const CAPTIONS = { money: ['pop', 'bar', 'underline'], space: ['glow', 'pop', 'bar'], history: ['serif', 'bar', 'glow'], science: ['glow', 'pop', 'bar'] };
 export const KINETIC = ['pop', 'slide', 'drop', 'stack'];
-export const MOTIFS = { money: ['grid', 'coins', 'bars'], space: ['stars', 'nebula', 'streak'], history: ['graticule', 'compass', 'paper'] };
+export const MOTIFS = { money: ['grid', 'coins', 'bars'], space: ['stars', 'nebula', 'streak'], history: ['graticule', 'compass', 'paper'], science: ['stars', 'nebula', 'streak'] };
 export const HEADERS = ['chip', 'line', 'banner'];
 export const ORIENT = ['v', 'h'];
-export const NAMES = { money: 'MONEY EXPLAINED', space: 'SPACE & SCIENCE', history: 'HISTORY IN MOTION' };
-export const HANDLES = { money: '@CentsAndSense', space: '@CosmicBits', history: '@MapsOfTime' };
+export const NAMES = { money: 'MONEY EXPLAINED', space: 'SPACE & SCIENCE', history: 'HISTORY IN MOTION', science: 'SCIENCE WITH DR. BIT' };
+export const HANDLES = { money: '@CentsAndSense', space: '@CosmicBits', history: '@MapsOfTime', science: '@DrBitScience' };
 
 const lum = (hex) => { const n = parseInt(hex.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255; };
 const mixHex = (a, b) => { const x = parseInt(a.slice(1), 16), y = parseInt(b.slice(1), 16); const c = (s) => Math.round((((x >> s) & 255) + ((y >> s) & 255)) / 2); return lum('#' + [16, 8, 0].map((s) => c(s).toString(16).padStart(2, '0')).join('')); };

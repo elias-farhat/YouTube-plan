@@ -2,7 +2,7 @@
 // money: always dark with green / gold accents.  space & history: several moods each.
 const P = (o) => o;
 
-export const PALETTES = {
+export const PALETTES = {  // science (below) reuses the space palettes
   money: {
     emerald_gold: P({ bgTop: '#04130f', bgBot: '#0b3a2b', glow: '#1fa97a', accent: '#3ddc97', accent2: '#ffd166', text: '#f4fff9', muted: '#8fc4b0', panel: '#0d2f25', bad: '#ff5d6c', onAccent: '#04150f' }),
     jade_champagne: P({ bgTop: '#061a17', bgBot: '#12483f', glow: '#2fbf8f', accent: '#4ade80', accent2: '#f4d58d', text: '#f6fffb', muted: '#97c9bb', panel: '#0f3a33', bad: '#ff6f7d', onAccent: '#04150f' }),
@@ -28,3 +28,4 @@ export const PALETTES = {
     olive: P({ bgTop: '#10150f', bgBot: '#24301f', glow: '#7a8f4a', sea: '#1d3331', sea2: '#122422', land: '#cfd2b0', border: '#8d9170', accent: '#8e2f27', accent2: '#e3c26a', text: '#f6f4e4', muted: '#b5b894', panel: '#1f2a1b', bad: '#d1584c', onAccent: '#fff4e2', ink: '#2a2d1b' }),
   },
 };
+PALETTES.science = PALETTES.space;

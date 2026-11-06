@@ -59,6 +59,8 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     if (seg.idx === 0 && segT < 3.4) { R(bx, 0, 40, 10, '#0a0e22'); R(bx, 0, 40, 1, accent); R(bx, 9, 40, 1, accent); R(bx, 0, 1, 10, accent); R(bx + 39, 0, 1, 10, accent); [...'DR. BIT'].forEach((ch, i) => glyph(ch, bx + 3 + i * 5, 1, '#ffffff')); }
 
     // ------------------------------------------------------------ DR. BIT
+    // dark spotlight behind him so the white coat/hair stand out on bright scenes (daylight, lightning flashes)
+    for (let y = 2; y < CH; y++) for (let x = 0; x < CHAR_W; x++) { const d = Math.hypot((x - 25) / 25, (y - 36) / 32); if (d < 1 && (1 - d) * 1.1 > ((x * 7 + y * 13) % 16) / 16 * 0.9) { ctx.fillStyle = 'rgba(10,8,34,0.62)'; ctx.fillRect(x, y, 1, 1); } }
     const SK = '#f2c9a3', SKd = '#d4a27a', HR = '#f6f6ff', HRd = '#b9bddf', COAT = '#f4f6ff', COATd = '#cdd3ee', LN = '#1a1d3a', TEAL = '#2ec4b6', TIE = '#ff4fa3', GL = '#bfeaff';
     const shock = mood === 'shock', worried = mood === 'worried', aha = mood === 'aha', happy = mood === 'happy';
     const bob = phase < 0.18 ? -1 : 0;

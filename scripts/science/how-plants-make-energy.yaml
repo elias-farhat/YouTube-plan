@@ -1,0 +1,43 @@
+# SCIENCE with DR. BIT.  Hook = a surprising TRUE fact; twist = the oxygen comes from WATER; payoff = the hook, now explained.
+title: How Plants Make Energy
+channel: science
+mode: bits
+hook: "A TREE IS MOSTLY MADE OF AIR."
+hook_visual: {type: pixel, scene: plant, phase: tree}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+bpm: 120
+pixel: {full: true, bits: 32, palette: day, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "A Tree Is Mostly Made of Air (How Plants Make Energy)"
+  description: |
+    How do plants make energy from sunlight? Leaves catch light in chloroplasts. Roots lift water. Tiny pores called stomata let in carbon dioxide. Light energy splits water, and that is where the oxygen we breathe comes from. The carbon from CO2 is then built into sugar, and the sugar becomes leaves and wood. That is why most of a tree's dry weight is carbon pulled out of the air.
+
+    Dr. Bit explains science with pixels. Simplified animation.
+  tags: [Science, Photosynthesis, Plants, Biology, HowItWorks, DrBit, PixelArt]
+  pinned_comment: "Did you know the oxygen comes from water? Tell me what to explain next."
+lines:
+  - say: "LIGHT HITS. STAY FOR THE TWIST."
+    mood: talk
+    visual: {type: pixel, scene: plant, phase: sunleaf}
+  - say: "WATER RISES FROM THE ROOTS."
+    mood: talk
+    visual: {type: pixel, scene: plant, phase: roots}
+  - say: "CO2 ENTERS THROUGH TINY PORES."
+    mood: talk
+    visual: {type: pixel, scene: plant, phase: stomata}
+  - say: "THE OXYGEN COMES FROM WATER!"
+    mood: aha
+    visual: {type: pixel, scene: plant, phase: split}
+  - say: "CARBON IS BUILT INTO SUGAR."
+    mood: talk
+    visual: {type: pixel, scene: plant, phase: sugar}
+  - say: "SUGAR BUILDS LEAVES AND WOOD."
+    mood: talk
+    visual: {type: pixel, scene: plant, phase: grow}
+  - say: "SO YES: A TREE IS MADE OF AIR."
+    mood: happy
+    visual: {type: pixel, scene: plant, phase: tree}

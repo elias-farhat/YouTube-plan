@@ -68,6 +68,27 @@ export function buildCues(plan) {
       else if (sc === 'nebula') add(enter + 0.2, 'swell', 0.45, { dur: Math.min(dur, 3) });
       else if (sc === 'disc') add(enter + 0.3, 'draw', 0.4, { dur: dur * 0.8 });
       else if (sc === 'cosmos') add(enter + 0.2, 'swell', 0.35, { dur: Math.min(dur, 2.5) });
+      else if (sc === 'storm') {
+        const ph = v.phase;
+        if (ph === 'strike') { for (let k = 0; k < Math.floor(dur); k++) add(enter + 0.05 + k * 1.0, 'crack', k ? 0.7 : 1.0); add(enter + 0.05, 'boom', 0.8); }
+        else if (ph === 'ice') for (let k = 0; k < 6; k++) add(enter + 0.5 + k * 0.7, 'tick', 0.5);
+        else if (ph === 'charge') { add(enter + 0.3, 'swell', 0.4, { dur: 2.5 }); add(enter + dur * 0.55, 'ping', 0.4, { f: 880 }); }
+        else if (ph === 'leader') { add(enter + 0.3, 'riser', 0.6, { dur: Math.max(1.5, dur - 1.2) }); for (let k = 0; k < 10; k++) add(enter + 0.5 + k * 0.45, 'tick', 0.35); }
+        else if (ph === 'return') { add(enter + 0.2, 'crack', 1.0); add(enter + 0.25, 'boom', 1.0); add(enter + 0.3, 'sweep', 0.6, { dur: 0.5 }); }
+        else if (ph === 'heat') { add(enter + 0.4, 'sweep', 0.5, { dur: 1.2 }); add(enter + 1.7, 'hit', 0.8); }
+        else if (ph === 'thunder') { add(enter + 0.15, 'crack', 0.9); add(enter + 0.3, 'thunder', 0.8, { dur: Math.min(3, dur - 0.5) }); }
+        else if (ph === 'count') { add(enter + 0.5, 'crack', 1.0); [1.5, 2.5, 3.5].forEach((q, j) => add(enter + q, 'ping', 0.5, { f: 700 + 160 * j })); add(enter + 3.5, 'thunder', 0.9, { dur: 2 }); }
+      }
+      else if (sc === 'plant') {
+        const ph = v.phase;
+        if (ph === 'tree') add(enter + 0.2, 'swell', 0.35, { dur: 2.5 });
+        else if (ph === 'sunleaf') for (let k = 0; k < 5; k++) add(enter + 0.5 + k * 0.6, 'ping', 0.35, { f: 880 + 110 * k });
+        else if (ph === 'roots') add(enter + 0.4, 'draw', 0.4, { dur: dur * 0.7 });
+        else if (ph === 'stomata') for (let k = 0; k < 4; k++) add(enter + 0.8 + k * 0.8, 'tick', 0.6);
+        else if (ph === 'split') { add(enter + 0.6, 'crack', 0.7); add(enter + 0.65, 'hit', 0.9); add(enter + 1.6, 'ping', 0.5, { f: 1175 }); }
+        else if (ph === 'sugar') for (let k = 0; k < 6; k++) add(enter + 0.5 + k * 0.5, 'ping', 0.3, { f: 600 + 70 * k });
+        else if (ph === 'grow') { add(enter + 0.3, 'swell', 0.45, { dur: dur - 0.8 }); add(enter + dur - 0.8, 'ping', 0.5, { f: 1318 }); }
+      }
       else if (sc === 'earth') { add(enter + 0.4, 'ping', 0.5, { f: 988 }); add(enter + 0.9, 'ping', 0.4, { f: 1318 }); }
       else if (sc === 'star' && s.isHook) add(0.0, 'sting', 0.6);
       else if (sc === 'pulsar' && s.isHook) add(0.0, 'sting', 0.6);

@@ -83,7 +83,8 @@ export function buildBitsSegments(script, style, bpm = 120) {
   let t = 0;
   items.forEach((it, i) => {
     const text = it.words.map((w) => w.shown).join(' ').toUpperCase();
-    const typeStart = beat, typeDur = text.length * charT;
+    const fast = !!it.isHook;                                   // the hook types twice as fast and starts at once: it must land inside 3 s
+    const cT = fast ? charT / 2 : charT, typeStart = fast ? 0.15 : beat, typeDur = text.length * cT;
     const need = typeStart + typeDur + (i === items.length - 1 ? 2.2 : 1.5);
     let dur = Math.ceil(need / bar - 1e-6) * bar;
     if (it.hold) dur = Math.max(dur, Math.ceil(it.hold / bar - 1e-6) * bar);
@@ -92,7 +93,7 @@ export function buildBitsSegments(script, style, bpm = 120) {
       idx: i, isHook: !!it.isHook, sfx: it.sfx ?? [], say: it.say, shown: text, visual: it.visual,
       startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
       speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
-      bits: { text, start: start + typeStart, charT }, mood: it.mood ?? autoMood(it, i, items.length),
+      bits: { text, start: start + typeStart, charT: cT }, mood: it.mood ?? autoMood(it, i, items.length),
     });
     t += dur;
   });

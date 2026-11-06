@@ -3,11 +3,12 @@ import path from 'node:path';
 import * as yaml from 'js-yaml';
 import { seedFromText } from './variation.mjs';
 
-export const CHANNELS = ['money', 'space', 'history'];
+export const CHANNELS = ['money', 'space', 'history', 'science'];
 export const VISUALS = {
   money: ['kinetic', 'stat', 'line', 'bar'],
   space: ['kinetic', 'counter', 'orbit', 'lightbeam', 'ladder', 'scale'],
   history: ['kinetic', 'stat', 'map', 'battle', 'stamps'],
+  science: ['kinetic', 'stat'],   // + pixel / clip (always Remotion)
 };
 export const PIXEL_OK = ['money', 'space', 'history']; // the `pixel` visual works in every channel
 
@@ -61,7 +62,7 @@ export function loadScript(file) {
     const v = l.visual;
     if (v !== undefined && v !== null) {
       if (typeof v !== 'object' || !v.type) fail(`lines[${i}].visual needs a "type" (${VISUALS[channel].join(', ')})`);
-      const allowed = channel === 'space' && raw.engine === 'remotion' ? ['kinetic', 'stat', 'line', 'bar'] : VISUALS[channel];
+      const allowed = (channel === 'space' && raw.engine === 'remotion') || channel === 'science' ? ['kinetic', 'stat', 'line', 'bar'] : VISUALS[channel];
       if (v.type !== 'pixel' && v.type !== 'clip' && !allowed.includes(v.type)) fail(`lines[${i}].visual.type "${v.type}" is not available for ${channel}. Use: ${VISUALS[channel].join(', ')}`);
     }
     if (v && v.type === 'pixel' && raw.pixel) l.visual = { ...raw.pixel, ...v };   // script-level defaults for pixel scenes

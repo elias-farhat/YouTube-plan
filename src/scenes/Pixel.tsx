@@ -14,6 +14,8 @@ const PALS: Record<string, Pal> = {
   sunset: {sky: ['#14092e', '#2f1670', '#8e1a9e', '#e0287a'], neb: ['#ff8a00', '#ffd60a'], hi: '#fff3b0', a: '#ff5d73', b: '#ffb703', c: '#ffe66d', text: '#fff8e1', panel: '#14092e'},
   aurora: {sky: ['#020b12', '#052a2e', '#07483f', '#0b6a50'], neb: ['#18d6a0', '#3a7bff'], hi: '#e6fff6', a: '#5cffb0', b: '#4aa8ff', c: '#ffe27a', text: '#f3fffa', panel: '#020b12'},
   pulsar: {sky: ['#02030c', '#050a24', '#08153f', '#0c2260'], neb: ['#1c4bd0', '#18d6ff'], hi: '#e6fbff', a: '#ff4fa3', b: '#37e6ff', c: '#ffe27a', text: '#ffffff', panel: '#02030c'},
+  storm: {sky: ['#04050d', '#080c1f', '#101a3a', '#1b2a55'], neb: ['#2a3a7a', '#4a5a9a'], hi: '#e8f0ff', a: '#ffe27a', b: '#7fb0ff', c: '#fff6a8', text: '#ffffff', panel: '#04050d'},
+  day: {sky: ['#4aa8ff', '#74c0ff', '#a5dbff', '#d8f1ff'], neb: ['#ffffff', '#e6f6ff'], hi: '#ffffff', a: '#ff8a3c', b: '#2f9bff', c: '#ffe14a', text: '#ffffff', panel: '#0a2a4a'},
   gameboy: {sky: ['#0f380f', '#0f380f', '#306230', '#306230'], neb: ['#306230', '#8bac0f'], hi: '#9bbc0f', a: '#8bac0f', b: '#8bac0f', c: '#9bbc0f', text: '#9bbc0f', panel: '#0f380f', limit: ['#0f380f', '#306230', '#8bac0f', '#9bbc0f']},
 };
 const PRESET = {8: {res: 80, levels: 3}, 16: {res: 128, levels: 4}, 32: {res: 216, levels: 5}} as const;
@@ -93,7 +95,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
     if (beatIdx % 4 === 0 && phase < 0.05) { ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fillRect(-2, -2, R + 4, RH + 4); }
 
     // ---------------------------------------------------------------- stars: three parallax layers + sparkles
-    for (let i = 0; i < Math.round(70 * sc + 20); i++) {
+    for (let i = 0; i < (v.stars ?? palName !== 'day' ? Math.round(70 * sc + 20) : 0); i++) {
       const layer = 1 + (i % 3), spd = (4 + kick * 3) * layer * sc;
       const x = Math.floor(hash(i) * R), y = Math.floor((hash(i + 77) * RH + t * spd) % RH);
       const tw = (beatIdx + i) % 7 === 0 && phase < 0.6;
@@ -208,7 +210,178 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
       sphere(cx, cy, sz + kick * 0.8, '#bfeaff', 'plain');
       dot(cx, cy, '#ffffff');
     };
-    if (scene === 'pulsar') {
+    // ================================================================== science scenes
+    const gy = Math.round(RH * 0.55);
+    const lineD = (x0: number, y0: number, x1: number, y1: number, c: string) => { const n = Math.max(1, Math.ceil(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)))); for (let i = 0; i <= n; i++) dot(x0 + ((x1 - x0) * i) / n, y0 + ((y1 - y0) * i) / n, c); };
+    const blob = (bx: number, by: number, r: number, base: string) => { const rp = ramp(base, L); for (let y = -Math.ceil(r); y <= Math.ceil(r); y++) for (let x = -Math.ceil(r); x <= Math.ceil(r); x++) { const d = Math.hypot(x, y); if (d > r) continue; const lit = (1 - (y / r + 1) / 2) * 0.7 + (1 - d / r) * 0.3 + (bayer(Math.round(bx) + x, Math.round(by) + y) - 0.5) * 0.35; dot(bx + x, by + y, rp[Math.max(0, Math.min(L - 1, Math.floor(lit * L)))]); } };
+    const cloudAt = (cx: number, cy: number, w: number, h: number, base: string, seed = 0) => { const n = Math.max(3, Math.round(w / 12)); for (let i = 0; i < n; i++) blob(cx - w / 2 + ((i + 0.5) * w) / n, cy + (hash(i + 7 + seed) - 0.5) * h * 0.35, h * (0.42 + 0.3 * hash(i + seed)), base); };
+    const boltPts = (x0: number, y0: number, x1: number, y1: number, seed: number): [number, number][] => {
+      const pts: [number, number][] = [[x0, y0]]; const steps = Math.max(2, Math.ceil((y1 - y0) / 6)); let x = x0;
+      for (let i = 1; i <= steps; i++) { const f = i / steps; x += (x0 + (x1 - x0) * f - x) * 0.55 + (hash(seed * 17 + i * 3.1) - 0.5) * 11 * (1 - f * 0.6); pts.push([x, y0 + (y1 - y0) * f]); }
+      pts[pts.length - 1] = [x1, y1]; return pts;
+    };
+    const boltDraw = (pts: [number, number][], from: number, to: number, core: string, halo: string) => {
+      const a = Math.max(1, from), b = Math.min(to, pts.length - 1);
+      for (let i = a; i <= b; i++) { lineD(pts[i - 1][0] - 1, pts[i - 1][1], pts[i][0] - 1, pts[i][1], halo); lineD(pts[i - 1][0] + 1, pts[i - 1][1], pts[i][0] + 1, pts[i][1], halo); }
+      for (let i = a; i <= b; i++) lineD(pts[i - 1][0], pts[i - 1][1], pts[i][0], pts[i][1], core);
+    };
+    const branchesOf = (pts: [number, number][], seed: number) => [0.3, 0.5, 0.7].map((k, i) => { const b0 = pts[Math.floor(pts.length * k)], dir = hash(seed + i) > 0.5 ? 1 : -1; return boltPts(b0[0], b0[1], b0[0] + dir * (12 + hash(i + seed) * 12), b0[1] + 20 + hash(i + 3 + seed) * 10, seed + i * 9); });
+    const groundDraw = (col = '#08111f', grass = '#1d3a2a') => { rect(0, gy, R, RH - gy, col); for (let x = 0; x < R; x++) { if (hash(x) > 0.5) dot(x, gy, grass); dot(x, gy + 1, mix(grass, '#000000', 0.5)); } };
+    const treeAt = (x: number, base: number, h: number, c: string, d: string) => { rect(x - 1, base - h * 0.4, 3, h * 0.4, '#3b2a1a'); for (let k = 0; k < 3; k++) { const w = h * (0.34 - k * 0.07), yy = base - h * 0.32 - k * h * 0.2; for (let r = 0; r < h * 0.3; r++) { const ww = w * (1 - r / (h * 0.3)); rect(x - ww, yy - r, ww * 2 + 1, 1, r % 3 === 0 ? d : c); } } };
+    const rain = (n: number) => { for (let i = 0; i < n; i++) { const x = hash(i * 1.3) * R, y = (hash(i + 4) * RH + t * 190) % gy; dot(x, y, '#6f9be0'); dot(x - 1, y + 2, '#3a5a9a'); } };
+    const plusAt = (x: number, y: number, c: string) => { dot(x, y, c); dot(x - 1, y, c); dot(x + 1, y, c); dot(x, y - 1, c); dot(x, y + 1, c); };
+    const minusAt = (x: number, y: number, c: string) => { dot(x - 1, y, c); dot(x, y, c); dot(x + 1, y, c); };
+    const flashOver = (a: number) => { if (a > 0.02) { ctx.fillStyle = `rgba(255,255,255,${Math.min(0.9, a)})`; ctx.fillRect(-4, -4, R + 8, RH + 8); } };
+    const tx = Math.round(R * 0.64), tyTop = gy - 36, boltSeed = 3;
+    const along = (path: [number, number][], f: number): [number, number] => { const n = path.length - 1, k = Math.max(0, Math.min(n - 1e-6, f * n)), i = Math.floor(k), q = k - i; return [path[i][0] + (path[i + 1][0] - path[i][0]) * q, path[i][1] + (path[i + 1][1] - path[i][1]) * q]; };
+    const co2 = (x: number, y: number, k = 1) => { sphere(x - 4 * k, y, 1.8 * k, '#ff4a4a', 'plain'); sphere(x + 4 * k, y, 1.8 * k, '#ff4a4a', 'plain'); sphere(x, y, 2.3 * k, '#6a6a76', 'plain'); };
+    const sunAt = (x: number, y: number, r: number) => star(x, y, r, '#ffd23f', 0);
+
+    if (scene === 'storm') {
+      const ph = v.phase ?? 'strike';
+      if (ph === 'strike') {
+        cloudAt(R * 0.5, RH * 0.09, R * 1.2, RH * 0.14, '#303a62', 1); cloudAt(R * 0.2, RH * 0.17, R * 0.7, RH * 0.08, '#222a4a', 5); cloudAt(R * 0.82, RH * 0.16, R * 0.6, RH * 0.08, '#222a4a', 9);
+        rain(70); groundDraw(); treeAt(R * 0.3, gy, 26, '#14301f', '#0c2014'); treeAt(tx, gy, 40, '#14301f', '#0c2014');
+        const ts = 0.08, k = Math.max(0, Math.floor((t - ts) / 1.0)), age = t - ts - k;
+        if (t >= ts) {
+          const pts = boltPts(R * 0.5 + (hash(k) - 0.5) * 24, RH * 0.15, tx, tyTop, boltSeed + k), f = Math.max(0, 1 - age / 0.6);
+          if (f > 0) { const core = mix(P.b, '#ffffff', f), halo = mix('#0a1a44', P.b, f); boltDraw(pts, 1, pts.length, core, halo); branchesOf(pts, boltSeed + k).forEach((b) => boltDraw(b, 1, b.length, core, halo)); }
+          flashOver(Math.exp(-age * 9) * 0.8);
+          if (age < 0.3) ctx.setTransform(1, 0, 0, 1, Math.round((hash(frame) - 0.5) * 5 * (1 - age / 0.3)), Math.round((hash(frame + 3) - 0.5) * 4 * (1 - age / 0.3)));
+        }
+      } else if (ph === 'ice') {
+        cloudAt(R * 0.5, RH * 0.28, R * 1.3, RH * 0.5, '#202a4c', 2);
+        for (let i = 0; i < 16; i++) { const x = R * (0.12 + 0.76 * hash(i)), y = RH * 0.5 - ((t * 15 * (0.6 + hash(i + 2)) + hash(i + 4) * RH * 0.5) % (RH * 0.46)); [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => dot(x + dx, y + dy, dx || dy ? P.b : '#ffffff')); }
+        for (let i = 0; i < 12; i++) { const x = R * (0.1 + 0.8 * hash(i + 20)), y = RH * 0.06 + ((t * 24 * (0.6 + hash(i + 22)) + hash(i + 24) * RH * 0.5) % (RH * 0.46)); blob(x, y, 2.6, '#9fc0ff'); }
+        for (let k = 0; k < 6; k++) { const te = 0.7 + k * 0.7, a = t - te; if (a < 0 || a > 0.5) continue; const x = R * (0.2 + 0.6 * hash(k + 50)), y = RH * (0.14 + 0.28 * hash(k + 60)), q = a / 0.5;
+          for (let an = 0; an < 6.283; an += 0.5) { lineD(x + Math.cos(an) * 2, y + Math.sin(an) * 2, x + Math.cos(an) * (4 + q * 8), y + Math.sin(an) * (4 + q * 8), mix('#ffe27a', '#000000', q * 0.7)); }
+          plusAt(x + 9, y - 9 - q * 4, mix('#ff7aa8', '#000000', q * 0.6)); minusAt(x - 10, y + 8 + q * 4, mix('#7fe3ff', '#000000', q * 0.6)); }
+        [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dx, dy]) => dot(14 + dx, 22 + dy, dx || dy ? P.b : '#ffffff')); draw('ICE', 22, 19, 1, P.hi); blob(14, 36, 2.6, '#9fc0ff'); draw('HAIL', 22, 33, 1, P.hi);
+      } else if (ph === 'charge') {
+        cloudAt(R * 0.5, RH * 0.17, R * 1.1, RH * 0.28, '#2c3558', 3); groundDraw();
+        for (let i = 0; i < 30; i++) { const x = R * (0.12 + 0.76 * hash(i)), a = ease(pr * 1.7 - hash(i + 9) * 0.6); if (a <= 0) continue; plusAt(x, RH * (0.05 + 0.07 * hash(i + 3)), '#ff7aa8'); minusAt(x + 2, RH * (0.2 + 0.08 * hash(i + 7)), '#7fe3ff'); }
+        for (let i = 0; i < 14; i++) { const a = ease((pr - 0.45) * 3 - hash(i) * 0.4); if (a > 0) plusAt(R * (i + 0.5) / 14, gy + 6 + (i % 2) * 5, '#ff7aa8'); }
+        if (pr > 0.72) for (let i = 0; i < 9; i++) { const x = R * (0.1 + 0.8 * i / 8); for (let yy = gy - 2; yy > RH * 0.34; yy -= 5) if (Math.round(yy + t * 30) % 10 < 4) dot(x, yy, mix('#ffe27a', '#000000', 0.4)); }
+        draw('+', R - 18, 10, 2, '#ff7aa8'); draw('-', R - 18, 40, 2, '#7fe3ff');
+      } else if (ph === 'leader' || ph === 'return') {
+        cloudAt(R * 0.5, RH * 0.1, R * 1.1, RH * 0.16, '#303a62', 1); rain(40); groundDraw(); treeAt(R * 0.3, gy, 26, '#14301f', '#0c2014'); treeAt(tx, gy, 40, '#14301f', '#0c2014');
+        const pts = boltPts(R * 0.5 + 6, RH * 0.17, tx, tyTop, boltSeed), N = pts.length - 1, brs = branchesOf(pts, boltSeed);
+        if (ph === 'leader') {
+          const n = Math.min(N, Math.floor(pr * 1.1 * N / 3) * 3);
+          boltDraw(pts, 1, n, '#7fb0ff', '#143064'); brs.forEach((b) => boltDraw(b, 1, Math.floor(b.length * Math.min(1, pr * 1.2)), '#4a78c8', '#10224a'));
+          if (n < N) { const [px, py] = pts[n]; sphere(px, py, 2 + kick, '#cfe6ff', 'plain'); }
+          const len = 3 + 16 * ease((pr - 0.4) / 0.55);
+          for (let i = 0; i < 6; i++) lineD(tx + (i - 2.5) * 2, tyTop, tx + (i - 2.5) * 3.4, tyTop - len * (0.55 + 0.45 * hash(i)), '#ff9ac0');
+          draw('LEADER', 10, 46, 1, '#9fc8ff'); draw('STREAMERS', tx - 22, tyTop - 26, 1, '#ff9ac0');
+          if (n >= N - 3) { sphere(tx, tyTop, 4, '#ffffff', 'plain'); }
+        } else {
+          const t0 = 0.15, f = easeO((t - t0) / 0.5), headIdx = Math.round((1 - f) * N), age = Math.max(0, t - t0 - 0.5);
+          boltDraw(pts, 1, N, '#7fb0ff', '#143064');
+          if (t >= t0) {
+            const fade = Math.max(0, 1 - age / 1.2), core = mix(P.b, '#ffffff', fade), halo = mix('#0a1a44', '#7fe3ff', fade);
+            boltDraw(pts, Math.max(1, headIdx), N, core, halo); brs.forEach((b) => boltDraw(b, 1, b.length, mix('#4a78c8', '#ffffff', fade * f), halo));
+            const [hx, hy] = pts[Math.max(0, headIdx)]; if (f < 1) sphere(hx, hy, 3, '#ffffff', 'plain');
+            for (let a = 0; a < 3; a++) { const ay = gy - 12 - ((t * 60 + a * 36) % (gy - 20)), ax = tx + 14; lineD(ax, ay, ax, ay - 6, '#ffe27a'); lineD(ax - 3, ay - 3, ax, ay - 7, '#ffe27a'); lineD(ax + 3, ay - 3, ax, ay - 7, '#ffe27a'); }
+            flashOver(Math.exp(-(t - t0) * 6) * 0.85);
+            if (t - t0 < 0.45) ctx.setTransform(1, 0, 0, 1, Math.round((hash(frame) - 0.5) * 6), Math.round((hash(frame + 3) - 0.5) * 5));
+            if (t > 0.7) draw('UP!', tx + 18, gy - 60 + Math.round(Math.sin(beats * 6) * 1), 3, '#ffe27a');
+          }
+        }
+      } else if (ph === 'heat') {
+        const baseY = Math.round(RH * 0.5), maxH = RH * 0.4, sx = Math.round(R * 0.3), lx = Math.round(R * 0.7);
+        rect(10, baseY, R - 20, 2, '#3a4a7a');
+        const g1 = easeO(pr * 2.2), g2 = easeO(pr * 1.7 - 0.15), sh = maxH * (5500 / 30000) * g1, lh = maxH * g2;
+        for (let y = 0; y < sh; y++) rect(sx - 13, baseY - y, 26, 1, y % 4 === 3 ? '#a8481c' : '#ff8a2c');
+        for (let y = 0; y < lh; y++) rect(lx - 13, baseY - y, 26, 1, y > lh - 4 ? '#ffffff' : y % 4 === 3 ? '#5a7ad0' : mix('#7fb0ff', '#ffffff', y / maxH));
+        sunAt(sx, baseY - sh - 12, 5); draw('5,500 C', sx - 22, baseY - sh - 32, 1, '#ffd23f'); draw('SUN', sx - 8, baseY + 8, 2, '#ffb347');
+        if (g2 > 0.5) { draw('30,000 C', lx - 28, baseY - lh - 14, 1, '#ffffff'); for (let i = 0; i < 8; i++) dot(lx - 10 + hash(i + Math.floor(t * 20)) * 20, baseY - lh - 2 - hash(i + 3 + Math.floor(t * 20)) * 8, '#e8f6ff'); }
+        draw('BOLT', lx - 13, baseY + 8, 2, '#9fc8ff');
+        if (g2 > 0.92) { const sc2 = 1 + 0.12 * kick; draw('5X', Math.round(R / 2 - 12 * sc2), Math.round(RH * 0.26), 4, '#ffe27a'); }
+      } else if (ph === 'thunder') {
+        groundDraw(); const bx = Math.round(R * 0.3), pts = boltPts(bx, RH * 0.04, bx, gy, 7), fade = Math.max(0, 1 - t / 0.5);
+        if (fade > 0) boltDraw(pts, 1, pts.length, mix(P.b, '#ffffff', fade), mix('#0a1a44', P.b, fade)); flashOver(Math.exp(-t * 8) * 0.6);
+        for (let k = 0; k < 5; k++) { const r = t * 34 - k * 13; if (r < 2) continue; for (let a = Math.PI; a < 2 * Math.PI + 0.02; a += 0.04) for (let th = 0; th < 2; th++) dot(bx + Math.cos(a) * (r - th), gy - 2 + Math.sin(a) * (r - th) * 0.9, mix('#bfe0ff', '#000000', Math.min(0.85, r / (R * 0.8) + k * 0.1))); }
+        const fx = Math.round(R * 0.84), hit = t * 34 > fx - bx - 8;
+        rect(fx - 3, gy - 20, 7, 7, '#e8c8a0'); rect(fx - 4, gy - 13, 9, 13, '#4a78c8'); rect(fx - 5, gy - 22 - (hit ? 2 : 0), 11, 3, '#2a2f4a');
+        if (hit) { draw('BOOM', fx - 34, gy - 50 + Math.round((hash(frame) - 0.5) * 3), 3, '#ffe27a'); }
+      } else if (ph === 'count') {
+        groundDraw(); for (let x = 0; x < R; x++) { const mh = 10 + 8 * Math.sin(x * 0.06) + 6 * Math.sin(x * 0.17); for (let y = 0; y < mh; y++) dot(x, gy - y, mix('#10203a', '#08111f', y / mh)); }
+        const bx = Math.round(R * 0.14), ts = 0.5, a = t - ts;
+        if (a >= 0 && a < 0.8) { const pts = boltPts(bx, RH * 0.14, bx, gy - 4, 5), f = 1 - a / 0.8; boltDraw(pts, 1, pts.length, mix(P.b, '#ffffff', f), mix('#0a1a44', P.b, f)); flashOver(Math.exp(-a * 9) * 0.5); }
+        const fx = Math.round(R * 0.84); rect(fx - 3, gy - 20, 7, 7, '#e8c8a0'); rect(fx - 4, gy - 13, 9, 13, '#4a78c8'); rect(fx - 5, gy - 22, 11, 3, '#2a2f4a');
+        const r = Math.max(0, (t - ts) / 3.0) * (fx - bx - 6);
+        if (a > 0) for (let an = -1.2; an < 1.2; an += 0.06) dot(bx + Math.cos(an) * r, gy - 14 + Math.sin(an) * r * 0.6, mix('#bfe0ff', '#000000', 0.5));
+        const nn = t < 1.5 ? 0 : t < 2.5 ? 1 : t < 3.5 ? 2 : 3;
+        if (nn > 0) { const kk = Math.max(0, 1 - ((t - 0.5) % 1) * 0 ); draw(String(nn), Math.round(R / 2 - 15), Math.round(RH * 0.1), 6, nn === 3 ? '#ffe27a' : '#ffffff'); }
+        if (t > 3.6) { draw('3 S = 1 KM', Math.round(R / 2 - 30), Math.round(RH * 0.34), 2, '#ffe27a'); }
+        if (t > 3.5) draw('BOOM', fx - 34, gy - 50, 2, '#ffe27a');
+      }
+    } else if (scene === 'plant') {
+      const ph = v.phase ?? 'tree';
+      const hillY = (x: number) => Math.round(RH * 0.5 + Math.sin(x * 0.04) * 3);
+      const grassDraw = () => { for (let x = 0; x < R; x++) { const yy = hillY(x); rect(x, yy, 1, RH - yy, '#6b4a2a'); dot(x, yy, '#4ec85a'); dot(x, yy + 1, '#2f9a3a'); if (hash(x) > 0.6) dot(x, yy - 1, '#4ec85a'); for (let y = yy + 3; y < RH; y += 3) if (hash(x * 3 + y) > 0.8) dot(x, y, '#4f3820'); } };
+      const treeP = (x: number, base: number, h: number, sway: number) => {
+        rect(x - Math.max(2, h * 0.07), base - h * 0.5, Math.max(4, h * 0.14), h * 0.5, '#6b4a2a'); rect(x - Math.max(2, h * 0.07), base - h * 0.5, 2, h * 0.5, '#4f3820');
+        [[0, -0.62, 0.3], [-0.2, -0.52, 0.22], [0.2, -0.52, 0.22], [-0.1, -0.78, 0.22], [0.12, -0.74, 0.2]].forEach(([dx, dy, rr]) => blob(x + dx * h + sway, base + dy * h, rr * h, '#3aa845'));
+      };
+      if (ph === 'tree') {
+        grassDraw(); sunAt(R * 0.84, RH * 0.09, 9);
+        const sway = Math.sin(beats * 0.6) * 1.5; treeP(R * 0.5, hillY(R * 0.5), 92, sway);
+        const target: [number, number] = [R * 0.5 + sway, RH * 0.5 - 92 * 0.65];
+        for (let i = 0; i < 16; i++) { const fr = (t * 0.3 + i / 16) % 1, sx = R * (0.04 + 0.92 * hash(i)), sy = RH * (0.05 + 0.2 * hash(i + 4)); if (fr > 0.94) continue; const e = ease(fr), x = sx + (target[0] - sx) * e, y = sy + (target[1] - sy) * e + Math.sin(fr * 6 + i) * 3; if (Math.hypot(x - target[0], y - target[1]) > 22) co2(x, y, 1.25); }
+        draw('CO2', 10, RH * 0.04, 2, '#ffffff');
+      } else if (ph === 'sunleaf') {
+        const lcx = Math.round(R / 2), lcy = Math.round(RH * 0.32), rx = R * 0.44, ry = RH * 0.2;
+        for (let y = -Math.ceil(ry); y <= Math.ceil(ry); y++) for (let x = -Math.ceil(rx); x <= Math.ceil(rx); x++) { const d = Math.hypot(x / rx, y / ry); if (d > 1) continue; const sh = (1 - (y / ry + 1) / 2) * 0.6 + (bayer(x + 40, y + 40) - 0.5) * 0.3; dot(lcx + x, lcy + y, ramp('#3aa845', L)[Math.max(0, Math.min(L - 1, Math.floor((0.35 + sh) * L)))]); }
+        lineD(lcx - rx, lcy, lcx + rx, lcy, '#b6f0a0'); for (let k = -4; k <= 4; k++) { if (!k) continue; lineD(lcx + k * rx * 0.2, lcy, lcx + k * rx * 0.2 + rx * 0.12, lcy - ry * 0.5, '#7fd87a'); lineD(lcx + k * rx * 0.2, lcy, lcx + k * rx * 0.2 + rx * 0.12, lcy + ry * 0.5, '#7fd87a'); }
+        sunAt(R * 0.88, RH * 0.07, 9);
+        const cp: [number, number][] = [[-0.55, -0.35], [-0.2, 0.3], [0.1, -0.4], [0.45, 0.25], [0.65, -0.2], [-0.8, 0.05]].map(([a, b]) => [lcx + a * rx * 0.8, lcy + b * ry * 0.8]);
+        cp.forEach(([x, y], i) => { const hitA = (t * 0.9 + i / 6) % 1; const glow = hitA > 0.93 ? 1 : 0; for (let yy = -5; yy <= 5; yy++) for (let xx = -8; xx <= 8; xx++) if ((xx / 8) ** 2 + (yy / 5) ** 2 <= 1) dot(x + xx, y + yy, glow ? '#c8ff8a' : (yy % 3 === 0 ? '#2f8a3a' : '#1d6b2a')); if (glow) sphere(x, y, 3, '#fff6a8', 'plain'); });
+        cp.forEach(([x, y], i) => { const s2 = (t * 0.9 + i / 6) % 1, px = R * 0.88 + (x - R * 0.88) * s2, py = RH * 0.07 + (y - RH * 0.07) * s2; for (let k = 0; k < 6; k++) { const q = Math.max(0, s2 - k * 0.025); dot(R * 0.88 + (x - R * 0.88) * q, RH * 0.07 + (y - RH * 0.07) * q, k ? mix('#ffe14a', '#4aa8ff', k / 6) : '#ffffff'); } });
+        draw('CHLOROPLAST', Math.round(cp[1][0] - 28), Math.round(cp[1][1] + 12), 1, '#ffffff');
+      } else if (ph === 'roots') {
+        const soilY = Math.round(RH * 0.3);
+        for (let y = soilY; y < RH; y++) for (let x = 0; x < R; x++) dot(x, y, ((x + y * 2) & 3) === 0 ? '#4f3820' : hash(x * 7 + y) > 0.93 ? '#8a6a44' : '#6b4a2a');
+        for (let x = 0; x < R; x++) { dot(x, soilY, '#4ec85a'); dot(x, soilY - 1, hash(x) > 0.5 ? '#4ec85a' : '#2f9a3a'); }
+        const cx1 = Math.round(R / 2); const stem: [number, number][] = [[cx1, soilY], [cx1 + 2, RH * 0.18], [cx1, RH * 0.04]];
+        for (let y = RH * 0.04; y < soilY; y++) { rect(cx1 - 2 + Math.round(Math.sin(y * 0.1)), y, 4, 1, '#3aa845'); } blob(cx1 - 14, RH * 0.12, 8, '#4ec85a'); blob(cx1 + 14, RH * 0.17, 8, '#4ec85a'); blob(cx1, RH * 0.05, 7, '#4ec85a');
+        const roots: [number, number][][] = [[[cx1, soilY], [cx1 - 4, soilY + 26], [cx1 - 2, soilY + 60]], [[cx1 - 2, soilY + 14], [cx1 - 30, soilY + 28], [cx1 - 52, soilY + 52]], [[cx1 + 2, soilY + 12], [cx1 + 28, soilY + 30], [cx1 + 54, soilY + 50]], [[cx1 - 3, soilY + 34], [cx1 - 20, soilY + 56], [cx1 - 28, soilY + 76]], [[cx1 + 2, soilY + 38], [cx1 + 22, soilY + 60], [cx1 + 30, soilY + 80]]];
+        roots.forEach((r) => { for (let i = 1; i < r.length; i++) { lineD(r[i - 1][0], r[i - 1][1], r[i][0], r[i][1], '#c89a64'); lineD(r[i - 1][0] + 1, r[i - 1][1], r[i][0] + 1, r[i][1], '#8a6a44'); } });
+        for (let i = 0; i < 30; i++) { const rt = roots[i % roots.length], f = (t * 0.35 + i / 30) % 1; const pos: [number, number] = f < 0.55 ? along(rt.slice().reverse(), f / 0.55) : along(stem, (f - 0.55) / 0.45); blob(pos[0], pos[1], 1.6, '#5fb8ff'); dot(pos[0] - 1, pos[1] - 1, '#ffffff'); }
+        draw('WATER', 8, soilY + 48, 1, '#9fd8ff');
+      } else if (ph === 'stomata') {
+        for (let y = 0; y < RH * 0.62; y++) for (let x = 0; x < R; x++) dot(x, y, ((x + y) & 3) === 0 ? '#2f9a3a' : '#3aa845');
+        const sx = Math.round(R / 2), sy = Math.round(RH * 0.33), open = 0.5 + 0.5 * Math.sin(beats * Math.PI * 0.5), gap = 2 + 9 * open;
+        for (const dir of [-1, 1]) for (let a = -1.45; a < 1.45; a += 0.03) for (let th = 0; th < 9; th++) { const rr = 24 - th; dot(sx + dir * (gap / 2 + 9 - Math.cos(a) * 9 + th * 0.2) * 1.0 + dir * 0, sy + Math.sin(a) * rr * 0.95, th < 2 ? '#1d6b2a' : th > 6 ? '#bff0a8' : '#7be07a'); }
+        rect(sx - gap / 2, sy - 22, gap, 44, '#0a2a12');
+        for (let i = 0; i < 8; i++) { const fr = (t * 0.28 + i / 8) % 1, x = sx + Math.sin(i * 2.1 + fr * 5) * (6 + gap * 0.3), y = RH * 0.04 + fr * (sy - 10 - RH * 0.04); co2(x, y, 1.1); }
+        draw('CO2', sx + 40, RH * 0.1, 2, '#ffffff'); draw('PORE', sx + 22, sy + 30, 1, '#ffffff');
+      } else if (ph === 'split') {
+        for (let y = 0; y < RH * 0.62; y++) for (let x = 0; x < R; x++) dot(x, y, hash(x * 0.3 + y) > 0.9 ? '#2f8a3a' : ((x + y) & 3) === 0 ? '#1d6b2a' : '#256f30');
+        for (let k = 0; k < 5; k++) { rect(10, RH * 0.16 + k * 12, 34, 6, '#4ec85a'); rect(10, RH * 0.16 + k * 12, 34, 1, '#b6f0a0'); }
+        const cxm = Math.round(R * 0.5), cym = Math.round(RH * 0.34), s0 = 0.15, a = t - s0;
+        for (let m = 0; m < 3; m++) {
+          const ox2 = (m - 1) * 56, mt = a - m * 0.55, oy2 = (m % 2) * 14;
+          if (mt < -0.4) continue;
+          if (mt < 0.5) { const x = cxm + ox2, y = cym + oy2; sphere(x, y, 5, '#ff4a4a', 'plain'); sphere(x - 6, y + 5, 3, '#ffffff', 'plain'); sphere(x + 6, y + 5, 3, '#ffffff', 'plain'); if (m === 0 && mt < 0.5) draw('H2O', x - 10, y - 16, 1, '#9fd8ff'); }
+          if (mt > 0 && mt < 0.5) for (let k = 0; k < 4; k++) { const q = mt / 0.5, x = cxm + ox2 - 80 * 0 + 0, ly = RH * 0.02 + 0; lineD(R * 0.88 - 0, RH * 0.04, cxm + ox2 + (k - 2) * 1, cym + oy2 - 6, mix('#ffe14a', '#ffffff', k / 4)); }
+          if (mt >= 0.5) { const q = Math.min(1, (mt - 0.5) / 1.4), x = cxm + ox2, y = cym + oy2; sphere(x - 3 - q * 6, y - q * 52, 4, '#ff4a4a', 'plain'); sphere(x + 4 - q * 6, y - q * 52, 4, '#ff4a4a', 'plain'); if (m === 0) draw('O2', x - 14 - q * 6, y - q * 52 - 14, 2, '#ffffff'); for (let h = 0; h < 2; h++) sphere(x + (h ? 8 : -8) + q * (30 + h * 14), y + 6 + q * 18, 2.4, '#ffffff', 'plain'); }
+        }
+        sunAt(R * 0.88, RH * 0.05, 8);
+      } else if (ph === 'sugar') {
+        for (let y = 0; y < RH * 0.62; y++) for (let x = 0; x < R; x++) dot(x, y, hash(x * 0.3 + y) > 0.92 ? '#2f8a3a' : ((x + y) & 3) === 0 ? '#1d6b2a' : '#256f30');
+        const cxm = Math.round(R / 2), cym = Math.round(RH * 0.3), rr = 26;
+        const ring = Array.from({length: 6}, (_, i) => [cxm + Math.cos((i / 6) * 6.283 - 1.57) * rr, cym + Math.sin((i / 6) * 6.283 - 1.57) * rr] as [number, number]);
+        const done = Math.min(6, pr * 8);
+        ring.forEach(([x, y], i) => { const a2 = Math.min(1, done - i); if (a2 <= 0) return; const sx = i % 2 ? R + 10 : -10, e = ease(a2), px = sx + (x - sx) * e, py = (RH * 0.05) + (y - RH * 0.05) * e; if (i > 0 && a2 >= 1) lineD(ring[i - 1][0], ring[i - 1][1], x, y, '#d8d8e4'); sphere(px, py, 4, '#6a6a76', 'plain'); if (a2 >= 1) { draw('C', Math.round(px - 2), Math.round(py - 3), 1, '#ffffff'); } });
+        if (done >= 6) { lineD(ring[5][0], ring[5][1], ring[0][0], ring[0][1], '#d8d8e4'); sphere(cxm, cym, rr * 0.55 + kick * 2, '#ffe14a', 'plain'); draw('SUGAR', Math.round(cxm - 14), Math.round(cym - 4), 1, '#6a3a00'); draw('C6H12O6', Math.round(cxm - 21), Math.round(cym + rr + 14), 1, '#ffffff'); }
+      } else if (ph === 'grow') {
+        grassDraw(); sunAt(R * 0.84, RH * 0.09, 9);
+        const g = ease(pr * 1.15), h = 18 + 78 * g; treeP(R * 0.5, hillY(R * 0.5), h, Math.sin(beats * 0.6) * 1.2);
+        for (let i = 0; i < 10; i++) { const fr = (t * 0.5 + i / 10) % 1, x = R * 0.5, y = hillY(x) - h * (0.65 - 0.65 * fr); blob(x + Math.sin(i + fr * 5) * 4, y, 1.4, '#ffe14a'); }
+        for (let i = 0; i < 10; i++) { const fr = (t * 0.3 + i / 10) % 1, sx = R * (0.04 + 0.92 * hash(i)), sy = RH * (0.05 + 0.2 * hash(i + 4)), tg: [number, number] = [R * 0.5, hillY(R * 0.5) - h * 0.65]; if (fr < 0.92) co2(sx + (tg[0] - sx) * ease(fr), sy + (tg[1] - sy) * ease(fr), 1.1); }
+      }
+    } else if (scene === 'pulsar') {
       const ang = beats * Math.PI + (v.offset ?? 0);
       const ex = R * 0.88, ey = cy0;                                  // a small Earth on the right: the beam hits it on every beat
       pulsarAt(cx0, cy0, ang, R * 0.035, R * 0.72, R * 0.07);

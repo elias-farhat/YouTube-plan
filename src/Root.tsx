@@ -15,7 +15,7 @@ const meta: CalculateMetadataFunction<Plan> = async ({props}) => ({durationInFra
 
 export const Root: React.FC = () => (
   <>
-    {(['money', 'space', 'history'] as const).map((c) => (
+    {(['money', 'space', 'history', 'science'] as const).map((c) => (
       <Composition key={c} id={c[0].toUpperCase() + c.slice(1)} component={Shorts} durationInFrames={90} fps={30} width={1080} height={1920} defaultProps={placeholder(c)} calculateMetadata={meta} />
     ))}
   </>
