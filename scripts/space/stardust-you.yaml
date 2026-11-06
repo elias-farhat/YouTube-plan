@@ -1,0 +1,33 @@
+# SPACE, "bits" mode (no narration): the pixel world types to the viewer. Peak = the supernova ("BOOM.").
+title: Stardust, You Are Made of Dead Stars
+mode: bits
+hook: "YOU ARE MADE OF DEAD STARS."
+hook_visual: {type: pixel, scene: star}
+engine: remotion
+chrome: minimal
+music: chip
+bpm: 120
+pixel: {full: true, bits: 32, palette: neon, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "You Are Made of Dead Stars (No Words, Just Pixels)"
+  description: |
+    No narration: a pixel universe talking to you. Almost every atom in your body was forged inside a star and thrown into space when it exploded. Big Bang, fusion up to iron, supernova, new stars, you.
+  tags: [Space, Science, Supernova, PixelArt, Astronomy, SpaceFacts]
+  pinned_comment: "Which element in your body surprised you the most?"
+lines:
+  - say: "BIG BANG: ONLY HYDROGEN, HELIUM."
+    visual: {type: pixel, scene: cosmos}
+  - say: "STARS FUSE ATOMS UP TO IRON."
+    visual: {type: pixel, scene: fusion}
+  - say: "IRON COSTS ENERGY. THE CORE COLLAPSES."
+    visual: {type: pixel, scene: supernova, phase: collapse}
+  - say: "BOOM."
+    hold: 4
+    visual: {type: pixel, scene: supernova, phase: blast}
+  - say: "IT SCATTERS CARBON AND IRON."
+    visual: {type: pixel, scene: nebula}
+  - say: "DUST BECAME NEW STARS. AND YOU."
+    visual: {type: pixel, scene: disc}
+  - say: "YOU ARE STARDUST."
+    visual: {type: pixel, scene: earth}

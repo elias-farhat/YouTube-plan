@@ -61,6 +61,34 @@ export function buildSegments(script, style, audio) {
   return { segs, total: t };
 }
 
+/**
+ * "bits" mode: nobody narrates. A little pixel character types each line on screen, one letter per 16th note, with a
+ * speech blip per letter. Scenes last a whole number of bars, so every cut lands on a downbeat.
+ */
+export function buildBitsSegments(script, style, bpm = 120) {
+  const beat = 60 / bpm, bar = beat * 4, charT = beat / 4;
+  const items = script.demo ? [...script.lines] : [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
+  const segs = [];
+  let t = 0;
+  items.forEach((it, i) => {
+    const text = it.words.map((w) => w.shown).join(' ').toUpperCase();
+    const typeStart = beat, typeDur = text.length * charT;
+    const need = typeStart + typeDur + (i === items.length - 1 ? 2.2 : 1.5);
+    let dur = Math.ceil(need / bar - 1e-6) * bar;
+    if (it.hold) dur = Math.max(dur, Math.ceil(it.hold / bar - 1e-6) * bar);
+    const start = t;
+    segs.push({
+      idx: i, isHook: !!it.isHook, sfx: it.sfx ?? [], say: it.say, shown: text, visual: it.visual,
+      startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
+      speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
+      bits: { text, start: start + typeStart, charT },
+    });
+    t += dur;
+  });
+  segs.forEach((s, i) => { if (i < segs.length - 1) s.endFrame = segs[i + 1].startFrame; });
+  return { segs, total: t };
+}
+
 export function srtTime(t) {
   const ms = Math.round(t * 1000);
   const p = (n, l = 2) => String(n).padStart(l, '0');

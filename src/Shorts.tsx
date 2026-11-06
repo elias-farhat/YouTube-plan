@@ -5,6 +5,7 @@ import {fontPromises, loadFonts} from './lib/fonts';
 import {Background} from './components/Background';
 import {Chrome} from './components/Chrome';
 import {Captions} from './components/Captions';
+import {BitSpeech} from './components/BitSpeech';
 import {SceneShell} from './components/SceneShell';
 import {Fx} from './components/Fx';
 import {Kinetic, Stat, Stage, SceneProps} from './scenes/common';
@@ -84,7 +85,7 @@ export const Shorts: React.FC<Plan> = (plan) => {
       })}
       <Fx plan={plan} />
       <Chrome plan={plan} />
-      <Captions plan={plan} />
+      {plan.mode === 'bits' ? <BitSpeech plan={plan} /> : <Captions plan={plan} />}
       {plan.audio && <Audio src={staticFile(plan.audio)} />}
     </AbsoluteFill>
   );

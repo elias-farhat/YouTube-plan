@@ -1,0 +1,33 @@
+# SPACE, "bits" mode: nobody narrates. A little pixel character types each line on screen (a blip per letter), over a chiptune
+# and sound effects. Scenes last whole bars (120 BPM = 2 s), so every cut lands on a downbeat.
+title: Hello, I Am a Pulsar
+mode: bits
+hook: "HELLO. I AM A PULSAR."
+hook_visual: {type: pixel, scene: pulsar}
+engine: remotion
+chrome: minimal
+music: chip
+bpm: 120
+pixel: {full: true, bits: 32, palette: pulsar, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "A Pulsar Talks to You (Pioneer 10's Secret Map)"
+  description: |
+    No narration, just a pulsar talking in pixels. In 1972, NASA bolted a plaque to the Pioneer 10 spacecraft with a map of where we are, made from 14 pulsars: dead stars that spin like lighthouses. Their spin slows at a known rate, so the plaque also tells the date.
+
+    The map in this video is a simplified illustration, not the exact plaque.
+  tags: [Space, Science, Pulsar, Pioneer10, PixelArt, SpaceFacts]
+  pinned_comment: "If you could add one thing to the plaque, what would it be?"
+lines:
+  - say: "MY BEAM SWEEPS PAST YOU."
+    visual: {type: pixel, scene: pulsar}
+  - say: "UP TO 716 SPINS EVERY SECOND."
+    visual: {type: pixel, scene: pulsars}
+  - say: "IN 1972, HUMANS SENT A PLAQUE."
+    visual: {type: pixel, scene: plaque, phase: probe}
+  - say: "IT MAPS 14 OF US IN BINARY."
+    visual: {type: pixel, scene: plaque, phase: map}
+  - say: "WE SLOW DOWN. THAT TELLS THE DATE."
+    visual: {type: pixel, scene: drift}
+  - say: "WE ARE YOUR ADDRESS."
+    visual: {type: pixel, scene: galaxy}

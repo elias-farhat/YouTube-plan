@@ -15,7 +15,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { loadScript, findScripts, CHANNELS } from './lib/script.mjs';
 import { pickStyle, describeStyle, NAMES, HANDLES } from './lib/variation.mjs';
-import { buildSegments, FPS, MIN_LEN, MAX_LEN, srtTime, clock } from './lib/timeline.mjs';
+import { buildSegments, buildBitsSegments, FPS, MIN_LEN, MAX_LEN, srtTime, clock } from './lib/timeline.mjs';
 import { buildCues } from './lib/sfx.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -119,7 +119,7 @@ function getVoice(script, style, workdir) {
     if (r.status !== 0) throw new Error(`voice import failed: ${(r.stderr || '').trim().split('\n').slice(-3).join(' | ')}`);
     return JSON.parse(r.stdout.trim().split('\n').pop());
   }
-  if (flags.tts === 'none' || script.demo) return { engine: 'none', status: 'no voice (demo)', lines: null };
+  if (flags.tts === 'none' || script.demo || script.mode === 'bits') return { engine: 'none', status: script.mode === 'bits' ? 'bits mode: no voice' : 'no voice (demo)', lines: null };
   const lines = [...(script.demo ? [] : [script.hook.words]), ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
   const req = { lines, voice: script.voice ?? ({ money: 'en-US-GuyNeural', space: 'en-US-AndrewNeural', history: 'en-GB-RyanNeural' })[script.channel], rate: style.pace.rate, outdir: workdir, engine: flags.tts };
   const r = spawnSync(py, [process.env.SHORTS_TTS_HELPER || 'tools/tts.py'], { input: JSON.stringify(req), encoding: 'utf8' });
@@ -155,7 +155,7 @@ for (const file of files) {
     const voice = flags.check ? { engine: 'none', status: 'check only', lines: null } : getVoice(script, style, path.join(buildDir, 'tts'));
     const voiced = voice.lines != null;
     console.log(`  voice: ${voiced ? voice.status : `NONE -> silent render + narration.txt (${voice.status})`}`);
-    const { segs, total } = buildSegments(script, style, voiced ? voice.lines : null);
+    const { segs, total } = script.mode === 'bits' ? buildBitsSegments(script, style, script.bpm ?? 120) : buildSegments(script, style, voiced ? voice.lines : null);
     const words = segs.reduce((a, s) => a + s.words.length, 0);
     console.log(`  ${script.channel} | "${script.title}" | ${segs.length} scenes | ${words} words | ${total.toFixed(1)}s | look: ${describeStyle(style)}`);
     if (!script.demo && (total < MIN_LEN || total > MAX_LEN)) {
@@ -170,6 +170,7 @@ for (const file of files) {
       fps: FPS, totalFrames: Math.round(total * FPS), style, segs, territories: script.territories, audio: null, bgVideo: null,
     };
     const { cues, impacts } = buildCues(plan);
+    plan.mode = script.mode;
     plan.music = script.music; plan.bpm = script.bpm; plan.chrome = script.chrome;
     plan.cues = cues; plan.impacts = flags.sfx ? impacts : impacts.filter((c) => false);
     if (voiced) mixVoice(segs, voice.lines, total, path.join(genDir, 'voice.wav'));

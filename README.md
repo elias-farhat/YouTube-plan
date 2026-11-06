@@ -91,6 +91,10 @@ A scene with `year: 133 BC` shows earlier territory solid, and the countries gai
 
 `npm run render demos` renders one 6-8 s example of every animation type from `scripts/demos/*.yaml` into `output/demos/`. A demo script has `demo: true` (no hook scene, no 30-50 s rule) and `hold: 6` per line.
 
+### "Bits" mode (no narration)
+
+`mode: bits` at the top of a script removes the voice completely. A little pixel character types each line (`hook:` and every `say:`) on screen, one letter per 16th note, with a speech blip per letter, over a chiptune (`music: chip`, `bpm: 120`) and the sound effects. Each scene lasts a whole number of bars, so every cut lands on a downbeat (use 120 or 150 BPM so bars are whole frames). Keep lines short (~30 characters = a 6 s scene). See `scripts/space/hello-i-am-a-pulsar.yaml` and `stardust-you.yaml`.
+
 ### Hook and peak
 
 `hook` is the first ~2 s. By default it becomes giant kinetic text; give it a visual with `hook_visual:` (e.g. a counting number) and the spoken hook is captioned as usual. A line can carry `sfx: [riser]` (a tension build that ends where the line starts), `boom`, `hit`, `stamp` or `sting`. Put the riser on the line *before the peak* and `kinetic: {dark: true}` on the peak itself.

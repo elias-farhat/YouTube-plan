@@ -103,6 +103,10 @@ def _sound(name, rng, dur=None, f=None):
         t = t_axis(1.1)
         s = sum(a * np.sin(2 * np.pi * f0 * m * t) * np.exp(-t * dcy) for m, a, dcy in ((1, 1.0, 5), (2.01, 0.35, 8), (3.0, 0.15, 12)))
         return fade(s * 0.5, 0.002, 0.05)
+    if name == "blip":                                   # retro speech blip, pitch set per letter
+        f0 = f or 600.0
+        t = t_axis(0.055)
+        return fade(np.where((t * f0) % 1.0 < 0.5, 1.0, -1.0) * np.exp(-t * 38), 0.001, 0.01) * 0.6
     if name == "tick":
         t = t_axis(0.05)
         return fade(bp(rng.standard_normal(len(t)), 1800, 6000) * env_exp(len(t), 0.006)) * 0.9
