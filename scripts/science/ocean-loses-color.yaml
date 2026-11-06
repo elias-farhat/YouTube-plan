@@ -1,0 +1,54 @@
+# SCIENCE with DR. BIT in a diving suit.  Hook = a true surprise; payoff = his torch brings red back.
+title: Why the Ocean Loses Its Color
+channel: science
+mode: bits
+hook: "AT 10 M DOWN, RED VANISHES."
+hook_visual: {type: pixel, scene: ocean, phase: reef, from: 0, to: 12}
+hook_bit: {x: 0.2, y: 0.8, s: 5}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+song: sunny
+blip: chirp
+outfit: diver
+pace: quick
+talk: 14
+outro: "NEXT DIVE, BRING A TORCH."
+outro_bit: {x: 0.2, y: 0.8, s: 5}
+bpm: 120
+pixel: {full: true, bits: 32, palette: day, bpm: 120}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "At 10 Meters Down, Red Disappears (Why the Ocean Loses Its Color)"
+  description: |
+    Why does everything turn blue underwater? Water absorbs light color by color. Red is almost gone within roughly 10 meters, orange and yellow go next, then green. Only blue light travels deep, and below about 1,000 meters there is no sunlight at all. That is why divers bring a torch: it puts the true colors back. Depths are approximate and depend on how clear the water is.
+
+    Dr. Bit explains science with pixels. Illustrative animation.
+  tags: [Science, Ocean, Diving, Light, Color, HowItWorks, DrBit, PixelArt]
+  pinned_comment: "Did you know a torch brings red back? Tell me what to explain next."
+lines:
+  - say: "WATER EATS LIGHT, COLOR BY COLOR."
+    mood: talk
+    visual: {type: pixel, scene: ocean, phase: reef, from: 0, to: 10}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "RED GOES FIRST. ORANGE FADES NEXT."
+    mood: worried
+    visual: {type: pixel, scene: ocean, phase: reef, from: 10, to: 22}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "THEN YELLOW AND GREEN. BLUE LASTS."
+    mood: talk
+    visual: {type: pixel, scene: ocean, phase: reef, from: 22, to: 150}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "BELOW 1,000 M: NO SUNLIGHT."
+    mood: shock
+    visual: {type: pixel, scene: ocean, phase: glow}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "YET MOST DEEP ANIMALS MAKE LIGHT."
+    mood: aha
+    visual: {type: pixel, scene: ocean, phase: glow}
+    bit: {x: 0.2, y: 0.8, s: 5}
+  - say: "BRING A TORCH. RED COMES BACK!"
+    mood: happy
+    visual: {type: pixel, scene: ocean, phase: reef, from: 30, to: 30, torch: true}
+    bit: {x: 0.2, y: 0.8, s: 5}

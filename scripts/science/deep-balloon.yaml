@@ -1,0 +1,49 @@
+# SCIENCE with DR. BIT (diver): pressure squeezes air.  Boyle's law, 1 atm per 10 m of water.
+title: Why Divers Never Hold Their Breath
+channel: science
+mode: bits
+hook: "AT 30 M, AIR SHRINKS TO 1/4."
+hook_visual: {type: pixel, scene: ocean, phase: pressure, from: 0, to: 30}
+hook_mood: shock
+engine: remotion
+chrome: minimal
+music: chip
+song: arcade
+blip: bell
+outfit: diver
+pace: quick
+talk: 14
+outro: "SO KEEP BREATHING OUT."
+bpm: 150
+pixel: {full: true, bits: 32, palette: day, bpm: 150}
+style: {layout: C, pacing: snappy, transition: fade}
+youtube:
+  title: "Why Divers Never Hold Their Breath (A Balloon at 30 m Is 1/4 Size)"
+  description: |
+    Every 10 meters of water adds about one atmosphere of pressure. At 30 meters the pressure is about 4 times the surface, so a balloon's air is squeezed to roughly a quarter of its volume. On the way up the same air expands again. That is why divers never hold their breath while ascending: the air in their lungs would expand too fast. Always breathe out slowly as you rise.
+
+    Dr. Bit explains science with pixels. Simplified animation, not diving advice.
+  tags: [Science, Diving, Pressure, Physics, BoylesLaw, HowItWorks, DrBit, PixelArt]
+  pinned_comment: "Did you know pressure adds 1 atmosphere every 10 m? Tell me what to explain next."
+lines:
+  - say: "EVERY 10 M ADDS ONE ATMOSPHERE."
+    mood: talk
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 0, to: 10}
+  - say: "AT 30 M PRESSURE IS 4X."
+    mood: talk
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 10, to: 30}
+  - say: "AIR GETS SQUEEZED INTO 1/4 THE SPACE."
+    mood: shock
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 30, to: 30}
+  - say: "THAT IS CALLED BOYLE'S LAW."
+    mood: aha
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 30, to: 30}
+  - say: "NOW RISE. THE AIR EXPANDS 4X."
+    mood: worried
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 30, to: 0}
+  - say: "SO NEVER HOLD YOUR BREATH UP."
+    mood: worried
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 30, to: 8}
+  - say: "BREATHE OUT, SLOW AND STEADY."
+    mood: happy
+    visual: {type: pixel, scene: ocean, phase: pressure, from: 8, to: 0}

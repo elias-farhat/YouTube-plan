@@ -63,7 +63,13 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
     const cv = ref.current!;
     const ctx = cv.getContext('2d', {willReadFrequently: true})!;
     ctx.imageSmoothingEnabled = false;
+    let raw = false, oD = 0;                                                     // ocean: depth in metres (colours are filtered by water); raw = draw untinted (UI, torch light)
+    const oceanTint = (hex: string, d: number) => {
+      const c = toRGB(hex), a = [Math.exp(-d / 4.5), Math.exp(-d / 40), Math.exp(-d / 120)], haze = (1 - Math.exp(-d / 70)) * 0.6, wc = [8, 46, 92].map((q) => q * Math.exp(-d / 260));
+      return toHex(c.map((q, i) => q * a[i] * (1 - haze) + wc[i] * haze));
+    };
     const near = (hex: string) => {
+      if (scene === 'ocean' && !raw && oD > 0) hex = oceanTint(hex, oD);
       if (!P.limit) return hex;
       const c = toRGB(hex); let best = P.limit[0], bd = 1e9;
       for (const q of P.limit) { const d = toRGB(q).reduce((s, x, i) => s + (x - c[i]) ** 2, 0); if (d < bd) { bd = d; best = q; } }
@@ -380,6 +386,71 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
         const g = ease(pr * 1.15), h = 18 + 78 * g; treeP(R * 0.5, hillY(R * 0.5), h, Math.sin(beats * 0.6) * 1.2);
         for (let i = 0; i < 10; i++) { const fr = (t * 0.5 + i / 10) % 1, x = R * 0.5, y = hillY(x) - h * (0.65 - 0.65 * fr); blob(x + Math.sin(i + fr * 5) * 4, y, 1.4, '#ffe14a'); }
         for (let i = 0; i < 10; i++) { const fr = (t * 0.3 + i / 10) % 1, sx = R * (0.04 + 0.92 * hash(i)), sy = RH * (0.05 + 0.2 * hash(i + 4)), tg: [number, number] = [R * 0.5, hillY(R * 0.5) - h * 0.65]; if (fr < 0.92) co2(sx + (tg[0] - sx) * ease(fr), sy + (tg[1] - sy) * ease(fr), 1.1); }
+      }
+    } else if (scene === 'ocean') {
+      const ph = v.phase ?? 'reef';
+      const dep = (v.from ?? 0) + ((v.to ?? v.from ?? 0) - (v.from ?? 0)) * ease(pr);
+      const sandY = Math.round(RH * 0.82);
+      const waterBg = (c0: string, c1: string) => { for (let y = 0; y < RH; y++) rect(0, y, R, 1, mix(c0, c1, y / RH)); };
+      if (ph === 'reef') {
+        oD = dep;
+        waterBg('#63d4f7', '#0c58a8');
+        const sh = Math.max(0, 1 - oD / 80);
+        if (sh > 0) for (let k = 0; k < 6; k++) { const x0 = R * (0.08 + 0.17 * k) + Math.sin(t * 0.4 + k) * 4; for (let y = 0; y < sandY; y++) for (let w = 0; w < 5 + (k % 3) * 2; w++) dot(x0 + y * 0.35 + w, y, mix(mix('#63d4f7', '#0c58a8', y / RH), '#ffffff', 0.17 * sh * (1 - (y / RH) * 0.6))); }
+        for (let y = sandY; y < RH; y++) for (let x = 0; x < R; x++) dot(x, y, hash(x * 3 + y) > 0.85 ? '#c9b070' : ((x + y) & 3) === 0 ? '#d8c07c' : '#e6cf8a');
+        const objects = () => {
+          const corals: [number, number, string][] = [[0.38, 26, '#e03a3a'], [0.5, 34, '#ff8a1f'], [0.6, 22, '#ff6fb0'], [0.72, 30, '#ffd23f'], [0.84, 24, '#e03a3a'], [0.94, 32, '#b06af0']];
+          corals.forEach(([fx, h, c]) => { const x = Math.round(R * fx), base = sandY + 2; rect(x - 1, base - h, 3, h, c); for (let k = 0; k < 3; k++) { const by = base - h * (0.35 + 0.22 * k), dx = k % 2 ? 6 : -6; lineD(x, by, x + dx, by - 9, c); blob(x + dx, by - 10, 3.3, c); } blob(x, base - h - 2, 3.8, c); });
+          for (const fx of [0.3, 0.55, 0.9]) { const kx = R * fx, kh = RH * 0.2; for (let y = 0; y < kh; y++) rect(kx + Math.sin(t * 1.3 + y * 0.12 + fx * 9) * 2, sandY - y, 2, 1, '#2f9a3a'); }
+          const fish = (x: number, y: number, len: number, c: string, dir: number, stripes = false) => {
+            for (let i = -len; i <= len; i++) { const hh = Math.round(Math.sqrt(Math.max(0, 1 - (i / len) ** 2)) * len * 0.45); rect(x + i, y - hh, 1, hh * 2 + 1, c); if (stripes && (i === Math.round(len * 0.1) || i === Math.round(-len * 0.45))) rect(x + i, y - hh, 2, hh * 2 + 1, '#ffffff'); }
+            for (let k = 0; k < len * 0.6; k++) rect(x - dir * (len + k), y - k * 0.7, 1, k * 1.4 + 1, c);
+            dot(x + dir * len * 0.55, y - len * 0.12, '#ffffff'); dot(x + dir * len * 0.58, y - len * 0.12, '#000000');
+          };
+          fish(R * (0.5 + 0.2 * Math.sin(t * 0.5)), RH * 0.46 + Math.sin(t * 1.1) * 3, 15, '#ff7a1a', Math.cos(t * 0.5) > 0 ? 1 : -1, true);
+          fish(R * (0.35 + 0.25 * Math.sin(t * 0.37 + 2)), RH * 0.3 + Math.sin(t * 0.9) * 3, 10, '#e83030', Math.cos(t * 0.37 + 2) > 0 ? 1 : -1);
+          fish(R * (0.6 + 0.25 * Math.sin(t * 0.43 + 4)), RH * 0.6, 9, '#ffd23f', Math.cos(t * 0.43 + 4) > 0 ? 1 : -1);
+          fish(R * (0.45 + 0.3 * Math.sin(t * 0.3 + 1)), RH * 0.2 + Math.sin(t * 0.7) * 2, 8, '#2a6ae8', Math.cos(t * 0.3 + 1) > 0 ? 1 : -1);
+          fish(R * (0.7 + 0.2 * Math.sin(t * 0.5 + 5)), RH * 0.38, 7, '#4ec85a', Math.cos(t * 0.5 + 5) > 0 ? 1 : -1);
+        };
+        objects();
+        if (v.torch) {                                                                                  // Dr. Bit's torch: true colours inside the beam
+          ctx.save(); ctx.beginPath(); ctx.moveTo(R * 0.27, RH * 0.66); ctx.lineTo(R * 1.0, RH * 0.3); ctx.lineTo(R * 1.0, RH * 0.95); ctx.closePath(); ctx.clip();
+          raw = true; objects(); raw = false; ctx.fillStyle = 'rgba(255,255,205,0.15)'; ctx.fillRect(0, 0, R, RH); ctx.restore();
+        }
+        for (let i = 0; i < 9; i++) { const fr = (t * 0.35 + i / 9) % 1, bx = R * 0.2 + Math.sin(i * 2 + fr * 6) * 3 + 6, by = RH * 0.62 - fr * RH * 0.5; sphere(bx, by, 1 + (i % 2), '#e8fbff', 'plain'); }
+        raw = true;
+        draw(`${Math.round(oD)} M`, 10, 12, 3, '#ffffff');
+        [['#ff2a2a', 4.5], ['#ff8a1f', 9], ['#ffe14a', 22], ['#3cd84a', 40], ['#2a7aff', 120]].forEach(([c, e], i) => { const vis = Math.exp(-oD / (e as number)); rect(R - 72 + i * 13, 14, 11, 11, '#101820'); rect(R - 72 + i * 13, 14, 11, 11, mix('#101820', c as string, vis)); rect(R - 72 + i * 13, 14, 11, 1, '#ffffff'); });
+        draw('COLOR LEFT', R - 72, 28, 1, '#ffffff');
+        raw = false;
+      } else if (ph === 'glow') {
+        raw = true;
+        waterBg('#04163a', '#010309');
+        for (let i = 0; i < 70; i++) { const x = hash(i) * R, y = (hash(i + 9) * RH - t * (2 + hash(i) * 5) + RH * 4) % RH; if (Math.sin(t * 3 + i) > 0.25) dot(x, y, i % 3 ? '#2a8aff' : '#5cffd0'); }
+        const J: [string, string][] = [['#ff5ad8', '#ffb0f4'], ['#4af0ff', '#c8fbff'], ['#9a7aff', '#ddd0ff']];
+        for (let k = 0; k < 3; k++) {
+          const cx = R * (0.3 + 0.25 * k) + Math.sin(t * 0.5 + k) * 8, cy = RH * (0.28 + 0.13 * k) + Math.sin(t * 0.9 + k * 2) * 6, r = 11 + k * 3, pulse = 0.5 + 0.5 * Math.sin(t * 2.2 + k * 1.7);
+          for (let y = -r; y <= 0; y++) for (let x = -r; x <= r; x++) { const d = Math.hypot(x, y * 1.2); if (d <= r) dot(cx + x, cy + y, mix(J[k][0], J[k][1], (d > r - 2 ? 0.8 : 0.15) + pulse * 0.2)); }
+          for (let i = 0; i < 6; i++) { const tx = cx - r + (i * 2 * r) / 5; for (let y = 0; y < r * 2.2 * (0.8 + 0.2 * pulse); y++) dot(tx + Math.sin(t * 2 + y * 0.25 + i) * 2.2, cy + y, mix(J[k][0], '#02050f', Math.min(0.85, y / (r * 2.6)))); }
+        }
+        const ax = R * 0.74 + Math.sin(t * 0.4) * 6, ay = RH * 0.72;
+        blob(ax, ay, 15, '#10162e'); for (let i = -2; i <= 2; i++) dot(ax - 14, ay + i * 2, '#ffffff');
+        lineD(ax - 4, ay - 12, ax - 20, ay - 26, '#2a3050'); sphere(ax - 20, ay - 26, 3 + 0.5 + 0.5 * Math.sin(t * 3), '#fff6a8', 'plain');
+        dot(ax - 7, ay - 3, '#ffffff'); dot(ax - 7, ay - 2, '#000000');
+        draw('DEEP SEA', 10, 12, 2, '#9fd8ff'); raw = false;
+      } else if (ph === 'pressure') {
+        raw = true;
+        const d = dep; waterBg(mix('#63d4f7', '#0c58a8', Math.min(1, d / 40)), mix('#2a8ad0', '#062a60', Math.min(1, d / 40)));
+        const P2 = 1 + d / 10, r0 = 28, rb = r0 * Math.pow(1 / P2, 1 / 3), bx = R * 0.5, by = RH * 0.45;
+        for (let a = 0; a < 6.283; a += 0.12) dot(bx + Math.cos(a) * r0, by + Math.sin(a) * r0, '#ffffff');                 // surface size (dotted)
+        for (let y = 0; y < RH * 0.3; y++) dot(bx + Math.sin(y * 0.3 + t * 2) * 1.5, by + rb + y, '#e8e8f0');
+        blob(bx, by, rb, '#ff3a4a'); dot(bx - rb * 0.4, by - rb * 0.45, '#ffffff'); dot(bx - rb * 0.4 + 1, by - rb * 0.45, '#ffffff'); rect(bx - 2, by + rb, 4, 3, '#b01c2c');
+        rect(R - 20, RH * 0.1, 2, RH * 0.8, '#ffffff');
+        for (let m = 0; m <= 30; m += 10) { const y = RH * 0.1 + (m / 30) * RH * 0.8; rect(R - 26, y, 8, 1, '#ffffff'); draw(String(m), R - 52, y - 3, 1, '#ffffff'); }
+        const my = RH * 0.1 + (d / 30) * RH * 0.8; for (let k = 0; k < 6; k++) rect(R - 30 + k, my - k, 1, 2 * k + 1, '#ffd23f');
+        draw(`${Math.round(d)} M`, 10, 78, 3, '#ffffff'); draw(`${P2.toFixed(1)} ATM`, 10, 104, 2, '#ffd23f'); draw(`AIR ${Math.round(100 / P2)}%`, 10, 122, 2, '#ff9aa6');
+        raw = false;
       }
     } else if (scene === 'pulsar') {
       const ang = beats * Math.PI + (v.offset ?? 0);
