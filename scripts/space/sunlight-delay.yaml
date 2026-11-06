@@ -1,6 +1,13 @@
 # SPACE sample (Manim motion graphics + Remotion captions overlay). Render:  npm run render space
 title: The Sun You See Is 8 Minutes Old
 hook: "The Sun you see is eight minutes old."
+youtube:
+  title: "The Sun You See Is 8 Minutes Old"
+  description: |
+    Sunlight takes 8 minutes and 19 seconds to reach Earth. If the Sun vanished right now, we would keep seeing it shine for 8 more minutes. Light needs about 43 minutes to reach Jupiter and over 4 hours to reach Neptune, and 109 Earths fit across the Sun.
+  tags: [Space, Astronomy, Science, Sun, SpaceFacts]
+  pinned_comment: "Which space fact should I animate next?"
+
 lines:
   - say: "Light is the fastest thing there is, about three hundred thousand kilometers every second."
     visual: {type: counter, label: "Speed of light", from: 0, to: 299792, suffix: " km/s", sub: "Fast enough to circle the Earth seven times in one second"}

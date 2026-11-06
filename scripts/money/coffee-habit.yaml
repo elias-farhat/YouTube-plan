@@ -3,6 +3,15 @@ title: The $5 Habit That Costs You $172,000
 hook: "Your daily coffee costs {$172,000|one hundred seventy two thousand dollars}."
 # seed: 3                                   # pin the look (default: hash of the title)
 # style: {palette: lime_gold, layout: B}    # or pin parts of it: palette, layout, pacing, caption, transition, kinetic, motif, header, orient
+youtube:
+  title: "A $5 Coffee Habit Can Cost You $172,000"
+  description: |
+    $5 a day sounds like nothing. But $1,825 a year, invested at an assumed 7% a year for 30 years, grows to about $172,000. Only $54,750 of that is money you put in.
+
+    This is an illustrative example using a steady 7% return. Real returns vary and are not guaranteed. Not financial advice.
+  tags: [Money, Investing, CompoundInterest, PersonalFinance, SavingMoney]
+  pinned_comment: "What is your daily $5 habit? Be honest."
+
 lines:
   - say: "Five dollars a day sounds like nothing."
     visual: {type: kinetic, text: ["*$5* a day", "sounds like", "*nothing*"]}

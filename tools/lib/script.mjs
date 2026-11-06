@@ -75,7 +75,7 @@ export function loadScript(file) {
   const slug = raw.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'video';
   return {
     file, channel, title: raw.title.trim(), slug, seed, handle: raw.handle, voice: raw.voice,
-    style: raw.style ?? {}, hook: { say: raw.hook.trim(), words: hookWords, sfx: [] }, hookVisual: raw.hook_visual ?? null, lines, territories,
+    style: raw.style ?? {}, hook: { say: raw.hook.trim(), words: hookWords, sfx: [] }, hookVisual: raw.hook_visual ?? null, youtube: raw.youtube ?? {}, lines, territories,
   };
 }
 

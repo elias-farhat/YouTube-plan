@@ -13,6 +13,17 @@ territories:
   - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece, North Macedonia, Albania]}
   - {year: 44 BC, countries: [France, Belgium, Switzerland, Slovenia, Croatia, Bosnia and Herz., Montenegro, Turkey, Cyprus, N. Cyprus, Syria, Lebanon, Israel, Palestine]}
   - {year: 117 AD, countries: [Egypt, Libya, Algeria, Morocco, United Kingdom, Luxembourg, Austria, Hungary, Serbia, Kosovo, Romania, Bulgaria, Jordan, Iraq]}
+youtube:
+  title: "Rome Lost 50,000 Soldiers in One Afternoon... and Still Won"
+  description: |
+    In 216 BC, Hannibal wiped out a Roman army at Cannae in a single afternoon. Everyone expected Rome to surrender. It said no.
+
+    Here is how Rome armed slaves, outlasted Hannibal for 15 years, burned Carthage, and ended up owning the entire Mediterranean.
+
+    Notes: ancient sources put Roman losses at Cannae between 50,000 and 70,000. Map territory is shown by modern country and is approximate.
+  tags: [History, Rome, Hannibal, AncientHistory, Cannae, HistoryForNoobs]
+  pinned_comment: "Would you have surrendered? Tell me below. Part 2: how Julius Caesar ended the Republic. Want it?"
+
 lines:
   - say: "Hannibal had fewer men. So he built a trap."
     visual: {type: map, year: 216 BC, view: "europe>italy", route: [Carthago Nova, Pyrenees, Alps, Po Valley], icon: elephant, battles: [Cannae], tint: red, label: "Cannae, 216 BC"}

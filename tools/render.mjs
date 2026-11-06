@@ -248,6 +248,14 @@ for (const file of files) {
       }
     }
     fs.writeFileSync(`${base}.srt`, srt.join('\n'));
+    // upload text: title / description / hashtags / pinned comment (from the script's `youtube:` block, with sane fallbacks)
+    const yt = script.youtube ?? {};
+    const tags = (yt.tags ?? [script.channel === 'money' ? 'Money' : script.channel === 'space' ? 'Space' : 'History', 'Shorts']).map((t) => '#' + String(t).replace(/^#/, '').replace(/\s+/g, ''));
+    if (!tags.some((t) => t.toLowerCase() === '#shorts')) tags.unshift('#Shorts');
+    const ytTitle = yt.title ?? script.title;
+    const ytDesc = yt.description ?? `${script.hook.words.map((w) => w.shown).join(' ')} ${script.lines.slice(0, 2).map((l) => l.words.map((w) => w.shown).join(' ')).join(' ')}`;
+    fs.writeFileSync(`${base}.youtube.txt`, `TITLE (${ytTitle.length}/100)\n${ytTitle}\n\nDESCRIPTION\n${ytDesc.trim()}\n\n${tags.join(' ')}\n` + (yt.pinned_comment ? `\nPINNED COMMENT\n${yt.pinned_comment}\n` : ''));
+    console.log(`  title: ${ytTitle}`);
     console.log(`  -> ${outMp4}  (${(fs.statSync(outMp4).size / 1e6).toFixed(1)} MB, ${voiced ? 'with voice' : 'no voice'}${flags.sfx ? ' + sound effects' : ''})`);
   } catch (e) {
     failures++;

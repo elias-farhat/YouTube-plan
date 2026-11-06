@@ -1,11 +1,11 @@
 How Rome Took The Mediterranean
-Total 49.5s. Start each narration line at its time:
+Total 49.8s. Start each narration line at its time:
 
 [00:00.1]  One city took the whole Mediterranean.
-[00:03.7]  In 264 BC, Rome ruled only Italy.
-[00:09.0]  Then it fought Carthage, a rival power across the sea, for over a century.
-[00:16.9]  In 218 BC, Hannibal marched elephants over the Alps and nearly broke Rome.
-[00:24.7]  Rome won anyway. By 133 BC, it held Spain, North Africa, and Greece.
-[00:33.7]  Julius Caesar then added Gaul, today's France.
-[00:38.2]  At its peak in 117 AD, the empire stretched from Britain to Egypt.
-[00:45.1]  Tens of millions of people lived under Roman rule.
+[00:03.8]  In 264 BC, Rome ruled only Italy.
+[00:09.1]  Then it fought Carthage, a rival power across the sea, for over a century.
+[00:17.0]  In 218 BC, Hannibal marched elephants over the Alps and nearly broke Rome.
+[00:24.8]  Rome won anyway. By 133 BC, it held Spain, North Africa, and Greece.
+[00:33.9]  Julius Caesar then added Gaul, today's France.
+[00:38.4]  At its peak in 117 AD, the empire stretched from Britain to Egypt.
+[00:45.4]  Tens of millions of people lived under Roman rule.

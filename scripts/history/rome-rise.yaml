@@ -6,6 +6,14 @@ territories:
   - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece, North Macedonia, Albania]}
   - {year: 44 BC, countries: [France, Belgium, Switzerland, Slovenia, Croatia, Bosnia and Herz., Montenegro, Turkey, Cyprus, N. Cyprus, Syria, Lebanon, Israel, Palestine]}
   - {year: 117 AD, countries: [Egypt, Libya, Algeria, Morocco, United Kingdom, Luxembourg, Austria, Hungary, Serbia, Kosovo, Romania, Bulgaria, Jordan, Iraq]}
+youtube:
+  title: "How Rome Conquered the Entire Mediterranean (Animated Map)"
+  description: |
+    One city in Italy became an empire. Watch the map change from 264 BC to 117 AD: the Punic Wars, Hannibal crossing the Alps, Julius Caesar and the empire at its peak.
+
+    Map territory is shown by modern country and is approximate.
+  tags: [History, Rome, AncientRome, Maps, Hannibal, HistoryForNoobs]
+
 lines:
   - say: "In 264 BC, Rome ruled only Italy."
     visual: {type: map, year: 264 BC, view: "italy>empire", cities: [Rome], label: "Rome rises"}
