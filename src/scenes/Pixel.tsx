@@ -824,6 +824,15 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
       });
     }
     if (v.title) { const k = Math.max(1, Math.round(1.4 * sc)); const s = String(v.title); draw(s, Math.round((R - textW(s, k)) / 2), Math.round(4 * sc), k, P.c); }
+    if (hd && scene !== 'touch') {                                            // floating motes: constant gentle motion + depth (3 parallax layers)
+      for (let i = 0; i < 44; i++) {
+        const layer = 1 + (i % 3), sp = 3 + layer * 4 + hash(i + 3) * 5;
+        const mx = (hash(i * 7) * R + Math.sin(t * 0.8 + i) * 5 * layer + t * layer * 2 + R * 4) % R, my = (hash(i * 11 + 5) * RH - t * sp + RH * 40) % RH;
+        const tw = 0.5 + 0.5 * Math.sin(t * 3 + i * 1.7);
+        dot(mx, my, tw > 0.4 ? '#eaf6ff' : '#a8c8f0');
+        if (layer === 3 && tw > 0.8) { dot(mx - 1, my, '#a8c8f0'); dot(mx + 1, my, '#a8c8f0'); dot(mx, my - 1, '#a8c8f0'); dot(mx, my + 1, '#a8c8f0'); }
+      }
+    }
     if (hd) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       hd2d(cv, ref.current!, 2, 1);
@@ -835,7 +844,7 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
   const box: React.CSSProperties = full ? {position: 'absolute', left: -stX, top: -stY, width: 1080, height: 1920, background: '#000'} : {position: 'absolute', inset: 0, borderRadius: 38, overflow: 'hidden', border: `4px solid ${plan.style.palette.accent2}`, boxSizing: 'border-box', background: '#000'};
   const punch = beatIdx % 4 === 0 ? 1 + 0.018 * Math.exp(-phase * 12) : 1 + 0.006 * Math.exp(-phase * 12);   // tiny camera zoom on every beat, bigger on the downbeat
   // 2.5D camera for the 64-bit look: perspective tilt + slow dolly, bloom, tilt-shift blur (far top / near bottom) and a vignette
-  const cam = hd ? `perspective(1500px) rotateX(${5.5 + 1.5 * Math.sin(t * 0.55)}deg) rotateY(${2.4 * Math.sin(t * 0.37 + at * 0.2)}deg) scale(${1.065 + 0.02 * pr})` : undefined;
+  const cam = hd ? `translate(${14 * Math.sin(t * 1.3 + at)}px, ${9 * Math.sin(t * 1.7)}px) rotate(${0.35 * Math.sin(t * 0.9)}deg) perspective(1500px) rotateX(${5.5 + 1.5 * Math.sin(t * 0.55)}deg) rotateY(${2.4 * Math.sin(t * 0.37 + at * 0.2)}deg) scale(${1.065 + 0.02 * pr + 0.012 * kick})` : undefined;
   return <div style={{...box, overflow: hd ? 'hidden' : undefined}}>
     <div style={{position: 'absolute', inset: 0, transform: cam, transformOrigin: '50% 62%'}}>
       <canvas ref={ref} width={hd ? R * 2 : R} height={hd ? RH * 2 : RH} style={{width: '100%', height: '100%', imageRendering: hd ? 'auto' : 'pixelated', display: 'block', transform: `scale(${punch})`}} />

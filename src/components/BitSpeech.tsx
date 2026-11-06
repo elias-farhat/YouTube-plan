@@ -35,7 +35,7 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
   const typing = !!b && shown > 0 && t < b.start + text.length * b.charT + 0.05;
   const talking = typing && t - lastReveal < b.charT * 0.9 && text[shown - 1] !== ' ';
   const pop = easeOutBack(clamp01((t - seg.startFrame / plan.fps) / 0.3), 1.3);
-  const leave = clamp01((seg.endFrame - frame) / 8);
+  const leave = clamp01((seg.endFrame - 1 - frame) / 10);
   const segT = t - seg.startFrame / plan.fps;
   // placement: default = small in the bottom-left corner; bit:{x,y,s} = full-body Dr. Bit standing IN the scene (feet at x,y as fractions of the frame), bubble above his head; bit:'off' = he leaves, text box stays at the top
   const place = (seg as any).bit ?? null;

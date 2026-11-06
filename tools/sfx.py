@@ -391,6 +391,12 @@ def chip_bed(d, bpm, seed, rng, song="arcade"):
             add(sig, t0, S["lead_gain"])
             if S.get("echo"):
                 add(sig, t0 + beat * 0.75, S["lead_gain"] * 0.45)
+    # steady pulse: a soft kick on every beat the song's own pattern skips, plus a quiet pad so the level never dips (clean loop)
+    for kb in range(int(d / beat) + 1):
+        if not S["kick"][(kb * 4) % 16]:
+            add(sound("thud", rng), kb * beat, 0.30)
+    tt = np.arange(n) / SR
+    out += 0.05 * (np.sin(2 * np.pi * root * 2 * tt) + 0.7 * np.sin(2 * np.pi * root * 3 * tt)) * (0.85 + 0.15 * np.sin(2 * np.pi * tt / (beat * 4)))
     out = np.round(out * S["crush"]) / S["crush"]
     return out * 0.55
 
@@ -447,7 +453,7 @@ def main():
             b = chip_bed(total + 0.5, plan.get("bpm") or 120, plan["style"]["seed"], rng, plan.get("song") or "arcade")
         else:
             b = bed(plan["channel"], total + 0.5, plan["style"]["seed"], rng)
-        g = speech_duck(plan, len(b))
+        g = np.ones(len(b)) if plan.get("mode") == "bits" else speech_duck(plan, len(b))     # nobody narrates in bits mode: keep the beat full
         mix[: len(b)] += b * g * (1.0 if plan.get("music") == "chip" else 0.55)
     for c in plan.get("cues", []):
         s = sound(c["name"], np.random.default_rng(zlib.crc32(f"{c['name']}{c['t']:.2f}".encode())), c.get("dur"), c.get("f"), c.get("voice"))
@@ -464,6 +470,12 @@ def main():
             v = v.reshape(-1, 2).mean(1)
         m = min(len(v), n)
         mix[:m] += v[:m] * 1.0
+    # master loudness: match the references (~ -15.5 dBFS average level), then limit
+    hop = SR // 30
+    fr = np.array([np.sqrt((mix[i * hop:(i + 1) * hop] ** 2).mean() + 1e-12) for i in range(len(mix) // hop)])
+    cur = float(np.mean(20 * np.log10(fr + 1e-6)))
+    if not voice:
+        mix *= float(np.clip(10 ** ((-15.5 - cur) / 20), 0.5, 3.0))
     # gentle master limiter
     peak = np.max(np.abs(mix)) + 1e-9
     if peak > 0.95:

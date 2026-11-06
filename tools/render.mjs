@@ -240,6 +240,13 @@ for (const file of files) {
     // dithered pixel art compresses badly: squeeze heavy renders (>25 MB) to a phone-friendly size
     const videoArgs = fs.statSync(rawOut).size > 25e6 ? ['-c:v', 'libx264', '-crf', '24', '-preset', 'medium', '-pix_fmt', 'yuv420p'] : ['-c:v', 'copy'];
     const audioIn = audioFile ? ['-i', audioFile] : ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo'];
+    if (script.mode === 'bits' && script.outro) {
+      // seamless loop: dissolve the last 0.65 s into the very first frame (measured on the references: last frame ~ first frame)
+      const first = path.join(genDir, 'first.png');
+      sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, '-frames:v', '1', first]);
+      const T = total.toFixed(3), st = (total - 0.7).toFixed(3);
+      sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, '-loop', '1', '-framerate', '30', '-i', first, ...audioIn, '-filter_complex', `[1:v]format=rgba,fade=t=in:st=${st}:d=0.65:alpha=1[f];[0:v][f]overlay=shortest=1:format=auto,format=yuv420p[v]`, '-map', '[v]', '-map', '2:a', '-c:v', 'libx264', '-crf', '22', '-preset', 'medium', '-c:a', 'aac', '-b:a', '192k', '-t', T, '-movflags', '+faststart', outMp4]);
+    } else
     sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, ...audioIn, '-map', '0:v', '-map', '1:a', ...videoArgs, '-c:a', 'aac', '-b:a', '192k', '-t', total.toFixed(3), '-movflags', '+faststart', outMp4]);
 
     // sidecars: narration text (for CapCut), cue sheet, SRT
