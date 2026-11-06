@@ -15,7 +15,7 @@ pace: quick
 talk: 14
 outro: "SO KEEP BREATHING OUT."
 bpm: 150
-pixel: {full: true, bits: 32, palette: day, bpm: 150}
+pixel: {full: true, bits: 64, palette: day, bpm: 150}
 style: {layout: C, pacing: snappy, transition: fade}
 youtube:
   title: "Why Divers Never Hold Their Breath (A Balloon at 30 m Is 1/4 Size)"

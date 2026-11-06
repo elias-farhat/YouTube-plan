@@ -17,7 +17,7 @@ outro: "NOW LOOK AT A TREE AGAIN."
 blip: bubble
 talk: 14
 bpm: 120
-pixel: {full: true, bits: 32, palette: day, bpm: 120}
+pixel: {full: true, bits: 64, palette: day, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}
 youtube:
   title: "A Tree Is Mostly Made of Air (How Plants Make Energy)"

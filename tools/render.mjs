@@ -170,7 +170,7 @@ for (const file of files) {
       fps: FPS, totalFrames: Math.round(total * FPS), style, segs, territories: script.territories, audio: null, bgVideo: null,
     };
     const { cues, impacts } = buildCues(plan);
-    plan.mode = script.mode; plan.song = script.song; plan.outfit = script.outfit; plan.blip = script.blip;
+    plan.mode = script.mode; plan.song = script.song; plan.outfit = script.outfit; plan.hd = !!script.hd; plan.blip = script.blip;
     plan.music = script.music; plan.bpm = script.bpm; plan.chrome = script.chrome;
     plan.cues = cues; plan.impacts = flags.sfx ? impacts : impacts.filter((c) => false);
     if (voiced) mixVoice(segs, voice.lines, total, path.join(genDir, 'voice.wav'));

@@ -79,7 +79,7 @@ export function loadScript(file) {
   const seed = Number.isInteger(raw.seed) ? raw.seed : seedFromText(raw.title);
   const slug = raw.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'video';
   return {
-    file, demo, mode: raw.mode === 'bits' ? 'bits' : 'voice', song: raw.song ?? 'arcade', outfit: raw.outfit ?? 'lab', pace: raw.pace ?? 'bar', outro: raw.outro ?? null, outroBit: raw.outro_bit ?? null, blip: raw.blip ?? 'retro', talk: raw.talk ?? 14, engine: raw.engine ?? null, badge: raw.badge ?? null, music: raw.music ?? null, bpm: raw.bpm ?? null, channel, title: raw.title.trim(), slug, seed, handle: raw.handle, voice: raw.voice,
+    file, demo, mode: raw.mode === 'bits' ? 'bits' : 'voice', song: raw.song ?? 'arcade', outfit: raw.outfit ?? 'lab', hd: raw.pixel?.bits === 64, pace: raw.pace ?? 'bar', outro: raw.outro ?? null, outroBit: raw.outro_bit ?? null, blip: raw.blip ?? 'retro', talk: raw.talk ?? 14, engine: raw.engine ?? null, badge: raw.badge ?? null, music: raw.music ?? null, bpm: raw.bpm ?? null, channel, title: raw.title.trim(), slug, seed, handle: raw.handle, voice: raw.voice,
     style: raw.style ?? {}, hook: { say: demo ? '' : raw.hook.trim(), words: hookWords, sfx: [], mood: raw.hook_mood ?? null, bit: raw.hook_bit ?? null }, hookVisual: raw.hook_visual?.type === 'pixel' && raw.pixel ? { ...raw.pixel, ...raw.hook_visual } : raw.hook_visual ?? null, chrome: raw.chrome ?? 'full', youtube: raw.youtube ?? {}, lines, territories,
   };
 }

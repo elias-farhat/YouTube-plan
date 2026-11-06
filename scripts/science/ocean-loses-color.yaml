@@ -17,7 +17,7 @@ talk: 14
 outro: "NEXT DIVE, BRING A TORCH."
 outro_bit: {x: 0.2, y: 0.8, s: 5}
 bpm: 120
-pixel: {full: true, bits: 32, palette: day, bpm: 120}
+pixel: {full: true, bits: 64, palette: day, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}
 youtube:
   title: "At 10 Meters Down, Red Disappears (Why the Ocean Loses Its Color)"

@@ -19,7 +19,7 @@ outro: "NEXT STORM, COUNT THE SECONDS."
 blip: zap
 talk: 14
 bpm: 120
-pixel: {full: true, bits: 32, palette: storm, bpm: 120}
+pixel: {full: true, bits: 64, palette: storm, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}
 youtube:
   title: "Lightning Is 5x Hotter Than the Sun. Here's How It Works"

@@ -3,6 +3,7 @@ import {useCurrentFrame} from 'remotion';
 import {Plan, W} from '../lib/types';
 import {FONT} from '../lib/pixelfont';
 import {clamp01, easeOutBack} from '../lib/anim';
+import {hd2d} from '../lib/hd2d';
 
 /**
  * "Bits" mode: DR. BIT, a pixel scientist (wild white hair, round glasses, moustache, lab coat, bow tie, bubbling flask)
@@ -17,6 +18,8 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
   const frame = useCurrentFrame();
   const ref = React.useRef<HTMLCanvasElement>(null);
   const refB = React.useRef<HTMLCanvasElement>(null);
+  const loC = React.useRef<HTMLCanvasElement | null>(null);
+  const hd = !!plan.hd;
   const t = frame / plan.fps;
   const seg = [...plan.segs].reverse().find((s) => frame >= s.startFrame) ?? plan.segs[0];
   const b = seg.bits;
@@ -53,7 +56,8 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
 
   React.useLayoutEffect(() => {
     if (!refB.current) return;
-    const cvC = ref.current ?? document.createElement('canvas'); cvC.width = CW; cvC.height = CH;
+    const target = ref.current;
+    const cvC = hd ? (loC.current ?? (loC.current = document.createElement('canvas'))) : (target ?? document.createElement('canvas')); cvC.width = CW; cvC.height = CH;
     const ctxC = cvC.getContext('2d')!, ctxB = refB.current.getContext('2d')!;
     let ctx = ctxB;
     ctxC.clearRect(0, 0, CW, CH); ctxB.clearRect(0, 0, BW, BH);
@@ -195,6 +199,7 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) ctxC.drawImage(tmp, dx, dy);
       ctxC.globalCompositeOperation = 'source-over';
     }
+    if (hd && target) hd2d(cvC, target, 2, 1);
   }, [frame, text, shown, talking, phase, mood, place, pointing, moving]);
 
   if (!b) return null;
@@ -205,13 +210,14 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
       <div style={{position: 'absolute', left: stage ? bubbleLeft : 0, width: stage ? BW * BPIX : W, display: 'flex', justifyContent: 'center', top: bubbleTop, zIndex: 5, transform: `scale(${sc})`, transformOrigin: stage ? 'bottom center' : 'top center', opacity: op}}>
         <canvas ref={refB} width={BW} height={BH} style={{width: BW * BPIX, height: BH * BPIX, imageRendering: 'pixelated', display: 'block'}} />
       </div>
+      {!hidden && stage && <div style={{position: 'absolute', left: feetX - 36 * sCh, top: feetY - 7 * sCh, width: 72 * sCh, height: 14 * sCh, borderRadius: '50%', background: 'rgba(0,0,0,0.38)', filter: 'blur(8px)', opacity: op}} />}
       {!hidden && (stage ? (
         <div style={{position: 'absolute', left: feetX - (CW * sCh) / 2, top: feetY - CH * sCh, transform: `scale(${sc}) ${flipped ? 'scaleX(-1)' : ''}`, transformOrigin: 'bottom center', opacity: op}}>
-          <canvas ref={ref} width={CW} height={CH} style={{width: CW * sCh, height: CH * sCh, imageRendering: 'pixelated', display: 'block'}} />
+          <canvas ref={ref} width={CW * (hd ? 2 : 1)} height={CH * (hd ? 2 : 1)} style={{width: CW * sCh, height: CH * sCh, imageRendering: hd ? 'auto' : 'pixelated', display: 'block'}} />
         </div>
       ) : (
         <div style={{position: 'absolute', left: 26, bottom: 230, transform: `scale(${sc})`, transformOrigin: 'bottom left', opacity: op}}>
-          <canvas ref={ref} width={CW} height={CH} style={{width: CW * CHAR_PX, height: CH * CHAR_PX, imageRendering: 'pixelated', display: 'block'}} />
+          <canvas ref={ref} width={CW * (hd ? 2 : 1)} height={CH * (hd ? 2 : 1)} style={{width: CW * CHAR_PX, height: CH * CHAR_PX, imageRendering: hd ? 'auto' : 'pixelated', display: 'block'}} />
         </div>
       ))}
       {stage && !hidden && pt && pointing && (() => {

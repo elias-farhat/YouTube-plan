@@ -1,3 +1,4 @@
+import {hd2d} from '../lib/hd2d';
 import React from 'react';
 import {useCurrentFrame, useVideoConfig} from 'remotion';
 import {SceneProps} from './common';
@@ -18,7 +19,7 @@ const PALS: Record<string, Pal> = {
   day: {sky: ['#4aa8ff', '#74c0ff', '#a5dbff', '#d8f1ff'], neb: ['#ffffff', '#e6f6ff'], hi: '#ffffff', a: '#ff8a3c', b: '#2f9bff', c: '#ffe14a', text: '#ffffff', panel: '#0a2a4a'},
   gameboy: {sky: ['#0f380f', '#0f380f', '#306230', '#306230'], neb: ['#306230', '#8bac0f'], hi: '#9bbc0f', a: '#8bac0f', b: '#8bac0f', c: '#9bbc0f', text: '#9bbc0f', panel: '#0f380f', limit: ['#0f380f', '#306230', '#8bac0f', '#9bbc0f']},
 };
-const PRESET = {8: {res: 80, levels: 3}, 16: {res: 128, levels: 4}, 32: {res: 216, levels: 5}} as const;
+const PRESET: Record<number, {res: number; levels: number}> = {8: {res: 80, levels: 3}, 16: {res: 128, levels: 4}, 32: {res: 216, levels: 5}, 64: {res: 216, levels: 7}};   // 64 = HD-2D: 216 px art + sub-pixel lighting (see lib/hd2d)
 
 // ---- colour helpers
 const toRGB = (h: string): [number, number, number] => { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
@@ -39,10 +40,13 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
   const ref = React.useRef<HTMLCanvasElement>(null);
+  const loRef = React.useRef<HTMLCanvasElement | null>(null);
+  const glowRef = React.useRef<HTMLCanvasElement>(null);
   const {x: stX, y: stY, w: stW, h: stH} = plan.style.stage;
   const full = !!v.full;                                   // fill the whole 1080x1920 frame instead of the stage box
   const w = full ? 1080 : stW, h = full ? 1920 : stH;
-  const bits: 8 | 16 | 32 = v.bits ?? 32;
+  const bits: number = v.bits ?? 32;
+  const hd = bits === 64;
   const preset = PRESET[bits] ?? PRESET[32];
   const R = v.res ?? preset.res, RH = Math.round((R * h) / w);
   const L = preset.levels;
@@ -60,7 +64,8 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
   const eqOn = v.eq ?? (scene === 'planets' || scene === 'rocket');                                   // everything is laid out for 216 px and scaled
 
   React.useLayoutEffect(() => {
-    const cv = ref.current!;
+    let cv = ref.current!;
+    if (hd) { cv = loRef.current ?? (loRef.current = document.createElement('canvas')); cv.width = R; cv.height = RH; }
     const ctx = cv.getContext('2d', {willReadFrequently: true})!;
     ctx.imageSmoothingEnabled = false;
     let raw = false, oD = 0;                                                     // ocean: depth in metres (colours are filtered by water); raw = draw untinted (UI, torch light)
@@ -819,11 +824,27 @@ export const Pixel: React.FC<SceneProps> = ({v, plan, dur, at = 0}) => {
       });
     }
     if (v.title) { const k = Math.max(1, Math.round(1.4 * sc)); const s = String(v.title); draw(s, Math.round((R - textW(s, k)) / 2), Math.round(4 * sc), k, P.c); }
+    if (hd) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      hd2d(cv, ref.current!, 2, 1);
+      const g = glowRef.current;
+      if (g) { const gc = g.getContext('2d')!; gc.clearRect(0, 0, g.width, g.height); gc.drawImage(ref.current!, 0, 0, g.width, g.height); }
+    }
   }, [frame, R, RH, palName, scene, bpm, at, bits]);
 
   const box: React.CSSProperties = full ? {position: 'absolute', left: -stX, top: -stY, width: 1080, height: 1920, background: '#000'} : {position: 'absolute', inset: 0, borderRadius: 38, overflow: 'hidden', border: `4px solid ${plan.style.palette.accent2}`, boxSizing: 'border-box', background: '#000'};
   const punch = beatIdx % 4 === 0 ? 1 + 0.018 * Math.exp(-phase * 12) : 1 + 0.006 * Math.exp(-phase * 12);   // tiny camera zoom on every beat, bigger on the downbeat
-  return <div style={box}>
-    <canvas ref={ref} width={R} height={RH} style={{width: '100%', height: '100%', imageRendering: 'pixelated', display: 'block', transform: `scale(${punch})`}} />
+  // 2.5D camera for the 64-bit look: perspective tilt + slow dolly, bloom, tilt-shift blur (far top / near bottom) and a vignette
+  const cam = hd ? `perspective(1500px) rotateX(${7 + 2 * Math.sin(t * 0.55)}deg) rotateY(${4 * Math.sin(t * 0.37 + at * 0.2)}deg) scale(${1.13 + 0.035 * pr})` : undefined;
+  return <div style={{...box, overflow: hd ? 'hidden' : undefined}}>
+    <div style={{position: 'absolute', inset: 0, transform: cam, transformOrigin: '50% 62%'}}>
+      <canvas ref={ref} width={hd ? R * 2 : R} height={hd ? RH * 2 : RH} style={{width: '100%', height: '100%', imageRendering: hd ? 'auto' : 'pixelated', display: 'block', transform: `scale(${punch})`}} />
+      {hd && <canvas ref={glowRef} width={108} height={192} style={{position: 'absolute', inset: 0, width: '100%', height: '100%', filter: 'blur(16px) saturate(1.5)', mixBlendMode: 'screen', opacity: 0.55}} />}
+    </div>
+    {hd && <>
+      <div style={{position: 'absolute', left: 0, right: 0, top: 0, height: '17%', backdropFilter: 'blur(5px)', WebkitMaskImage: 'linear-gradient(#000, transparent)', maskImage: 'linear-gradient(#000, transparent)'}} />
+      <div style={{position: 'absolute', left: 0, right: 0, bottom: 0, height: '20%', backdropFilter: 'blur(7px)', WebkitMaskImage: 'linear-gradient(transparent, #000)', maskImage: 'linear-gradient(transparent, #000)'}} />
+      <div style={{position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,0.38) 100%)'}} />
+    </>}
   </div>;
 };
