@@ -26,3 +26,25 @@ Five reference Shorts: solar flare (v6), wombat (v2), LHC (v3), Chelyabinsk (v4)
 - `outro:` line: Dr. Bit closes over the opening scene, last scene never fades -> loop-friendly ending.
 - `pace: quick`: scenes snap to 2 beats (1 s at 120 BPM) instead of a bar, so text changes every ~3 s.
 - `outfit:` Dr. Bit costume (`lab`, `storm`, `gardener`, `astronaut`, `diver`, `hardhat`) with ambient effects (floating, bubbles, rain, falling leaves).
+
+# Batch 2: hearing test (w1, 36.0 s) and skin cells (w2, 32.1 s), 720x1280 @30 fps
+
+| | hearing | skin | earlier 5 (range) | ours (science) |
+|---|---|---|---|---|
+| visual change events per second | 1.08 | 1.03 | 0.0-1.2 | 0.43-1.66 |
+| events that land on the 15-frame beat grid (120 BPM; chance = 0.20) | **0.79** | **1.00** | 0.23-0.86 | quick pace: 2-beat snap |
+| median gap between events | 0.55 s | 0.50 s (one beat) | 0.5-6 s | 0.5-1.6 s |
+| mean pixel change per frame (motion) | 4.3 | 11.7 | 1.2-11.3 | 1.5-4.1 |
+| first vs last frame difference (loop) | **2.1** | **1.9** | 1.3-9.8 | 4.4-13.7 (was 49-57 on 2 videos, fixed) |
+| music tempo (autocorrelation) | 120 | 120 (corr .88) | 60-128 | 120 / 150 |
+| energy below 150 Hz | 0.83 | 0.81 | 0.15-0.26 | 0.53-0.68 |
+| loudness first 1 s / last 1 s (dBFS) | -14.6 / -16.1 | -15.3 / -16.7 | equal within 1.5 dB | n/a |
+
+New findings
+1. **Everything is quantised to the beat.** In 3 of the 7 references 79-100% of visual changes fall on the 15-frame grid (chance is 20%): cuts, text swaps, counter ticks. The counter in the skin video ticks every 15 frames.
+2. **A persistent HUD**: a big gold number/title at the top that keeps updating (8,000 Hz -> 16,000 Hz; "SINCE YOU HIT PLAY 738 -> 14,000" live counter tied to the elapsed time), small white captions inside the scene, and a viewer prompt in the hook ("CAN YOU HEAR THIS?") and the outro ("COMMENT YOUR NUMBER", "FUN TEST, NOT MEDICAL").
+3. **One hero scene with a moving camera** instead of many scene changes (cochlea spiral zooming for 25 s; brick wall scrolling for 25 s), ending back on the opening frame.
+4. **Bass-heavy mix**: 81-83% of the energy below 150 Hz versus 15-26% in batch 1 (ours 53-68%).
+5. The dominant-frequency track of the hearing tone could not be measured reliably (the music masks the sine), so no sweep schedule is claimed.
+
+Applied: the loop outro now restarts the opening scene in its START state (loop error 49-57 -> 4.4-4.9).

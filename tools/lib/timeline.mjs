@@ -76,6 +76,15 @@ function autoMood(it, i, n) {
   return i === n - 1 ? 'happy' : 'talk';
 }
 
+/** the loop outro shows the opening scene in its START state (depth/height animations frozen at their first value) */
+function restState(v) {
+  if (!v) return v;
+  const o = { ...v };
+  if (o.from !== undefined) o.to = o.from;
+  if (o.h0 !== undefined) o.h1 = o.h0;
+  return o;
+}
+
 export function buildBitsSegments(script, style, bpm = 120) {
   const beat = 60 / bpm, quick = script.pace === 'quick', bar = quick ? beat * 2 : beat * 4, charT = 1 / (script.talk ?? 14);   // `talk:` = letters per second
   const items = script.demo ? [...script.lines] : [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
@@ -103,7 +112,7 @@ export function buildBitsSegments(script, style, bpm = 120) {
     const text = String(script.outro).toUpperCase(), typeStart = 0.15, typeDur = text.length * charT;
     const dur = Math.ceil((typeStart + typeDur + 1.4) / bar - 1e-6) * bar, start = t, first = items[0];
     segs.push({
-      idx: items.length, isHook: false, isOutro: true, sfx: [], say: text, shown: text, visual: first.visual,
+      idx: items.length, isHook: false, isOutro: true, sfx: [], say: text, shown: text, visual: restState(first.visual),
       startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
       speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
       bits: { text, start: start + typeStart, charT }, mood: 'happy', bit: script.outroBit ?? null,
