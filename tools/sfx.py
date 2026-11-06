@@ -259,6 +259,27 @@ def chip_bed(d, bpm, seed, rng):
     return out * 0.55
 
 
+def pulse_bed(channel, d, bpm, seed, rng):
+    """Not a song: the channel's ambient drone plus a soft, deep pulse on every beat (and a faint tick on the off-beat),
+    on the same grid the pixel scenes use, so motion lands on the pulse."""
+    n = int(d * SR)
+    out = bed(channel, d, seed, rng) * 0.7
+    beat = 60.0 / bpm
+    for b in range(int(d / beat) + 1):
+        t0 = b * beat
+        th = sound("thud", rng)
+        i = int(t0 * SR)
+        m = min(len(th), n - i)
+        if m > 0:
+            out[i:i + m] += th[:m] * (0.5 if b % 4 == 0 else 0.32)
+        tk = sound("tick", rng)
+        j = int((t0 + beat / 2) * SR)
+        m = min(len(tk), n - j)
+        if m > 0:
+            out[j:j + m] += tk[:m] * 0.07
+    return out
+
+
 def speech_duck(plan, n):
     """gain curve for the bed: lower while someone is speaking"""
     g = np.ones(n)
@@ -280,7 +301,9 @@ def main():
     rng = np.random.default_rng(plan["style"]["seed"] & 0xFFFFFFFF)
     mix = np.zeros(n)
     if use_bed:
-        if plan.get("music") == "chip":
+        if plan.get("music") == "pulse":
+            b = pulse_bed(plan["channel"], total + 0.5, plan.get("bpm") or 100, plan["style"]["seed"], rng)
+        elif plan.get("music") == "chip":
             b = chip_bed(total + 0.5, plan.get("bpm") or 120, plan["style"]["seed"], rng)
         else:
             b = bed(plan["channel"], total + 0.5, plan["style"]["seed"], rng)

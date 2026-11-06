@@ -64,8 +64,9 @@ export function loadScript(file) {
       const allowed = channel === 'space' && raw.engine === 'remotion' ? ['kinetic', 'stat', 'line', 'bar'] : VISUALS[channel];
       if (v.type !== 'pixel' && v.type !== 'clip' && !allowed.includes(v.type)) fail(`lines[${i}].visual.type "${v.type}" is not available for ${channel}. Use: ${VISUALS[channel].join(', ')}`);
     }
+    if (v && v.type === 'pixel' && raw.pixel) l.visual = { ...raw.pixel, ...v };   // script-level defaults for pixel scenes
     const sfx = l.sfx === undefined ? [] : Array.isArray(l.sfx) ? l.sfx : [l.sfx];
-    return { say: l.say.trim(), words: parseNarration(l.say), visual: v ?? null, sfx, hold: l.hold ?? 0 };
+    return { say: l.say.trim(), words: parseNarration(l.say), visual: l.visual ?? v ?? null, sfx, hold: l.hold ?? 0 };
   });
   let territories = [];
   if (raw.territories) {
@@ -78,7 +79,7 @@ export function loadScript(file) {
   const slug = raw.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 48) || 'video';
   return {
     file, demo, engine: raw.engine ?? null, badge: raw.badge ?? null, music: raw.music ?? null, bpm: raw.bpm ?? null, channel, title: raw.title.trim(), slug, seed, handle: raw.handle, voice: raw.voice,
-    style: raw.style ?? {}, hook: { say: demo ? '' : raw.hook.trim(), words: hookWords, sfx: [] }, hookVisual: raw.hook_visual ?? null, youtube: raw.youtube ?? {}, lines, territories,
+    style: raw.style ?? {}, hook: { say: demo ? '' : raw.hook.trim(), words: hookWords, sfx: [] }, hookVisual: raw.hook_visual?.type === 'pixel' && raw.pixel ? { ...raw.pixel, ...raw.hook_visual } : raw.hook_visual ?? null, chrome: raw.chrome ?? 'full', youtube: raw.youtube ?? {}, lines, territories,
   };
 }
 

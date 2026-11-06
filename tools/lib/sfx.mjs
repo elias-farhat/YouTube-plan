@@ -59,6 +59,16 @@ export function buildCues(plan) {
     } else if (v.type === 'stamps') {
       const k = v.items.length, st = Math.max(0.5, (dur * 0.6) / k);
       v.items.forEach((_, j) => add(enter + 0.3 + j * st, 'stamp', 0.85));
+    } else if (v.type === 'pixel') {
+      const sc = v.scene ?? 'planets';
+      if (sc === 'fusion') { const k = v.layers ?? 5; for (let j = 0; j < k; j++) add(enter + 0.3 + ((dur - 1.0) * j) / k, 'ping', 0.45, { f: 520 + 110 * j }); }
+      else if (sc === 'supernova' && v.phase === 'collapse') { add(enter, 'riser', 0.8, { dur: Math.max(1.2, dur - 0.25) }); add(enter + dur - 0.1, 'tick', 0.5); }
+      else if (sc === 'supernova') { add(enter + 0.05, 'boom', 1.0); add(enter + 0.1, 'sweep', 0.5, { dur: 1.4 }); }
+      else if (sc === 'nebula') add(enter + 0.2, 'swell', 0.45, { dur: Math.min(dur, 3) });
+      else if (sc === 'disc') add(enter + 0.3, 'draw', 0.4, { dur: dur * 0.8 });
+      else if (sc === 'cosmos') add(enter + 0.2, 'swell', 0.35, { dur: Math.min(dur, 2.5) });
+      else if (sc === 'earth') { add(enter + 0.4, 'ping', 0.5, { f: 988 }); add(enter + 0.9, 'ping', 0.4, { f: 1318 }); }
+      else if (sc === 'star' && s.isHook) add(0.0, 'sting', 0.6);
     } else if (v.type === 'lightbeam') {
       add(enter + 0.45, 'draw', 0.35, { dur: dur * 0.82 }); add(enter + 0.45 + dur * 0.82, 'ping', 0.5, { f: 1318 });
     } else if (v.type === 'ladder') {

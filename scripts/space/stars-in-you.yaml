@@ -1,0 +1,44 @@
+# SPACE (pixel-art science video).  32-bit pixel scenes fill the whole frame; motion lands on a soft pulse (100 BPM),
+# not a song: no lyrics, no title cards, minimal chrome.  Structure: hook -> setup -> build -> PEAK (supernova) -> payoff.
+title: You Are Made of Dead Stars
+hook: "You are made of dead stars."
+hook_visual: {type: pixel, scene: star}
+engine: remotion          # pixel scenes are drawn by Remotion
+chrome: minimal           # only a thin progress line: no header, no title, no handle
+music: pulse              # ambient drone + soft beat on the same BPM grid as the visuals
+bpm: 100
+pixel: {full: true, bits: 32, palette: neon, bpm: 100}     # defaults for every pixel scene below
+style: {layout: C, pacing: steady, caption: bar, transition: fade}
+youtube:
+  title: "You Are Made of Dead Stars (Here's How)"
+  description: |
+    Almost every atom in your body was forged inside a star and thrown into space when it exploded. From the Big Bang to the supernova to you, in 40 seconds.
+
+    The Big Bang made almost only hydrogen and helium. Stars fused heavier elements, up to iron, and exploded as supernovae. That dust became new stars, planets, and us.
+  tags: [Space, Science, Astronomy, Supernova, Universe, SpaceFacts]
+  pinned_comment: "Which element in your body surprised you the most?"
+lines:
+  - say: "The Big Bang made almost nothing but hydrogen and helium."
+    visual: {type: pixel, scene: cosmos}
+
+  - say: "Everything else was built inside stars."
+    visual: {type: pixel, scene: star, color: "#ffb347"}
+
+  - say: "They fuse hydrogen into helium, helium into carbon and oxygen, and heavier atoms all the way up to iron."
+    visual: {type: pixel, scene: fusion}
+
+  - say: "But fusing iron costs energy instead of making it. In under a second, the core collapses."
+    visual: {type: pixel, scene: supernova, phase: collapse}
+
+  - say: "And the star explodes."
+    hold: 3.4
+    visual: {type: pixel, scene: supernova, phase: blast}
+
+  - say: "That blast scatters carbon, oxygen and iron across space."
+    visual: {type: pixel, scene: nebula}
+
+  - say: "Billions of years later, that dust formed new stars, planets, and you."
+    visual: {type: pixel, scene: disc}
+
+  - say: "Apart from hydrogen, nearly every atom in your body was made in stars."
+    visual: {type: pixel, scene: earth}

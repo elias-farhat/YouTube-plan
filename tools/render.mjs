@@ -170,7 +170,7 @@ for (const file of files) {
       fps: FPS, totalFrames: Math.round(total * FPS), style, segs, territories: script.territories, audio: null, bgVideo: null,
     };
     const { cues, impacts } = buildCues(plan);
-    plan.music = script.music; plan.bpm = script.bpm;
+    plan.music = script.music; plan.bpm = script.bpm; plan.chrome = script.chrome;
     plan.cues = cues; plan.impacts = flags.sfx ? impacts : impacts.filter((c) => false);
     if (voiced) mixVoice(segs, voice.lines, total, path.join(genDir, 'voice.wav'));
     if (flags.sfx) {
@@ -236,8 +236,10 @@ for (const file of files) {
     const outDir = script.demo ? path.join(flags.out, 'demos') : flags.out;
     fs.mkdirSync(outDir, { recursive: true });
     const outMp4 = path.join(outDir, `${script.channel}_${script.slug}.mp4`);
+    // dithered pixel art compresses badly: squeeze heavy renders (>25 MB) to a phone-friendly size
+    const videoArgs = fs.statSync(rawOut).size > 25e6 ? ['-c:v', 'libx264', '-crf', '24', '-preset', 'medium', '-pix_fmt', 'yuv420p'] : ['-c:v', 'copy'];
     const audioIn = audioFile ? ['-i', audioFile] : ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo'];
-    sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, ...audioIn, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-t', total.toFixed(3), '-movflags', '+faststart', outMp4]);
+    sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, ...audioIn, '-map', '0:v', '-map', '1:a', ...videoArgs, '-c:a', 'aac', '-b:a', '192k', '-t', total.toFixed(3), '-movflags', '+faststart', outMp4]);
 
     // sidecars: narration text (for CapCut), cue sheet, SRT
     const base = outMp4.replace(/\.mp4$/, '');

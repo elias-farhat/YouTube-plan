@@ -1,0 +1,12 @@
+You Are Made of Dead Stars
+Total 49.3s. Start each narration line at its time:
+
+[00:00.1]  You are made of dead stars.
+[00:03.0]  The Big Bang made almost nothing but hydrogen and helium.
+[00:08.1]  Everything else was built inside stars.
+[00:11.6]  They fuse hydrogen into helium, helium into carbon and oxygen, and heavier atoms all the way up to iron.
+[00:20.5]  But fusing iron costs energy instead of making it. In under a second, the core collapses.
+[00:28.3]  And the star explodes.
+[00:31.7]  That blast scatters carbon, oxygen and iron across space.
+[00:36.7]  Billions of years later, that dust formed new stars, planets, and you.
+[00:43.0]  Apart from hydrogen, nearly every atom in your body was made in stars.
