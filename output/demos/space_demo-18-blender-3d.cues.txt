@@ -1,0 +1,4 @@
+Demo 18 - Blender 3D
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Blender: a real lit 3D planet, rendered in the pipeline.

@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: space
+title: "Demo 12 - Manim: light beam"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Manim: light racing across space with a live timer."
+    hold: 6.0
+    visual: {type: lightbeam, title: "Sunlight trip", from: Sun, to: Earth, time: "8:19", distance: "149.6 million km"}

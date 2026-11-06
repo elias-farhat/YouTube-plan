@@ -1,0 +1,4 @@
+Demo 13 - Manim: planet ladder
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Manim: a ladder of worlds, lit one by one.

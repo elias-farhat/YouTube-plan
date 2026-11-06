@@ -1,0 +1,10 @@
+# A real 3D scene rendered with Blender (bpy, Cycles) and dropped in as a clip. Make the clip first:  npm run render3d
+demo: true
+channel: space
+engine: remotion
+title: "Demo 18 - Blender 3D"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Blender: a real lit 3D planet, rendered in the pipeline."
+    hold: 6
+    visual: {type: clip, src: "gen/blender/earth.mp4", full: true}

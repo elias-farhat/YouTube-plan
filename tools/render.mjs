@@ -45,7 +45,7 @@ if (!targets.length) {
 
 const files = [];
 for (const t of targets) {
-  if (t === 'all' || CHANNELS.includes(t)) files.push(...findScripts(t));
+  if (t === 'all' || CHANNELS.includes(t) || t === 'demos') files.push(...findScripts(t === 'demos' ? 'demos' : t));
   else if (fs.existsSync(t)) files.push(t);
   else { console.error(`not a channel or script file: ${t}`); process.exit(1); }
 }
@@ -114,13 +114,13 @@ function findVoiceFile(script) {
 function getVoice(script, style, workdir) {
   const vf = findVoiceFile(script);
   if (vf) {
-    const lines = [script.hook.words, ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
+    const lines = [...(script.demo ? [] : [script.hook.words]), ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
     const r = spawnSync(py, ['tools/voice_import.py'], { input: JSON.stringify({ lines, voiceFile: vf, outdir: workdir }), encoding: 'utf8' });
     if (r.status !== 0) throw new Error(`voice import failed: ${(r.stderr || '').trim().split('\n').slice(-3).join(' | ')}`);
     return JSON.parse(r.stdout.trim().split('\n').pop());
   }
-  if (flags.tts === 'none') return { engine: 'none', status: 'TTS disabled (--tts none)', lines: null };
-  const lines = [script.hook.words, ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
+  if (flags.tts === 'none' || script.demo) return { engine: 'none', status: 'no voice (demo)', lines: null };
+  const lines = [...(script.demo ? [] : [script.hook.words]), ...script.lines.map((l) => l.words)].map((ws) => ws.map((w) => w.spoken.join(' ')).join(' '));
   const req = { lines, voice: script.voice ?? ({ money: 'en-US-GuyNeural', space: 'en-US-AndrewNeural', history: 'en-GB-RyanNeural' })[script.channel], rate: style.pace.rate, outdir: workdir, engine: flags.tts };
   const r = spawnSync(py, [process.env.SHORTS_TTS_HELPER || 'tools/tts.py'], { input: JSON.stringify(req), encoding: 'utf8' });
   if (r.status !== 0) return { engine: 'none', status: `tts helper crashed: ${(r.stderr || '').trim().split('\n').pop()}`, lines: null };
@@ -158,7 +158,7 @@ for (const file of files) {
     const { segs, total } = buildSegments(script, style, voiced ? voice.lines : null);
     const words = segs.reduce((a, s) => a + s.words.length, 0);
     console.log(`  ${script.channel} | "${script.title}" | ${segs.length} scenes | ${words} words | ${total.toFixed(1)}s | look: ${describeStyle(style)}`);
-    if (total < MIN_LEN || total > MAX_LEN) {
+    if (!script.demo && (total < MIN_LEN || total > MAX_LEN)) {
       const msg = `length ${total.toFixed(1)}s is outside the ${MIN_LEN}-${MAX_LEN}s Shorts window (${total < MIN_LEN ? 'add' : 'cut'} ~${Math.round(Math.abs(total - 40) * 2.6)} words)`;
       if (!flags.anyLength) throw new Error(msg + ' - use --any-length to render anyway');
       console.log(`  ! ${msg}`);
@@ -166,10 +166,11 @@ for (const file of files) {
     if (flags.check) continue;
 
     const plan = {
-      channel: script.channel, title: script.title, handle: script.handle ?? HANDLES[script.channel], channelName: NAMES[script.channel],
+      channel: script.channel, title: script.title, handle: script.handle ?? HANDLES[script.channel], channelName: script.badge ?? NAMES[script.channel],
       fps: FPS, totalFrames: Math.round(total * FPS), style, segs, territories: script.territories, audio: null, bgVideo: null,
     };
     const { cues, impacts } = buildCues(plan);
+    plan.music = script.music; plan.bpm = script.bpm;
     plan.cues = cues; plan.impacts = flags.sfx ? impacts : impacts.filter((c) => false);
     if (voiced) mixVoice(segs, voice.lines, total, path.join(genDir, 'voice.wav'));
     if (flags.sfx) {
@@ -184,7 +185,8 @@ for (const file of files) {
 
     const planFile = path.join(buildDir, 'plan.json');
     const Comp = script.channel[0].toUpperCase() + script.channel.slice(1);
-    if (script.channel === 'space') {
+    const useManim = script.channel === 'space' && script.engine !== 'remotion';
+    if (useManim) {
       fs.writeFileSync(planFile, JSON.stringify(plan));
       // the Manim video only depends on the plan (minus audio paths) and the scene code: reuse it when unchanged
       const hash = createHash('sha1').update(JSON.stringify({ ...plan, audio: null, cues: null, impacts: null })).update(fs.readFileSync('manim/space_scene.py')).update(fs.readFileSync('manim/planets.py')).digest('hex');
@@ -231,7 +233,9 @@ for (const file of files) {
     }
 
     fs.mkdirSync(flags.out, { recursive: true });
-    const outMp4 = path.join(flags.out, `${script.channel}_${script.slug}.mp4`);
+    const outDir = script.demo ? path.join(flags.out, 'demos') : flags.out;
+    fs.mkdirSync(outDir, { recursive: true });
+    const outMp4 = path.join(outDir, `${script.channel}_${script.slug}.mp4`);
     const audioIn = audioFile ? ['-i', audioFile] : ['-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=stereo'];
     sh('ffmpeg', ['-y', '-loglevel', 'error', '-i', rawOut, ...audioIn, '-map', '0:v', '-map', '1:a', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-t', total.toFixed(3), '-movflags', '+faststart', outMp4]);
 
@@ -250,12 +254,14 @@ for (const file of files) {
     fs.writeFileSync(`${base}.srt`, srt.join('\n'));
     // upload text: title / description / hashtags / pinned comment (from the script's `youtube:` block, with sane fallbacks)
     const yt = script.youtube ?? {};
+    if (!script.demo) {
     const tags = (yt.tags ?? [script.channel === 'money' ? 'Money' : script.channel === 'space' ? 'Space' : 'History', 'Shorts']).map((t) => '#' + String(t).replace(/^#/, '').replace(/\s+/g, ''));
     if (!tags.some((t) => t.toLowerCase() === '#shorts')) tags.unshift('#Shorts');
     const ytTitle = yt.title ?? script.title;
     const ytDesc = yt.description ?? `${script.hook.words.map((w) => w.shown).join(' ')} ${script.lines.slice(0, 2).map((l) => l.words.map((w) => w.shown).join(' ')).join(' ')}`;
     fs.writeFileSync(`${base}.youtube.txt`, `TITLE (${ytTitle.length}/100)\n${ytTitle}\n\nDESCRIPTION\n${ytDesc.trim()}\n\n${tags.join(' ')}\n` + (yt.pinned_comment ? `\nPINNED COMMENT\n${yt.pinned_comment}\n` : ''));
     console.log(`  title: ${ytTitle}`);
+    }
     console.log(`  -> ${outMp4}  (${(fs.statSync(outMp4).size / 1e6).toFixed(1)} MB, ${voiced ? 'with voice' : 'no voice'}${flags.sfx ? ' + sound effects' : ''})`);
   } catch (e) {
     failures++;

@@ -1,0 +1,4 @@
+Demo 05 - Animated map: territory sweep
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Animated maps: a frontier sweeps over new land.

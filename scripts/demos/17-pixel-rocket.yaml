@@ -1,0 +1,12 @@
+# Same idea, other scene + palette: a rocket climbing through parallax stars on a 140 BPM beat.
+demo: true
+channel: space
+engine: remotion
+title: "Demo 17 - Pixel art: rocket"
+badge: "ANIMATION DEMO"
+music: chip
+bpm: 140
+lines:
+  - say: "Retro pixel scenes: rocket, parallax, chiptune."
+    hold: 7
+    visual: {type: pixel, scene: rocket, palette: gameboy, bpm: 140, res: 80, title: "LIFT OFF", lyrics: ["3 2 1", "LIFT OFF", "TO THE MOON", "AND BEYOND"]}

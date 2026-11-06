@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: history
+title: "Demo 08 - Stamped cards"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Cards stamped onto the screen, one by one."
+    hold: 6.0
+    visual: {type: stamps, title: "Rome answer", items: [{text: "Armed slaves", tag: "8,000"}, {text: "Paid no ransom", tag: "REFUSED"}, {text: "Never surrendered", tag: "NEVER"}]}

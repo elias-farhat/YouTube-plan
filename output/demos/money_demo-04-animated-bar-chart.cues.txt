@@ -1,0 +1,4 @@
+Demo 04 - Animated bar chart
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Bar charts grow one by one.

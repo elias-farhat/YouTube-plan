@@ -1,0 +1,4 @@
+Demo 11 - Manim: orbits
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Manim: orbiting planets and a vanishing Sun.

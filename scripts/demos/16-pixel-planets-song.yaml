@@ -1,0 +1,12 @@
+# Pixel art locked to a BPM: sun, planets, equalizer and typed lyrics all hit on the beat; chiptune generated to match.
+demo: true
+channel: space
+engine: remotion        # draw this one with Remotion (the pixel scene), not Manim
+title: "Demo 16 - Pixel art: planet song"
+badge: "ANIMATION DEMO"
+music: chip
+bpm: 120
+lines:
+  - say: "Pixel art locked to the beat, with lyrics."
+    hold: 8
+    visual: {type: pixel, scene: planets, palette: neon, bpm: 120, title: "PLANET SONG", lyrics: ["MERCURY IS HOT", "VENUS IS HOTTER", "EARTH IS HOME", "MARS IS RED"]}

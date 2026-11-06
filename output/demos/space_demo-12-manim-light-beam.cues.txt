@@ -1,0 +1,4 @@
+Demo 12 - Manim: light beam
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Manim: light racing across space with a live timer.

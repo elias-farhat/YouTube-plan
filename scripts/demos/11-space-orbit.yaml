@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: space
+title: "Demo 11 - Manim: orbits"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Manim: orbiting planets and a vanishing Sun."
+    hold: 6.0
+    visual: {type: orbit, vanish: true}

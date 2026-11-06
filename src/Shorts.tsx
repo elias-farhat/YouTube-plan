@@ -12,10 +12,12 @@ import {BarChart, LineChart} from './scenes/charts';
 import {MapScene} from './history/MapScene';
 import {Battle} from './history/Battle';
 import {Stamps} from './history/Stamps';
+import {Pixel} from './scenes/Pixel';
+import {Clip} from './scenes/Clip';
 
 loadFonts();
 
-const SCENES: Record<string, React.FC<SceneProps>> = {kinetic: Kinetic, stat: Stat, line: LineChart, bar: BarChart, map: MapScene, battle: Battle, stamps: Stamps};
+const SCENES: Record<string, React.FC<SceneProps>> = {kinetic: Kinetic, stat: Stat, line: LineChart, bar: BarChart, map: MapScene, battle: Battle, stamps: Stamps, pixel: Pixel, clip: Clip};
 
 /** Hook = the first ~2 s: the hook sentence as huge kinetic text, last row highlighted. */
 const hookRows = (shown: string) => {
@@ -35,7 +37,7 @@ const autoRows = (shown: string) => {
   return rows.slice(0, 4);
 };
 
-const SceneFor: React.FC<{seg: Seg; plan: Plan; dur: number}> = ({seg, plan, dur}) => {
+const SceneFor: React.FC<{seg: Seg; plan: Plan; dur: number; at: number}> = ({seg, plan, dur, at}) => {
   if (seg.isHook && !seg.visual) {
     const v = {type: 'kinetic', text: hookRows(seg.shown ?? seg.say)};
     return <Stage plan={plan}><Kinetic v={v} plan={plan} dur={dur} big /></Stage>;
@@ -43,7 +45,7 @@ const SceneFor: React.FC<{seg: Seg; plan: Plan; dur: number}> = ({seg, plan, dur
   const v = seg.visual ?? {type: 'kinetic', text: autoRows(seg.shown ?? seg.say)};
   const C = SCENES[v.type];
   if (!C) throw new Error(`no ${plan.channel} scene for visual type "${v.type}"`);
-  return <Stage plan={plan} v={v}><C v={v} plan={plan} dur={dur} /></Stage>;
+  return <Stage plan={plan} v={v}><C v={v} plan={plan} dur={dur} at={at} /></Stage>;
 };
 
 /** Text is measured (fitText) while rendering, so wait until the custom fonts are really loaded. */
@@ -59,7 +61,7 @@ const useFontsReady = () => {
 export const Shorts: React.FC<Plan> = (plan) => {
   const fontsReady = useFontsReady();
   const n = plan.style.pace.trans;
-  const space = plan.channel === 'space';
+  const space = !!plan.bgVideo;   // Manim draws the visuals itself
   if (!fontsReady) return null;
   return (
     <AbsoluteFill style={{background: plan.style.palette.bgTop}}>
@@ -75,7 +77,7 @@ export const Shorts: React.FC<Plan> = (plan) => {
           <Sequence key={seg.idx} from={from} durationInFrames={len} layout="none">
             <SceneShell plan={plan} from={from} length={len} first={i === 0} last={last}>
               {dark && <div style={{position: 'absolute', inset: -80, background: 'rgba(0,0,0,0.93)'}} />}
-              <SceneFor seg={seg} plan={plan} dur={len / plan.fps} />
+              <SceneFor seg={seg} plan={plan} dur={len / plan.fps} at={from / plan.fps} />
             </SceneShell>
           </Sequence>
         );

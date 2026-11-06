@@ -1,0 +1,4 @@
+Demo 16 - Pixel art: planet song
+Total 8.0s. Start each narration line at its time:
+
+[00:00.3]  Pixel art locked to the beat, with lyrics.

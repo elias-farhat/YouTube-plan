@@ -29,14 +29,14 @@ function mapTts(words, wt) {
  * The hook segment is held to ~2-2.6 s.
  */
 export function buildSegments(script, style, audio) {
-  const items = [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
+  const items = script.demo ? [...script.lines] : [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
   const td = style.pace.trans / FPS;
   const segs = [];
   let t = 0;
   items.forEach((it, i) => {
     const a = audio?.[i] ?? null;
     const tight = !!a?.tight; // imported voice already has natural pauses: add only the transition time
-    const lead = i === 0 ? 0.12 : td + (tight ? 0.03 : 0.1);
+    const lead = i === 0 ? (script.demo ? 0.35 : 0.12) : td + (tight ? 0.03 : 0.1);
     let spans = null, speech;
     if (a) { speech = a.duration; spans = mapTts(it.words, a.words); }
     if (!spans) {
@@ -46,6 +46,7 @@ export function buildSegments(script, style, audio) {
     }
     let tail = (tight ? 0.04 : style.pace.gap) + (i === items.length - 1 ? 0.55 : 0);
     let dur = lead + speech + tail;
+    if (it.hold) dur = Math.max(dur, it.hold);   // `hold: 6` -> this scene lasts at least 6 s
     if (it.isHook) dur = a ? Math.max(2.0, dur) : Math.min(2.6, Math.max(2.0, dur)); // the hook owns the first ~2 s
     const start = t, s0 = start + lead;
     segs.push({

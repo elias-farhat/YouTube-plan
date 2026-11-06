@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: space
+title: "Demo 13 - Manim: planet ladder"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Manim: a ladder of worlds, lit one by one."
+    hold: 6.0
+    visual: {type: ladder, title: "Sunlight travel time", items: [{name: Earth, label: "8.3 min"}, {name: Mars, label: "12.7 min"}, {name: Jupiter, label: "43 min"}, {name: Neptune, label: "4.2 hours"}], note: "Spacing not to scale"}

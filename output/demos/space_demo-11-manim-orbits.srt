@@ -1,0 +1,7 @@
+1
+00:00:00,350 --> 00:00:02,851
+Manim: orbiting planets and
+
+2
+00:00:02,851 --> 00:00:04,294
+a vanishing Sun.

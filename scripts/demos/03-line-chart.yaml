@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: money
+title: "Demo 03 - Animated line chart"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Animated line charts draw themselves."
+    hold: 6.0
+    visual: {type: line, title: "Your balance over 30 years", x: ["Today", "10 yrs", "20 yrs", "30 yrs"], y: [0, 1825, 3778, 5867, 8103, 10495, 13055, 15794, 18724, 21860, 25215, 28805, 32646, 36757, 41155, 45860, 50896, 56283, 62048, 68217, 74817, 81879, 89435, 97521, 106172, 115429, 125335, 135933, 147273, 159407, 172391], prefix: "$", color: gold}

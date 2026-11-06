@@ -1,0 +1,14 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: history
+title: "Demo 06 - Routes with icons"
+badge: "ANIMATION DEMO"
+territories:
+  - {year: 264 BC, countries: [Italy]}
+  - {year: 133 BC, countries: [Spain, Portugal, Tunisia, Greece, North Macedonia, Albania]}
+  - {year: 44 BC, countries: [France, Belgium, Switzerland, Slovenia, Croatia, Bosnia and Herz., Montenegro, Turkey, Cyprus, N. Cyprus, Syria, Lebanon, Israel, Palestine]}
+  - {year: 117 AD, countries: [Egypt, Libya, Algeria, Morocco, United Kingdom, Luxembourg, Austria, Hungary, Serbia, Kosovo, Romania, Bulgaria, Jordan, Iraq]}
+lines:
+  - say: "Routes with marching armies, icons and labels."
+    hold: 6.0
+    visual: {type: map, year: 218 BC, view: west_med, route: [Carthago Nova, Pyrenees, Alps, Po Valley, Cannae], icon: elephant, label: "Hannibal marches"}

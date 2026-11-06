@@ -56,6 +56,17 @@ const History: React.FC<{plan: Plan; g: number}> = ({plan, g}) => {
   );
 };
 
+const Stars: React.FC<{plan: Plan; g: number}> = ({plan, g}) => {
+  const p = plan.style.palette;
+  const r = rnd(plan.style.seed + 21);
+  const stars = React.useMemo(() => Array.from({length: 150}, () => ({x: r() * W, y: r() * H, s: [1, 1.5, 2, 3][Math.floor(r() * 4)], ph: r() * 6.28, v: 6 + r() * 30})), []);
+  return (
+    <svg width={W} height={H} style={{position: 'absolute', inset: 0}}>
+      {stars.map((s, i) => <circle key={i} cx={s.x} cy={(s.y + g * s.v) % H} r={s.s} fill={i % 7 === 0 ? p.accent : '#fff'} opacity={0.35 + 0.5 * (0.5 + 0.5 * Math.sin(g * 2 + s.ph))} />)}
+    </svg>
+  );
+};
+
 export const Background: React.FC<{plan: Plan}> = ({plan}) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -67,6 +78,7 @@ export const Background: React.FC<{plan: Plan}> = ({plan}) => {
       <AbsoluteFill style={{background: `radial-gradient(700px 700px at ${78 + drift / 20}% 18%, ${withAlpha(p.glow, 0.40)}, transparent 70%), radial-gradient(800px 800px at 10% 86%, ${withAlpha(p.glow, 0.24)}, transparent 70%)`}} />
       {plan.channel === 'money' && <Money plan={plan} g={g} />}
       {plan.channel === 'history' && <History plan={plan} g={g} />}
+      {plan.channel === 'space' && <Stars plan={plan} g={g} />}
     </AbsoluteFill>
   );
 };

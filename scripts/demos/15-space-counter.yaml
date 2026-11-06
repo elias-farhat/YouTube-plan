@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: space
+title: "Demo 15 - Manim: counters"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Manim: counters inside spinning rings."
+    hold: 6.0
+    visual: {type: counter, label: "Speed of light", from: 0, to: 299792, suffix: " km/s", sub: "seven laps around Earth every second"}

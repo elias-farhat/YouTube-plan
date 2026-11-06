@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: money
+title: "Demo 01 - Kinetic text"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Kinetic text: words slam in, the screen shakes."
+    hold: 6.0
+    visual: {type: kinetic, text: ["Words *slam* in", "with real *impact*", "on every beat"]}

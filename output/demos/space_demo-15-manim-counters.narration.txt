@@ -1,0 +1,3 @@
+Demo 15 - Manim: counters
+
+Manim: counters inside spinning rings.

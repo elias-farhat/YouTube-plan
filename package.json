@@ -9,7 +9,8 @@
     "render": "node tools/render.mjs",
     "check": "node tools/render.mjs all --check",
     "studio": "remotion studio src/index.ts",
-    "test": "node --test tests/pipeline.test.mjs"
+    "test": "node --test tests/pipeline.test.mjs",
+    "render3d": "node tools/render3d.mjs"
   },
   "dependencies": {
     "@remotion/bundler": "^4.0.541",

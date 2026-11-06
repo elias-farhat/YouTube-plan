@@ -1,0 +1,3 @@
+Demo 08 - Stamped cards
+
+Cards stamped onto the screen, one by one.

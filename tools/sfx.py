@@ -214,6 +214,51 @@ def bed(channel, d, seed, rng):
     return x * 0.5
 
 
+def square(freq, d, duty=0.5):
+    t = t_axis(d)
+    return np.where((t * freq) % 1.0 < duty, 1.0, -1.0)
+
+
+def chip_bed(d, bpm, seed, rng):
+    """8-bit style loop locked to `bpm`: kick on 1 & 3, snare on 2 & 4, 8th hats, square bass, arpeggiated square lead.
+    The beat grid starts at t=0, so a pixel scene that uses the same bpm and absolute time lands on the kicks."""
+    n = int(d * SR)
+    out = np.zeros(n)
+    beat = 60.0 / bpm
+    root = 110.0 * 2 ** ((seed % 5) / 12)          # A2-ish, key varies per video
+    pent = [0, 3, 5, 7, 10, 12, 15, 12, 10, 7, 5, 3]  # minor pentatonic walk
+    prog = [0, 0, 5, 3]                              # bass root per bar (semitones)
+    def add(sig, t0, gain):
+        i = int(t0 * SR)
+        m = min(len(sig), n - i)
+        if i >= 0 and m > 0:
+            out[i:i + m] += sig[:m] * gain
+    nb = int(d / beat) + 1
+    for b in range(nb):
+        t0 = b * beat
+        bar, pos = divmod(b, 4)
+        if pos in (0, 2):
+            add(sound("thud", rng) * 1.1, t0, 0.9)                                # kick
+        if pos in (1, 3):
+            sn = hp(rng.standard_normal(int(0.16 * SR)), 1500) * env_exp(int(0.16 * SR), 0.05)
+            add(sn / (np.max(np.abs(sn)) + 1e-9), t0, 0.5)                          # snare
+        for h in range(2):                                                          # 8th hats
+            th = t0 + h * beat / 2
+            ht = hp(rng.standard_normal(int(0.04 * SR)), 6000) * env_exp(int(0.04 * SR), 0.01)
+            add(ht / (np.max(np.abs(ht)) + 1e-9), th, 0.22 if h == 0 else 0.14)
+            # square bass on the 8ths
+            bf = root * 2 ** (prog[bar % 4] / 12) * (1 if (b * 2 + h) % 4 != 3 else 1.5)
+            bn = square(bf, beat / 2 * 0.9, 0.5) * env_exp(int(beat / 2 * 0.9 * SR), 0.18)
+            add(bn, th, 0.32)
+        for q in range(4):                                                          # 16th-note arpeggio (lead)
+            tq = t0 + q * beat / 4
+            deg = pent[(bar * 4 + pos * 2 + q) % len(pent)] + prog[bar % 4]
+            ln = square(root * 4 * 2 ** (deg / 12), beat / 4 * 0.85, 0.25) * env_exp(int(beat / 4 * 0.85 * SR), 0.09)
+            add(ln, tq, 0.16)
+    out = np.round(out * 7) / 7                                                      # bit-crush: 8-bit feel
+    return out * 0.55
+
+
 def speech_duck(plan, n):
     """gain curve for the bed: lower while someone is speaking"""
     g = np.ones(n)
@@ -235,9 +280,12 @@ def main():
     rng = np.random.default_rng(plan["style"]["seed"] & 0xFFFFFFFF)
     mix = np.zeros(n)
     if use_bed:
-        b = bed(plan["channel"], total + 0.5, plan["style"]["seed"], rng)
+        if plan.get("music") == "chip":
+            b = chip_bed(total + 0.5, plan.get("bpm") or 120, plan["style"]["seed"], rng)
+        else:
+            b = bed(plan["channel"], total + 0.5, plan["style"]["seed"], rng)
         g = speech_duck(plan, len(b))
-        mix[: len(b)] += b * g * 0.55
+        mix[: len(b)] += b * g * (1.0 if plan.get("music") == "chip" else 0.55)
     for c in plan.get("cues", []):
         s = sound(c["name"], np.random.default_rng(zlib.crc32(f"{c['name']}{c['t']:.2f}".encode())), c.get("dur"), c.get("f"))
         i = int(max(0, c["t"]) * SR)

@@ -1,0 +1,3 @@
+Demo 05 - Animated map: territory sweep
+
+Animated maps: a frontier sweeps over new land.

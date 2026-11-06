@@ -1,0 +1,3 @@
+Demo 12 - Manim: light beam
+
+Manim: light racing across space with a live timer.

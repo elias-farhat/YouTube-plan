@@ -1,0 +1,3 @@
+Demo 04 - Animated bar chart
+
+Bar charts grow one by one.

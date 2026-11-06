@@ -1,0 +1,4 @@
+Demo 17 - Pixel art: rocket
+Total 7.0s. Start each narration line at its time:
+
+[00:00.3]  Retro pixel scenes: rocket, parallax, chiptune.

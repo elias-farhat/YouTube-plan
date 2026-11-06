@@ -1,0 +1,4 @@
+Demo 08 - Stamped cards
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Cards stamped onto the screen, one by one.

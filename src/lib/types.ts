@@ -21,6 +21,7 @@ export type Plan = {
   fps: number; totalFrames: number; style: Style; segs: Seg[];
   territories: {year: number; countries: string[]}[];
   audio?: string | null; bgVideo?: string | null;
+  bpm?: number | null; music?: string | null;
   impacts?: {t: number; amp: number}[];   // sound hits -> camera shake + flash
 };
 export const W = 1080;

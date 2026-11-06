@@ -74,6 +74,23 @@ territories:
 
 A scene with `year: 133 BC` shows earlier territory solid, and the countries gained in 133 BC are conquered by a dashed frontier ring sweeping out from the heart of the empire (the borders of the new land "march" with moving dashes). `route` draws a curved, dashed, animated path with an arrowhead and waypoint chips. Places are built-in names (Rome, Carthage, Athens, Alexandria, Alps, ...) or `"Name@lat,lon"`. Presets for `view`: `italy med empire west_med east_med europe wide`.
 
+### More scene types
+
+| type | what | fields |
+|---|---|---|
+| `pixel` | retro pixel art on a tiny canvas, **locked to a BPM** (sun/planets pulse, equalizer, typed lyrics, 1 px screen kick) | `scene: planets\|rocket`, `res: 96` (canvas width in pixels; smaller = chunkier), `palette: neon\|gameboy\|pico8\|sunset`, `bpm`, `lyrics: [one per bar]`, `title`. Works in every channel. For a song feel add `music: chip` and `bpm:` at the top of the script: a chiptune (kick, snare, hats, square bass + arpeggio) is generated on the same beat grid |
+| `clip` | any pre-rendered video as a scene (Blender renders, footage) | `src: "gen/blender/earth.mp4"` (inside `public/`), `full: true` for full-frame |
+
+`engine: remotion` on a space script draws it with Remotion instead of Manim (needed for `pixel` / `clip` in the space channel).
+
+### 3D with Blender
+
+`npm run render3d` renders `blender/earth3d.py` with Blender's Python module (`pip install bpy`, ~400 MB, no GPU needed: Cycles on the CPU) into `public/gen/blender/earth.mp4`. That scene is a lit Earth (continents, clouds, atmosphere, night side) with an orbiting Moon, stars and a slow push-in; everything is procedural, no image files. It takes about 15 minutes for 6 s at 540x960 (upscaled to 1080x1920); `-- --width 1080 --height 1920 --samples 24` is cleaner and slower. Use it in a script with `{type: clip, src: "gen/blender/earth.mp4", full: true}`. New 3D scenes = new `blender/*.py` files.
+
+### Showcase
+
+`npm run render demos` renders one 6-8 s example of every animation type from `scripts/demos/*.yaml` into `output/demos/`. A demo script has `demo: true` (no hook scene, no 30-50 s rule) and `hold: 6` per line.
+
 ### Hook and peak
 
 `hook` is the first ~2 s. By default it becomes giant kinetic text; give it a visual with `hook_visual:` (e.g. a counting number) and the spoken hook is captioned as usual. A line can carry `sfx: [riser]` (a tension build that ends where the line starts), `boom`, `hit`, `stamp` or `sting`. Put the riser on the line *before the peak* and `kinetic: {dark: true}` on the peak itself.

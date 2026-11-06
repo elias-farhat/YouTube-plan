@@ -1,0 +1,4 @@
+Demo 09 - Map effects: fire and battle
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Map effects: fire, smoke and battle markers.

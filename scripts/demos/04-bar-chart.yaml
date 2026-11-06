@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: money
+title: "Demo 04 - Animated bar chart"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Bar charts grow one by one."
+    hold: 6.0
+    visual: {type: bar, title: "Money after 10, 20 and 30 years", x: ["10 years", "20 years", "30 years"], y: [25215, 74817, 172391], prefix: "$", highlight: [2]}

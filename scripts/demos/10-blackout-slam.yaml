@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: history
+title: "Demo 10 - Black-out slam"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "The black-out slam for your big moment."
+    hold: 6.0
+    visual: {type: kinetic, dark: true, text: ["*NO.*"]}

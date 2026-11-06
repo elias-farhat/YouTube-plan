@@ -5,7 +5,7 @@ import {Plan, Visual} from '../lib/types';
 import {SANS, SERIF, fontFor} from '../lib/fonts';
 import {bounceOut, clamp01, easeOut, easeOutBack, easeOutExpo, fmtNum, lerp, parseMarkup, seg, withAlpha} from '../lib/anim';
 
-export type SceneProps = {v: Visual; plan: Plan; dur: number};
+export type SceneProps = {v: Visual; plan: Plan; dur: number; at?: number};  // at = absolute time (s) the scene starts, for beat sync
 
 /** Absolutely positioned stage rectangle (+ optional footnote under it). */
 export const Stage: React.FC<{plan: Plan; v?: Visual; children: React.ReactNode}> = ({plan, v, children}) => {

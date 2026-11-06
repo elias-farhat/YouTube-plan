@@ -1,0 +1,4 @@
+Demo 14 - Manim: scale comparison
+Total 6.0s. Start each narration line at its time:
+
+[00:00.3]  Manim: scale comparisons that make sense.

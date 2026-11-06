@@ -1,0 +1,3 @@
+Demo 09 - Map effects: fire and battle
+
+Map effects: fire, smoke and battle markers.

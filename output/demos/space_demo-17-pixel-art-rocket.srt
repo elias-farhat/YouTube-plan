@@ -1,0 +1,7 @@
+1
+00:00:00,350 --> 00:00:01,926
+Retro pixel scenes:
+
+2
+00:00:01,926 --> 00:00:03,919
+rocket, parallax, chiptune.

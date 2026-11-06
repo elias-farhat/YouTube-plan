@@ -1,0 +1,9 @@
+# Animation showcase: one ~6 s example.  Render all of them with:  npm run render demos
+demo: true
+channel: money
+title: "Demo 02 - Count-up numbers"
+badge: "ANIMATION DEMO"
+lines:
+  - say: "Count-up numbers that land with a hit."
+    hold: 6.0
+    visual: {type: stat, label: "Balance after 30 years", from: 0, to: 172391, prefix: "$", trend: up, impact: true, sub: "ticks, then slams"}
