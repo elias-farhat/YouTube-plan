@@ -6,6 +6,8 @@ hook_visual: {type: pixel, scene: star}
 engine: remotion
 chrome: minimal
 music: chip
+song: epic
+blip: robot
 bpm: 120
 pixel: {full: true, bits: 32, palette: neon, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}

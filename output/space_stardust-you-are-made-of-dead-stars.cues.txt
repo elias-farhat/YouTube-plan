@@ -1,11 +1,11 @@
 Stardust, You Are Made of Dead Stars
-Total 48.0s. Start each narration line at its time:
+Total 34.0s. Start each narration line at its time:
 
-[00:00.5]  
-[00:06.5]  
+[00:00.1]  
+[00:04.5]  
+[00:08.5]  
 [00:12.5]  
 [00:18.5]  
+[00:22.5]  
 [00:26.5]  
 [00:30.5]  
-[00:36.5]  
-[00:42.5]  

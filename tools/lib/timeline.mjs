@@ -77,15 +77,15 @@ function autoMood(it, i, n) {
 }
 
 export function buildBitsSegments(script, style, bpm = 120) {
-  const beat = 60 / bpm, bar = beat * 4, charT = beat / 4;
+  const beat = 60 / bpm, bar = beat * 4, charT = 1 / (script.talk ?? 14);   // `talk:` = letters per second
   const items = script.demo ? [...script.lines] : [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
   const segs = [];
   let t = 0;
   items.forEach((it, i) => {
     const text = it.words.map((w) => w.shown).join(' ').toUpperCase();
     const fast = !!it.isHook;                                   // the hook types twice as fast and starts at once: it must land inside 3 s
-    const cT = fast ? charT / 2 : charT, typeStart = fast ? 0.15 : beat, typeDur = text.length * cT;
-    const need = typeStart + typeDur + (i === items.length - 1 ? 2.2 : 1.5);
+    const cT = fast ? charT / 1.5 : charT, typeStart = fast ? 0.15 : beat, typeDur = text.length * cT;
+    const need = typeStart + typeDur + (i === items.length - 1 ? 2.0 : 1.2);
     let dur = Math.ceil(need / bar - 1e-6) * bar;
     if (it.hold) dur = Math.max(dur, Math.ceil(it.hold / bar - 1e-6) * bar);
     const start = t;

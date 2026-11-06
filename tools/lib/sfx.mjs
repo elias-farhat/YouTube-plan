@@ -15,7 +15,7 @@ export function buildCues(plan) {
     const enter = i === 0 ? 0 : space ? start + n / FPS : (s.startFrame + h) / FPS;
     if (i > 0) add(start + 0.02, 'whoosh', 0.32);
     const v = s.visual;
-    if (s.bits) { [...s.bits.text].forEach((ch, k) => { if (ch !== ' ') add(s.bits.start + k * s.bits.charT, 'blip', 0.22, { f: 440 + (ch.charCodeAt(0) % 9) * 48 }); }); }
+    if (s.bits) { [...s.bits.text].forEach((ch, k) => { if (ch !== ' ') add(s.bits.start + k * s.bits.charT, 'blip', 0.22, { f: 440 + (ch.charCodeAt(0) % 9) * 48, voice: plan.blip ?? 'retro' }); }); }
     if (s.isHook && !v) {
       const words = (s.shown ?? s.say).split(/\s+/).length;
       const rows = Math.min(3, Math.max(1, Math.round(words / 2.4)));

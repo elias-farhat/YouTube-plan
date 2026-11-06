@@ -100,7 +100,7 @@ A scene with `year: 133 BC` shows earlier territory solid, and the countries gai
 General "how does it work?" videos (lightning, plants, devices...). Same `mode: bits` format, Dr. Bit speaks. The retention recipe baked into the scripts:
 
 1. **Hook in under 3 s**: one shocking, true fact (`hook:` is typed twice as fast and starts on frame 1) with a visual hit on frame 1.
-2. **Open loop** on the first or second line ("STAY FOR THE TWIST").
+2. **Open loop** on the first or second line (a question or gap the next lines answer; never announce it).
 3. **A new visual every 6 s** (one scene per line, whole bars), so nothing sits still.
 4. **Peak = the twist** (`mood: aha`, riser, boom/shake).
 5. **Payoff that calls back the hook**, then a useful bonus line.

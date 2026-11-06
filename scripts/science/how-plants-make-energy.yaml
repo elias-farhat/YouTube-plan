@@ -8,6 +8,9 @@ hook_mood: shock
 engine: remotion
 chrome: minimal
 music: chip
+song: sunny
+blip: bubble
+talk: 14
 bpm: 120
 pixel: {full: true, bits: 32, palette: day, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}
@@ -20,7 +23,7 @@ youtube:
   tags: [Science, Photosynthesis, Plants, Biology, HowItWorks, DrBit, PixelArt]
   pinned_comment: "Did you know the oxygen comes from water? Tell me what to explain next."
 lines:
-  - say: "LIGHT HITS. STAY FOR THE TWIST."
+  - say: "IT EATS LIGHT. BUT WHERE'S THE FOOD?"
     mood: talk
     visual: {type: pixel, scene: plant, phase: sunleaf}
   - say: "WATER RISES FROM THE ROOTS."

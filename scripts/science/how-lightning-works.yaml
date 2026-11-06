@@ -1,5 +1,5 @@
 # SCIENCE with DR. BIT (no narration).  Format that keeps people watching:
-#   HOOK in <3 s (a shocking fact, typed fast + a bolt on frame 1)  ->  open loop ("stay for the twist")  ->  one new visual every 6 s
+#   HOOK in <3 s (a shocking fact, typed fast + a bolt on frame 1)  ->  open loop (a question the next lines answer)  ->  one new visual every 6 s
 #   ->  PEAK = the twist (the flash goes UP)  ->  payoff that calls back the hook (30,000 degrees = 5x the Sun)  ->  useful bonus tip.
 title: How Lightning Works
 channel: science
@@ -10,6 +10,9 @@ hook_mood: shock
 engine: remotion
 chrome: minimal
 music: chip
+song: storm
+blip: zap
+talk: 14
 bpm: 120
 pixel: {full: true, bits: 32, palette: storm, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}
@@ -24,7 +27,7 @@ youtube:
   tags: [Science, Lightning, Physics, HowItWorks, Weather, DrBit, PixelArt]
   pinned_comment: "Did you know the flash goes UP? Tell me what to explain next."
 lines:
-  - say: "ICE CRASHES. STAY FOR THE TWIST."
+  - say: "IT ALL STARTS WITH TINY ICE."
     mood: talk
     visual: {type: pixel, scene: storm, phase: ice}
   - say: "IT SPLITS CHARGE: + UP, - DOWN."

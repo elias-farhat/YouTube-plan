@@ -7,6 +7,8 @@ hook_visual: {type: pixel, scene: pulsar}
 engine: remotion
 chrome: minimal
 music: chip
+song: mystery
+blip: bell
 bpm: 120
 pixel: {full: true, bits: 32, palette: pulsar, bpm: 120}
 style: {layout: C, pacing: snappy, transition: fade}
