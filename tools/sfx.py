@@ -475,10 +475,12 @@ def main():
     fr = np.array([np.sqrt((mix[i * hop:(i + 1) * hop] ** 2).mean() + 1e-12) for i in range(len(mix) // hop)])
     cur = float(np.mean(20 * np.log10(fr + 1e-6)))
     if not voice:
-        mix *= float(np.clip(10 ** ((-15.5 - cur) / 20), 0.5, 3.0))
+        gain = float(np.clip(10 ** ((-18.4 - cur) / 20), 0.05, 3.0)); print(f"[sfx] mean {cur:.1f} dB gain {gain:.2f}", file=sys.stderr); mix *= gain
     # gentle master limiter
     peak = np.max(np.abs(mix)) + 1e-9
-    if peak > 0.95:
+    if not voice:
+        mix = np.tanh(mix) * 0.98          # soft clip: keeps the loudness set above (no peak re-normalising)
+    elif peak > 0.95:
         mix = np.tanh(mix / peak * 1.2) / np.tanh(1.2) * 0.95
     st = np.stack([mix, mix], 1)
     import wave

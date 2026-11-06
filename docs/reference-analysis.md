@@ -48,3 +48,20 @@ New findings
 5. The dominant-frequency track of the hearing tone could not be measured reliably (the music masks the sine), so no sweep schedule is claimed.
 
 Applied: the loop outro now restarts the opening scene in its START state (loop error 49-57 -> 4.4-4.9).
+
+# Ours vs references, same script (tools: frame diff at 30 fps on 90x160 gray, 22 kHz audio)
+
+| Metric | References avg / median | Ours before | Ours after avg / median |
+|---|---|---|---|
+| Loop: first vs last frame (lower = seamless) | 3.90 / 2.11 | 8.22 | **0.28 / 0.28** |
+| Beat-locked changes (own tempo grid) | 0.65 / 0.79 | 0.70 (150 BPM videos mis-measured on a 15f grid) | **0.94 / 1.00** |
+| Beat clarity (autocorrelation) | 0.71 / 0.73 | 0.50 | 0.65 / 0.67 |
+| Average loudness (dBFS) | -16.4 / -15.0 | -18.8 | -15.8 / -15.8 |
+| Start vs end loudness jump (dB) | 2.73 / 3.54 | 4.21 | 3.09 / 2.49 |
+| Motion per frame | 5.27 / 3.42 | 2.25 | 2.71 / 2.75 |
+| Motion in first 3 s | 4.38 / 1.97 | 3.39 | 3.93 / 2.83 |
+| Visual changes per second | 0.60 / 0.66 | 1.20 | 1.63 / 1.80 |
+| Energy below 150 Hz | 0.37 / 0.20 | 0.59 | 0.68 / 0.68 |
+| Colours per frame | 869 / 681 | 959 | 974 / 1050 |
+
+Open gaps: motion (mean 2.71 vs 5.27; the reference mean is lifted by the two scrolling/zooming videos at 11.3 and 11.7, the median gap is 2.75 vs 3.42), beat clarity (0.65 vs 0.71), sky video start/end loudness jump (8.8 dB).
