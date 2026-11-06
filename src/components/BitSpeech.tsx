@@ -63,7 +63,7 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     for (let y = 2; y < CH; y++) for (let x = 0; x < CHAR_W; x++) { const d = Math.hypot((x - 25) / 25, (y - 36) / 32); if (d < 1 && (1 - d) * 1.1 > ((x * 7 + y * 13) % 16) / 16 * 0.9) { ctx.fillStyle = 'rgba(10,8,34,0.62)'; ctx.fillRect(x, y, 1, 1); } }
     const SK = '#f2c9a3', SKd = '#d4a27a', HR = '#f6f6ff', HRd = '#b9bddf', COAT = '#f4f6ff', COATd = '#cdd3ee', LN = '#1a1d3a', TEAL = '#2ec4b6', TIE = '#ff4fa3', GL = '#bfeaff';
     const shock = mood === 'shock', worried = mood === 'worried', aha = mood === 'aha', happy = mood === 'happy';
-    const bob = phase < 0.18 ? -1 : 0;
+    const bob = plan.outfit === 'astronaut' ? Math.round(Math.sin(t * 1.7) * 2) : plan.outfit === 'diver' ? Math.round(Math.sin(t * 1.2) * 1.5) : phase < 0.18 ? -1 : 0;   // space/sea: float instead of bounce
     const jit = shock ? Math.round((hash(frame) - 0.5) * 2) : 0;
     const ox = 5 + jit, oy = 12 + bob + (shock ? Math.round((hash(frame + 9) - 0.5) * 2) : 0);
     const P = (x: number, y: number, w: number, h: number, c: string) => R(ox + x, oy + y, w, h, c);
@@ -108,6 +108,35 @@ export const BitSpeech: React.FC<{plan: Plan}> = ({plan}) => {
     // bow tie on top of the shirt
     P(12, 33, 4, 3, TIE); P(18, 33, 4, 3, TIE); P(15, 33, 3, 3, '#c02f78');
 
+    // ---- outfit: costume + ambient effects so Dr. Bit lives inside the scene (diver, astronaut, storm, gardener, hardhat)
+    const outfit = plan.outfit ?? 'lab';
+    const bowl = (rim: string, glass: string, shine: string) => {                    // glass helmet over the whole head
+      for (let y = -2; y <= 33; y++) for (let x = -1; x <= 35; x++) { const d = Math.hypot((x - 17) / 18.5, (y - 15) / 19); if (d <= 1) { if (d > 0.9) Q(x, y, rim); else Q(x, y, glass); } }
+      for (let k = 0; k < 6; k++) { Q(5 + k, 4 + k * 0, shine); } for (let k = 0; k < 5; k++) { Q(4, 8 + k, shine); }
+    };
+    if (outfit === 'diver') {
+      P(5, 31, 24, 5, '#b9792f'); P(5, 31, 24, 1, '#e8b25a'); P(5, 35, 24, 1, '#7a4a18'); for (let k = 0; k < 5; k++) Q(8 + k * 5, 33, '#ffe9a8');
+      bowl('#c98a3a', 'rgba(110,210,255,0.30)', '#e8fbff');
+      line(ox + 31, oy + 33, ox + 40, oy + 20, '#1a2a3a', 2);
+      for (let i = 0; i < 6; i++) { const q = ((t * 5 + i * 1.7) % 10) / 10; const bx2 = 36 + Math.sin(t * 3 + i * 2) * 3 + i % 3, by4 = 18 - q * 30; if (by4 > -oy) { ring(ox + bx2, oy + by4, 1 + (i % 2), '#d8f6ff'); } }
+    } else if (outfit === 'astronaut') {
+      P(6, 33, 22, 4, '#9aa4c4'); P(6, 33, 22, 1, '#ffffff'); P(10, 39, 14, 10, '#eef1fb'); P(10, 39, 14, 1, '#ffffff');
+      P(12, 41, 3, 2, '#ff4a4a'); P(16, 41, 3, 2, '#4aa8ff'); P(20, 41, 3, 2, '#5cff9c'); P(11, 46, 12, 1, '#9aa4c4');
+      bowl('#e6eaf8', 'rgba(255,190,60,0.16)', '#ffffff');
+      for (let i = 0; i < 7; i++) { const sx = Math.round(hash(i + 3) * 36) - 1, sy = Math.round(hash(i + 11) * 52) - 6; if (((frame + i * 7) % 24) < 14) Q(sx, sy, '#ffffff'); }
+    } else if (outfit === 'storm') {
+      P(4, 35, 26, 18, '#ffcf2e'); P(26, 36, 4, 17, '#e0a800'); P(4, 35, 26, 1, '#fff0a0'); P(16, 36, 2, 17, '#c98f00'); for (let k = 0; k < 3; k++) P(15, 38 + k * 5, 4, 2, '#7a5600');
+      P(3, 3, 28, 6, '#ffcf2e'); P(1, 8, 32, 3, '#e0a800'); P(3, 3, 28, 1, '#fff0a0');
+      for (let i = 0; i < 14; i++) { const rx = Math.round(hash(i + 1) * 40), ry = ((frame * 3 + i * 11) % 66) - 4; line(rx, ry, rx - 1, ry + 3, '#9fd8ff', 1); }
+    } else if (outfit === 'gardener') {
+      P(8, 38, 18, 15, '#3fae5a'); P(8, 38, 18, 1, '#6fe08a'); P(12, 44, 10, 5, '#2f8a46'); P(11, 36, 2, 3, '#3fae5a'); P(21, 36, 2, 3, '#3fae5a');
+      P(-3, 6, 40, 3, '#e8c36a'); P(-3, 8, 40, 1, '#b8913a'); P(7, -2, 20, 9, '#f0d27a'); P(7, 4, 20, 2, '#d33f49'); P(12, -4, 1, 3, '#f0d27a');
+      for (let i = 0; i < 4; i++) { const lx2 = ((t * 6 + i * 9) % 40) - 2, ly = 6 + ((i * 17) % 40) + Math.sin(t * 2 + i) * 2; P(lx2, ly, 2, 1, '#6fe08a'); Q(lx2 + 2, ly - 1, '#3fae5a'); }
+    } else if (outfit === 'hardhat') {
+      P(7, 40, 3, 13, '#ff8a1f'); P(24, 40, 3, 13, '#ff8a1f'); P(5, 35, 24, 3, '#ff8a1f');
+      P(5, 0, 24, 9, '#ffc400'); P(4, 7, 26, 3, '#e0a800'); P(5, 0, 24, 1, '#fff0a0'); P(15, -2, 4, 3, '#ffc400'); P(14, 2, 6, 4, '#ffffff'); P(15, 3, 4, 2, '#fff7a0');
+      if (phase < 0.6) for (let k = 0; k < 4; k++) Q(17 + k * 2, 6 + k * 0, 'rgba(255,255,160,0.8)');
+    }
     // arms: the gesturing arm (screen left) and the flask arm (screen right)
     const arm = (sx: number, sy: number, hx: number, hy: number) => { line(ox + sx, oy + sy, ox + hx, oy + hy, COAT, 4); line(ox + sx + 3, oy + sy + 1, ox + hx + 3, oy + hy + 1, COATd, 1); P(hx - 1, hy - 2, 4, 3, SK); };
     if (shock) arm(4, 38, -1, 20); else if (aha) { arm(4, 38, 1, 14); P(1, 10, 2, 4, SK); } else if (happy) arm(4, 38, -2 + Math.round(Math.sin(beats * 3) * 2), 24); else arm(4, 39, -1, 30 - (talking ? 2 : 0) - (phase < 0.2 ? 2 : 0));

@@ -1,11 +1,12 @@
 How Lightning Works
-Total 34.0s. Start each narration line at its time:
+Total 35.0s. Start each narration line at its time:
 
 [00:00.1]  
-[00:04.5]  
-[00:08.5]  
-[00:12.5]  
-[00:16.5]  
-[00:20.5]  
-[00:24.5]  
-[00:28.5]  
+[00:03.5]  
+[00:07.5]  
+[00:11.5]  
+[00:15.5]  
+[00:19.5]  
+[00:23.5]  
+[00:27.5]  
+[00:31.1]  

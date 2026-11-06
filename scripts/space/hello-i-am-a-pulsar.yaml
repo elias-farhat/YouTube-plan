@@ -8,6 +8,7 @@ engine: remotion
 chrome: minimal
 music: chip
 song: mystery
+outfit: astronaut
 blip: bell
 bpm: 120
 pixel: {full: true, bits: 32, palette: pulsar, bpm: 120}

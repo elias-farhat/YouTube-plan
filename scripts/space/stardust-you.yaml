@@ -7,6 +7,7 @@ engine: remotion
 chrome: minimal
 music: chip
 song: epic
+outfit: astronaut
 blip: robot
 bpm: 120
 pixel: {full: true, bits: 32, palette: neon, bpm: 120}

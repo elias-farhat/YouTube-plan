@@ -1,11 +1,12 @@
 How Plants Make Energy
-Total 36.0s. Start each narration line at its time:
+Total 35.0s. Start each narration line at its time:
 
 [00:00.1]  
-[00:04.5]  
-[00:10.5]  
-[00:14.5]  
-[00:18.5]  
-[00:22.5]  
-[00:26.5]  
-[00:30.5]  
+[00:03.5]  
+[00:07.5]  
+[00:11.5]  
+[00:15.5]  
+[00:19.5]  
+[00:23.5]  
+[00:27.5]  
+[00:31.1]  

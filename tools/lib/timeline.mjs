@@ -77,7 +77,7 @@ function autoMood(it, i, n) {
 }
 
 export function buildBitsSegments(script, style, bpm = 120) {
-  const beat = 60 / bpm, bar = beat * 4, charT = 1 / (script.talk ?? 14);   // `talk:` = letters per second
+  const beat = 60 / bpm, quick = script.pace === 'quick', bar = quick ? beat * 2 : beat * 4, charT = 1 / (script.talk ?? 14);   // `talk:` = letters per second
   const items = script.demo ? [...script.lines] : [{ ...script.hook, visual: script.hookVisual ?? null, isHook: true }, ...script.lines];
   const segs = [];
   let t = 0;
@@ -85,7 +85,7 @@ export function buildBitsSegments(script, style, bpm = 120) {
     const text = it.words.map((w) => w.shown).join(' ').toUpperCase();
     const fast = !!it.isHook;                                   // the hook types twice as fast and starts at once: it must land inside 3 s
     const cT = fast ? charT / 1.5 : charT, typeStart = fast ? 0.15 : beat, typeDur = text.length * cT;
-    const need = typeStart + typeDur + (i === items.length - 1 ? 2.0 : 1.2);
+    const need = typeStart + typeDur + (i === items.length - 1 && !script.outro ? 2.0 : quick ? 0.8 : 1.2);
     let dur = Math.ceil(need / bar - 1e-6) * bar;
     if (it.hold) dur = Math.max(dur, Math.ceil(it.hold / bar - 1e-6) * bar);
     const start = t;
@@ -97,6 +97,19 @@ export function buildBitsSegments(script, style, bpm = 120) {
     });
     t += dur;
   });
+  // Loop ending (measured on the reference videos: last frame ~ first frame, audio level equal at both ends, nothing fades):
+  // Dr. Bit says a closing line over the OPENING scene, so the video ends where it began and the replay is seamless.
+  if (script.outro) {
+    const text = String(script.outro).toUpperCase(), typeStart = 0.15, typeDur = text.length * charT;
+    const dur = Math.ceil((typeStart + typeDur + 1.4) / bar - 1e-6) * bar, start = t, first = items[0];
+    segs.push({
+      idx: items.length, isHook: false, isOutro: true, sfx: [], say: text, shown: text, visual: first.visual,
+      startFrame: Math.round(start * FPS), endFrame: Math.round((start + dur) * FPS),
+      speechStart: start + typeStart, speechEnd: start + typeStart + typeDur, words: [],
+      bits: { text, start: start + typeStart, charT }, mood: 'happy',
+    });
+    t += dur;
+  }
   segs.forEach((s, i) => { if (i < segs.length - 1) s.endFrame = segs[i + 1].startFrame; });
   return { segs, total: t };
 }

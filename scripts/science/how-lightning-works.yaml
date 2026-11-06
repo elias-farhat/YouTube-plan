@@ -11,6 +11,9 @@ engine: remotion
 chrome: minimal
 music: chip
 song: storm
+outfit: storm
+pace: quick
+outro: "NEXT STORM, COUNT THE SECONDS."
 blip: zap
 talk: 14
 bpm: 120
